@@ -37,7 +37,8 @@ namespace MCLevelEdit.DataModel
         public void AddEntity(Entity entity)
         {
             //TODO: Validation needed, this assumes for the moment that more than 1 entity can be on one square
-            this.Entities.Add(entity);
+            if (this.Entities.Count < Globals.MAX_ENTITIES)
+                this.Entities.Add(entity);
         }
 
         public void RemoveEntity(Entity entity)

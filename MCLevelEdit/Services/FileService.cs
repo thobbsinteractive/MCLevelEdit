@@ -40,7 +40,7 @@ namespace MCLevelEdit.Services
 
             int fpos = 1090; // Move on to Thing data
 
-            var entityCount = 1999;
+            var entityCount = Globals.MAX_ENTITIES;
 
             Map map = new Map()
             {
