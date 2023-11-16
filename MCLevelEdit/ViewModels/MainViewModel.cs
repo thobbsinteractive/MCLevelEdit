@@ -13,7 +13,7 @@ public class MainViewModel : ViewModelBase
 
     public Interaction<MapViewModel, MapViewModel?> ShowDialog { get; }
 
-    public MainViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
+    public MainViewModel(IMapService mapService, ITerrainService terrainService, IFileService fileService) : base(mapService, terrainService, fileService)
     {
         MapViewModel = Locator.Current.GetService<MapViewModel>();
 

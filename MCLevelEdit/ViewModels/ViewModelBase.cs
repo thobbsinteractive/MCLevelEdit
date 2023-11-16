@@ -19,7 +19,7 @@ public class ViewModelBase : ReactiveObject
     public AvaloniaList<Entity> Entities => new AvaloniaList<Entity>(Map.Instance.Entities);
     public Map Map { get; set; }
 
-    public ViewModelBase(IMapService mapService, ITerrainService terrainService)
+    public ViewModelBase(IMapService mapService, ITerrainService terrainService, IFileService fileService)
     {
         _mapService = mapService;
         _terrainService = terrainService;
