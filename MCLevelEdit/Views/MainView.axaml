@@ -7,20 +7,30 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              x:Class="MCLevelEdit.Views.MainView"
              x:DataType="vm:MainViewModel">
-  <Grid ColumnDefinitions="*"
-        RowDefinitions="*,50">
-    <views:MapView Grid.Row="0"
-                   Grid.Column="0"
-                   Margin="10"
-                   DataContext="{Binding MapViewModel}" />
-    <Button x:Name="btnEdit"
-            Grid.Row="1"
-            Grid.Column="0"
-            Margin="10"
-            HorizontalAlignment="Stretch"
-            HorizontalContentAlignment="Center"
-            Command="{Binding EditEntitiesCommand}">
-      Edit Entities
-    </Button>
-  </Grid>
+  <DockPanel>
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="_File">
+        <MenuItem Header="_Open" Command="{Binding OpenFileCommand}"/>
+        <Separator/>
+        <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+      </MenuItem>
+    </Menu>
+    <Grid DockPanel.Dock="Bottom"
+          ColumnDefinitions="*"
+          RowDefinitions="*,50">
+      <views:MapView Grid.Row="0"
+                     Grid.Column="0"
+                     Margin="10"
+                     DataContext="{Binding MapViewModel}" />
+      <Button x:Name="btnEdit"
+              Grid.Row="1"
+              Grid.Column="0"
+              Margin="10"
+              HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Center"
+              Command="{Binding EditEntitiesCommand}">
+        Edit Entities
+      </Button>
+    </Grid>
+  </DockPanel>
 </UserControl>

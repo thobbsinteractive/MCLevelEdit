@@ -12,7 +12,7 @@ namespace MCLevelEdit.ViewModels
         public bool GenerateTerrainButtonEnable { get; set; }
         public TerrainGenerationParameters TerrainGenerationParameters => Map.Instance.TerrainGenerationParameters;
 
-        public CreateTerrainViewModel(IMapService mapService, ITerrainService terrainService, IFileService fileService) : base(mapService, terrainService, fileService)
+        public CreateTerrainViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
         {
             GenerateTerrainButtonEnable = true;
 
