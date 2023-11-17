@@ -22,7 +22,7 @@
               Grid.Column="0"
               Margin="10,10,10,0"
               x:Name="dgEntities"
-              ItemsSource="{Binding Entities}"
+              ItemsSource="{Binding Map.Entities}"
               IsReadOnly="True"
               GridLinesVisibility="All"
               BorderThickness="1" BorderBrush="Gray">

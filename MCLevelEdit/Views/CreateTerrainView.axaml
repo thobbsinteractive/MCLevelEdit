@@ -31,7 +31,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="1"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.Seed, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.Seed, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="2"
@@ -41,7 +41,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="2"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.Offset, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.Offset, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="3"
@@ -51,7 +51,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="3"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.Raise, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.Raise, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="4"
@@ -61,7 +61,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="4"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.Gnarl, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.Gnarl, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="5"
@@ -71,7 +71,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="5"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.River, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.River, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="6"
@@ -81,7 +81,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="6"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.Source, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.Source, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="7"
@@ -91,7 +91,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="7"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.SnLin, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.SnLin, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="8"
@@ -101,7 +101,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="8"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.SnFlt, Converter={StaticResource uInt8ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.SnFlt, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="9"
@@ -111,7 +111,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="9"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.BhLin, Converter={StaticResource uInt8ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.BhLin, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="10"
@@ -121,7 +121,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="10"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.BhFlt, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.BhFlt, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="11"
@@ -131,7 +131,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="11"
              HorizontalAlignment="Stretch"
-             Text="{Binding TerrainGenerationParameters.RkSte, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.RkSte, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Button x:Name="btnGenerate" 
             Grid.Column="0"

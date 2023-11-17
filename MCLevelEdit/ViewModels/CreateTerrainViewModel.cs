@@ -10,7 +10,6 @@ namespace MCLevelEdit.ViewModels
     {
         public ICommand GenerateTerrainCommand { get; }
         public bool GenerateTerrainButtonEnable { get; set; }
-        public TerrainGenerationParameters TerrainGenerationParameters => Map.Instance.TerrainGenerationParameters;
 
         public CreateTerrainViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
         {
@@ -25,7 +24,7 @@ namespace MCLevelEdit.ViewModels
         public async Task GenerateHeightMap()
         {
             GenerateTerrainButtonEnable = false;
-            Map.Instance.HeightMap = await _terrainService.CalculateTerrain(TerrainGenerationParameters);
+            Map.HeightMap = await _terrainService.CalculateTerrain(Map.TerrainGenerationParameters);
             GenerateTerrainButtonEnable = true;
             await RefreshPreviewAsync();
         }

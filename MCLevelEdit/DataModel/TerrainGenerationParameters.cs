@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Diagnostics;
 
 namespace MCLevelEdit.DataModel
 {
@@ -87,6 +88,22 @@ namespace MCLevelEdit.DataModel
         {
             get { return _rkSte; }
             set { SetProperty(ref _rkSte, value); }
+        }
+
+        public void SetParameters(TerrainGenerationParameters terrainGenerationParameters)
+        {
+            this.Seed = terrainGenerationParameters.Seed;
+            this.Offset = terrainGenerationParameters.Offset;
+            this.Raise = terrainGenerationParameters.Raise;
+            this.Gnarl = terrainGenerationParameters.Gnarl;
+            this.River = terrainGenerationParameters.River;
+            this.LRiver = terrainGenerationParameters.LRiver;
+            this.Source = terrainGenerationParameters.Source;
+            this.SnLin = terrainGenerationParameters.SnLin;
+            this.SnFlt = terrainGenerationParameters.SnFlt;
+            this.BhLin = terrainGenerationParameters.BhLin;
+            this.BhFlt = terrainGenerationParameters.BhFlt;
+            this.RkSte = terrainGenerationParameters.RkSte;
         }
     }
 }

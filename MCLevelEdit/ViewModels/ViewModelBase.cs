@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.Collections;
 using Avalonia.Media;
 using MCLevelEdit.DataModel;
 using MCLevelEdit.Interfaces;
@@ -16,19 +15,13 @@ public class ViewModelBase : ReactiveObject
     protected readonly IMapService _mapService;
     protected readonly ITerrainService _terrainService;
 
-    public AvaloniaList<Entity> Entities => new AvaloniaList<Entity>(Map.Instance.Entities);
-    public Map Map { get; set; }
+    public static Map Map { get; set; }
 
     public ViewModelBase(IMapService mapService, ITerrainService terrainService)
     {
         _mapService = mapService;
         _terrainService = terrainService;
-
-        if (Map.Instance is null)
-        {
-            Map.Instance = _mapService.CreateNewMap();
-        }
-        Map = Map.Instance;
+        Map = _mapService.CreateNewMap();
     }
 
     protected async Task RefreshPreviewAsync()
@@ -44,7 +37,7 @@ public class ViewModelBase : ReactiveObject
             if (Map.HeightMap is not null)
             {
                 this.Log().Debug("Drawing Terrain...");
-                Map.Preview = await _terrainService.GenerateBitmapAsync(Map.Instance.HeightMap);
+                Map.Preview = await _terrainService.GenerateBitmapAsync(Map.HeightMap);
                 Map.Preview = await _mapService.DrawBitmapAsync(Map, Map.Preview);
             }
             else
@@ -52,6 +45,7 @@ public class ViewModelBase : ReactiveObject
                 this.Log().Debug("Drawing Entities...");
                 Map.Preview = await _mapService.GenerateBitmapAsync(Map);
             }
+            this.RaisePropertyChanged(nameof(Map.Preview));
             this.Log().Debug("Preview refreshed");
         });
     }
@@ -79,7 +73,7 @@ public class ViewModelBase : ReactiveObject
         newEntity.EntityType.Child.PropertyChanged += Entity_PropertyChanged;
 
         Map.AddEntity(newEntity);
-        this.RaisePropertyChanged(nameof(Entities));
+        this.RaisePropertyChanged(nameof(Map.Entities));
         RefreshPreviewAsync();
         return newEntity;
     }
@@ -87,7 +81,7 @@ public class ViewModelBase : ReactiveObject
     protected void DeleteEntity(Entity entity)
     {
         Map.RemoveEntity(entity);
-        this.RaisePropertyChanged(nameof(Entities));
+        this.RaisePropertyChanged(nameof(Map.Entities));
         RefreshPreviewAsync();
     }
 

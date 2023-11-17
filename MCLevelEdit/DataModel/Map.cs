@@ -7,15 +7,26 @@ namespace MCLevelEdit.DataModel
 {
     public class Map : ObservableObject
     {
-        public static Map Instance { get; set; }
-
         private IList<Entity> _entities;
         byte[] _heightMap;
         private WriteableBitmap _preview;
+        private TerrainGenerationParameters _terrainGenerationParameters;
 
-        public TerrainGenerationParameters TerrainGenerationParameters { get; set; }
-        public IList<Entity> Entities { get { return _entities; } }
-        public byte[] HeightMap { get { return _heightMap; } set { _heightMap = value; } }
+        public TerrainGenerationParameters TerrainGenerationParameters
+        {
+            get { return _terrainGenerationParameters; }
+            set { SetProperty(ref _terrainGenerationParameters, value); }
+        }
+        public IList<Entity> Entities 
+        { 
+            get { return _entities; }
+            set { SetProperty(ref _entities, value); }
+        }
+        public byte[] HeightMap 
+        { 
+            get { return _heightMap; } 
+            set { SetProperty(ref _heightMap, value); } 
+        }
         public WriteableBitmap Preview
         {
             get { return _preview; }
@@ -32,6 +43,13 @@ namespace MCLevelEdit.DataModel
         public IList<Entity> GetEntitiesByPosition(Position postion)
         {
             return _entities.Where(e => e.Position == postion).ToList();
+        }
+
+        public void SetEntities(IList<Entity> entities)
+        {
+            _entities.Clear();
+            foreach (Entity entity in entities)
+                _entities.Add(entity);
         }
 
         public void AddEntity(Entity entity)
