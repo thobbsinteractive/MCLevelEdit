@@ -8,7 +8,7 @@ namespace MCLevelEdit.DataModel
     public class Map : ObservableObject
     {
         private IList<Entity> _entities;
-        byte[] _heightMap;
+        private Terrain _terrain;
         private WriteableBitmap _preview;
         private TerrainGenerationParameters _terrainGenerationParameters;
 
@@ -22,10 +22,10 @@ namespace MCLevelEdit.DataModel
             get { return _entities; }
             set { SetProperty(ref _entities, value); }
         }
-        public byte[] HeightMap 
+        public Terrain Terrain
         { 
-            get { return _heightMap; } 
-            set { SetProperty(ref _heightMap, value); } 
+            get { return _terrain; } 
+            set { SetProperty(ref _terrain, value); } 
         }
         public WriteableBitmap Preview
         {
@@ -36,7 +36,6 @@ namespace MCLevelEdit.DataModel
         public Map()
         {
             _entities = new List<Entity>();
-            _heightMap = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
             TerrainGenerationParameters = new TerrainGenerationParameters();
         }
 

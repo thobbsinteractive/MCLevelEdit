@@ -6,7 +6,13 @@ namespace MCLevelEdit.Interfaces;
 
 public interface ITerrainService
 {
-    public Task<byte[]> CalculateTerrain(TerrainGenerationParameters genParams);
-    Task<WriteableBitmap> GenerateBitmapAsync(byte[] heightMap);
-    Task<WriteableBitmap> DrawBitmapAsync(byte[] heightMap, WriteableBitmap bitmap);
+    public enum Layer
+    {
+        Game,
+        Height
+    }
+
+    public Task<Terrain> CalculateTerrain(TerrainGenerationParameters genParams);
+    public Task<WriteableBitmap> GenerateBitmapAsync(Terrain terrain, Layer layer);
+    public Task<WriteableBitmap> DrawBitmapAsync(Terrain terrain, Layer layer, WriteableBitmap bitmap);
 }

@@ -34,10 +34,10 @@ public class ViewModelBase : ReactiveObject
                 BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(0, 0, 0, 0), Map.Preview);
             }
 
-            if (Map.HeightMap is not null)
+            if (Map.Terrain is not null)
             {
                 this.Log().Debug("Drawing Terrain...");
-                Map.Preview = await _terrainService.GenerateBitmapAsync(Map.HeightMap);
+                Map.Preview = await _terrainService.GenerateBitmapAsync(Map.Terrain, ITerrainService.Layer.Game);
                 Map.Preview = await _mapService.DrawBitmapAsync(Map, Map.Preview);
             }
             else

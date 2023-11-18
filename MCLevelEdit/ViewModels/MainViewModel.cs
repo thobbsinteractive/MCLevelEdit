@@ -49,7 +49,7 @@ public class MainViewModel : ViewModelBase
 
                 Map.SetEntities(map.Entities);
                 Map.TerrainGenerationParameters.SetParameters(map.TerrainGenerationParameters);
-                Map.HeightMap = await _terrainService.CalculateTerrain(map.TerrainGenerationParameters);
+                Map.Terrain = await _terrainService.CalculateTerrain(map.TerrainGenerationParameters);
                 RefreshPreviewAsync();
             }
         });

@@ -9,12 +9,18 @@ using MCLevelEdit.Utils;
 using Splat;
 using System;
 using System.Threading.Tasks;
+using static MCLevelEdit.Interfaces.ITerrainService;
 
 namespace MCLevelEdit.Services
 {
     public class TerrainService : ITerrainService, IEnableLogger
     {
-        public Task<WriteableBitmap> GenerateBitmapAsync(byte[] heightMap)
+        public Color WATER_COLOUR = new Color(255, 46, 78, 166);
+        public Color COAST_COLOUR = new Color(255, 136, 99, 66);
+        public Color SAND_COLOUR = new Color(255, 186, 150, 101);
+        public Color GRASS_COLOUR = new Color(255, 117, 105, 40);
+
+        public Task<WriteableBitmap> GenerateBitmapAsync(Terrain terrain, Layer layer)
         {
             return Task.Run(() =>
             {
@@ -23,13 +29,16 @@ namespace MCLevelEdit.Services
                     new Vector(96, 96), // DPI (dots per inch)
                     PixelFormat.Rgba8888);
 
-                BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(255, 0, 0, 0), bitmap);
+                if (layer == Layer.Game)
+                    BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(255, 0, 0, 0), bitmap);
+                if (layer == Layer.Height)
+                    BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(255, 46, 78, 166), bitmap);
 
-                return DrawBitmapAsync(heightMap, bitmap);
+                return DrawBitmapAsync(terrain, layer, bitmap);
             });
         }
 
-        public Task<WriteableBitmap> DrawBitmapAsync(byte[] heightMap, WriteableBitmap bitmap)
+        public Task<WriteableBitmap> DrawBitmapAsync(Terrain terrain, Layer layer, WriteableBitmap bitmap)
         {
             return Task.Run(() =>
             {
@@ -40,11 +49,27 @@ namespace MCLevelEdit.Services
                         for (int x = 0; x < Globals.MAX_MAP_SIZE; x++)
                         {
                             int index = (y * Globals.MAX_MAP_SIZE) + x;
-                            if (heightMap[index] > 20)
+
+                            if (layer == Layer.Game)
                             {
-                                int j = 0;
+                                switch (terrain.MapTerrainType_10B4E0[index])
+                                {
+                                    case 0:
+                                        fb.SetPixel(x, y, WATER_COLOUR);
+                                        break;
+                                    case 3:
+                                        fb.SetPixel(x, y, GRASS_COLOUR);
+                                        break;
+                                    case 4:
+                                        fb.SetPixel(x, y, COAST_COLOUR);
+                                        break;
+                                    default:
+                                        fb.SetPixel(x, y, SAND_COLOUR);
+                                        break;
+                                }
                             }
-                            fb.SetPixel(x, y, new Color(255, heightMap[index], heightMap[index], heightMap[index]));
+                            if (layer == Layer.Height)
+                                fb.SetPixel(x, y, new Color(255, terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index]));
                         }
                     }
                 }
@@ -54,7 +79,7 @@ namespace MCLevelEdit.Services
             });
         }
 
-        public async Task<byte[]> CalculateTerrain(TerrainGenerationParameters genParams)
+        public async Task<Terrain> CalculateTerrain(TerrainGenerationParameters genParams)
         {
             short[] mapEntityIndex_15B4E0 = new short[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
             byte[] mapHeightmap_11B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
@@ -70,8 +95,13 @@ namespace MCLevelEdit.Services
             sub_45060(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.SnFlt, genParams.BhLin);//226060
             sub_44320(mapAngle_13B4E0);//225320
             sub_45210(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.SnFlt, genParams.BhLin);//226210
-                                                                                                
-            return mapHeightmap_11B4E0;
+
+            return new Terrain()
+            {
+                MapTerrainType_10B4E0 = mapTerrainType_10B4E0,
+                MapHeightmap_11B4E0 = mapHeightmap_11B4E0,
+                MapAngle_13B4E0 = mapAngle_13B4E0,
+            };
         }
 
         private void sub_B5E70_decompress_terrain_map_level(short[] mapEntityIndex_15B4E0, short seed, ushort offset, ushort raise, ushort gnarl)
