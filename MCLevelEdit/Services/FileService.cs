@@ -30,12 +30,12 @@ namespace MCLevelEdit.Services
                 Raise = (ushort)BitConverter.ToUInt32(levfile, 12),
                 Gnarl = BitConverter.ToUInt16(levfile, 16),
                 River = BitConverter.ToUInt16(levfile, 20),
-                Source = BitConverter.ToUInt16(levfile, 24),
+                Source = (byte)BitConverter.ToUInt16(levfile, 24),
                 SnLin = BitConverter.ToUInt16(levfile, 28),
                 SnFlt = (byte)BitConverter.ToUInt16(levfile, 32),
                 BhLin = (byte)BitConverter.ToUInt16(levfile, 36),
-                BhFlt = BitConverter.ToUInt16(levfile, 40),
-                RkSte = BitConverter.ToUInt16(levfile, 44)
+                BhFlt = (byte)BitConverter.ToUInt16(levfile, 40),
+                RkSte = (byte)BitConverter.ToUInt16(levfile, 44)
             };
 
             int fpos = 1090; // Move on to Thing data

@@ -52,21 +52,26 @@ namespace MCLevelEdit.Services
 
                             if (layer == Layer.Game)
                             {
+                                Color baseColour = SAND_COLOUR;
                                 switch (terrain.MapTerrainType_10B4E0[index])
                                 {
                                     case 0:
-                                        fb.SetPixel(x, y, WATER_COLOUR);
+                                        baseColour = WATER_COLOUR;
                                         break;
                                     case 3:
-                                        fb.SetPixel(x, y, GRASS_COLOUR);
+                                        baseColour = GRASS_COLOUR;
                                         break;
                                     case 4:
-                                        fb.SetPixel(x, y, COAST_COLOUR);
+                                        baseColour = COAST_COLOUR;
                                         break;
                                     default:
-                                        fb.SetPixel(x, y, SAND_COLOUR);
+                                        baseColour = SAND_COLOUR;
                                         break;
                                 }
+
+                                fb.SetPixel(x, y, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
+                                    (byte)Math.Max(baseColour.G - terrain.MapShading_12B4E0[index], byte.MinValue),
+                                    (byte)Math.Max(baseColour.B - terrain.MapShading_12B4E0[index], byte.MinValue)));
                             }
                             if (layer == Layer.Height)
                                 fb.SetPixel(x, y, new Color(255, terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index]));
@@ -85,6 +90,7 @@ namespace MCLevelEdit.Services
             byte[] mapHeightmap_11B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
             byte[] mapAngle_13B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
             byte[] mapTerrainType_10B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
+            byte[] mapShading_12B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
 
             ushort seed_17B4E0 = genParams.Seed;
             sub_B5E70_decompress_terrain_map_level(mapEntityIndex_15B4E0, (short)genParams.Seed, genParams.Offset, genParams.Raise, genParams.Gnarl);
@@ -95,12 +101,23 @@ namespace MCLevelEdit.Services
             sub_45060(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.SnFlt, genParams.BhLin);//226060
             sub_44320(mapAngle_13B4E0);//225320
             sub_45210(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.SnFlt, genParams.BhLin);//226210
+            sub_454F0(mapHeightmap_11B4E0, mapAngle_13B4E0, genParams.Source, genParams.RkSte);//2264f0
+            sub_45600(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.BhFlt);//226600
+            sub_43FC0(mapAngle_13B4E0);//224fc0
+
+            //Array.Fill<byte>(mapTerrainType_10B4E0, 0);
+
+            sub_43970_smooth_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0);//224970 // smooth terrain
+            sub_43EE0_add_rivers(mapHeightmap_11B4E0, mapAngle_13B4E0);//224ee0 // add rivers
+            sub_43D50_change_angle_of_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0);//224d50
+            sub_44D00_shade_terrain(mapHeightmap_11B4E0, mapShading_12B4E0, ref seed_17B4E0);//225d00
 
             return new Terrain()
             {
                 MapTerrainType_10B4E0 = mapTerrainType_10B4E0,
                 MapHeightmap_11B4E0 = mapHeightmap_11B4E0,
                 MapAngle_13B4E0 = mapAngle_13B4E0,
+                MapShading_12B4E0 = mapShading_12B4E0
             };
         }
 
@@ -819,6 +836,531 @@ namespace MCLevelEdit.Services
                             mapAngle_13B4E0[index.Word] = 2;
                     }
                 }
+            }
+        }
+
+        void sub_454F0(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, byte maxHeightCut, byte maxHeightDiffCut)//2264f0
+        {
+            //    X
+            //	 / \
+            //  X-B X
+            //    |/
+            //    X
+
+            byte maxHeight;
+            byte minHeight;
+            UAxis2d index = new UAxis2d();
+            for (int i = 0; i < 256 * 256; i++)
+            {
+                index.Word = (ushort)i;
+                if (mapHeightmap_11B4E0[index.Word] > maxHeightCut)
+                {
+                    maxHeight = 0;
+                    minHeight = 255;
+                    if (mapHeightmap_11B4E0[index.Word] > 0)
+                        maxHeight = mapHeightmap_11B4E0[index.Word];
+                    if (mapHeightmap_11B4E0[index.Word] < 255)
+                        minHeight = mapHeightmap_11B4E0[index.Word];
+                    index.Y--;
+                    if (maxHeight < mapHeightmap_11B4E0[index.Word])
+                        maxHeight = mapHeightmap_11B4E0[index.Word];
+                    if (minHeight > mapHeightmap_11B4E0[index.Word])
+                        minHeight = mapHeightmap_11B4E0[index.Word];
+                    index.X++;
+                    index.Y++;
+                    if (maxHeight < mapHeightmap_11B4E0[index.Word])
+                        maxHeight = mapHeightmap_11B4E0[index.Word];
+                    if (minHeight > mapHeightmap_11B4E0[index.Word])
+                        minHeight = mapHeightmap_11B4E0[index.Word];
+                    index.X--;
+                    index.Y++;
+                    if (maxHeight < mapHeightmap_11B4E0[index.Word])
+                        maxHeight = mapHeightmap_11B4E0[index.Word];
+                    if (minHeight > mapHeightmap_11B4E0[index.Word])
+                        minHeight = mapHeightmap_11B4E0[index.Word];
+                    index.X--;
+                    index.Y--;
+                    if (maxHeight < mapHeightmap_11B4E0[index.Word])
+                        maxHeight = mapHeightmap_11B4E0[index.Word];
+                    if (minHeight > mapHeightmap_11B4E0[index.Word])
+                        minHeight = mapHeightmap_11B4E0[index.Word];
+                    index.X++;
+                    if (mapAngle_13B4E0[index.Word] > 0)
+                    {
+                        if (maxHeight - minHeight < maxHeightDiffCut)
+                            mapAngle_13B4E0[index.Word] = 6;
+                    }
+                }
+            }
+        }
+
+        void sub_45600(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, byte[] mapTerrainType_10B4E0, byte a1)//226600
+        {
+            byte ang4;
+            byte ang2;
+            byte ang3;
+            byte ang5;
+            byte maxHeight;
+            byte minHeight;
+
+            Array.Copy(mapAngle_13B4E0, mapTerrainType_10B4E0, Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE);
+            UAxis2d index = new UAxis2d();
+
+            //    X
+            //	 / \
+            //  X-B X
+            //    |/
+            //    X
+
+            for (int i = 0; i < Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE; i++)
+            {
+                index.Word = (ushort)i;
+                maxHeight = 0;
+                minHeight = 255;
+                if (mapHeightmap_11B4E0[index.Word] > 0)
+                    maxHeight = mapHeightmap_11B4E0[index.Word];
+                if (mapHeightmap_11B4E0[index.Word] < 255)
+                    minHeight = mapHeightmap_11B4E0[index.Word];
+                index.Y--;
+                if (maxHeight < mapHeightmap_11B4E0[index.Word])
+                    maxHeight = mapHeightmap_11B4E0[index.Word];
+                if (minHeight > mapHeightmap_11B4E0[index.Word])
+                    minHeight = mapHeightmap_11B4E0[index.Word];
+                index.X++;
+                index.Y++;
+                if (maxHeight < mapHeightmap_11B4E0[index.Word])
+                    maxHeight = mapHeightmap_11B4E0[index.Word];
+                if (minHeight > mapHeightmap_11B4E0[index.Word])
+                    minHeight = mapHeightmap_11B4E0[index.Word];
+                index.X--;
+                index.Y++;
+                if (maxHeight < mapHeightmap_11B4E0[index.Word])
+                    maxHeight = mapHeightmap_11B4E0[index.Word];
+                if (minHeight > mapHeightmap_11B4E0[index.Word])
+                    minHeight = mapHeightmap_11B4E0[index.Word];
+                index.X--;
+                index.Y--;
+                if (maxHeight < mapHeightmap_11B4E0[index.Word])
+                    maxHeight = mapHeightmap_11B4E0[index.Word];
+                if (minHeight > mapHeightmap_11B4E0[index.Word])
+                    minHeight = mapHeightmap_11B4E0[index.Word];
+                index.X++;
+                if (mapAngle_13B4E0[index.Word] > 0 && maxHeight - minHeight >= a1)
+                    mapAngle_13B4E0[index.Word] = 1;
+            }
+
+            //  X-X-X
+            //  |   |
+            //  X B X
+            //  |/| |
+            //  X X-X
+
+            for (int i = 0; i < Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE; i++)
+            {
+                index.Word = (ushort)i;
+                if (mapAngle_13B4E0[index.Word] == 6)
+                {
+                    ang4 = 0;
+                    ang2 = 0;
+                    ang3 = 0;
+                    ang5 = 0;
+                    index.Y--;
+                    if (mapAngle_13B4E0[index.Word] == 3)
+                        ang3 = 1;
+                    if (mapAngle_13B4E0[index.Word] == 2)
+                        ang2 = 1;
+                    if (mapAngle_13B4E0[index.Word] == 5)
+                        ang5 = 1;
+                    if (mapAngle_13B4E0[index.Word] == 4)
+                        ang4 = 1;
+                    index.X++;
+                    if (mapAngle_13B4E0[index.Word] == 3)
+                        ang3++;
+                    if (mapAngle_13B4E0[index.Word] == 2)
+                        ang2++;
+                    if (mapAngle_13B4E0[index.Word] == 5)
+                        ang5++;
+                    if (mapAngle_13B4E0[index.Word] == 4)
+                        ang4++;
+                    index.Y++;
+                    if (mapAngle_13B4E0[index.Word] == 3)
+                        ang3++;
+                    if (mapAngle_13B4E0[index.Word] == 2)
+                        ang2++;
+                    if (mapAngle_13B4E0[index.Word] == 5)
+                        ang5++;
+                    if (mapAngle_13B4E0[index.Word] == 4)
+                        ang4++;
+                    index.Y++;
+                    if (mapAngle_13B4E0[index.Word] == 3)
+                        ang3++;
+                    if (mapAngle_13B4E0[index.Word] == 2)
+                        ang2++;
+                    if (mapAngle_13B4E0[index.Word] == 5)
+                        ang5++;
+                    if (mapAngle_13B4E0[index.Word] == 4)
+                        ang4++;
+                    index.X--;
+                    if (mapAngle_13B4E0[index.Word] == 3)
+                        ang3++;
+                    if (mapAngle_13B4E0[index.Word] == 2)
+                        ang2++;
+                    if (mapAngle_13B4E0[index.Word] == 5)
+                        ang5++;
+                    if (mapAngle_13B4E0[index.Word] == 4)
+                        ang4++;
+                    index.X--;
+                    if (mapAngle_13B4E0[index.Word] == 3)
+                        ang3++;
+                    if (mapAngle_13B4E0[index.Word] == 2)
+                        ang2++;
+                    if (mapAngle_13B4E0[index.Word] == 5)
+                        ang5++;
+                    if (mapAngle_13B4E0[index.Word] == 4)
+                        ang4++;
+                    index.Y--;
+                    if (mapAngle_13B4E0[index.Word] == 3)
+                        ang3++;
+                    if (mapAngle_13B4E0[index.Word] == 2)
+                        ang2++;
+                    if (mapAngle_13B4E0[index.Word] == 5)
+                        ang5++;
+                    if (mapAngle_13B4E0[index.Word] == 4)
+                        ang4++;
+                    index.Y--;
+                    if (mapAngle_13B4E0[index.Word] == 3)
+                        ang3++;
+                    if (mapAngle_13B4E0[index.Word] == 2)
+                        ang2++;
+                    if (mapAngle_13B4E0[index.Word] == 5)
+                        ang5++;
+                    if (mapAngle_13B4E0[index.Word] == 4)
+                        ang4++;
+                    index.X++;
+                    index.Y++;
+                    if (ang3 > 0)
+                    {
+                        if (ang2 > 0 || ang5 > 0  || ang4 > 0)
+                            mapAngle_13B4E0[index.Word] = 1;
+                    }
+                    else if (ang2 > 0 || (ang5 > 0 && ang4 > 0))
+                    {
+                        mapAngle_13B4E0[index.Word] = 1;
+                    }
+                }
+            }
+        }
+
+        void sub_43FC0(byte[] mapAngle_13B4E0)//224fc0
+        {
+            int sameAngle;
+            byte centerAngle;
+
+            //  X-X-X
+            //  |   |
+            //  X B X
+            //  |/| |
+            //  X X-X
+
+            UAxis2d index = new UAxis2d();
+            for (int i = 0; i < Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE; i++)
+            {
+                index.Word = (ushort)i;
+                index.Y--;
+                centerAngle = mapAngle_13B4E0[index.Word];
+                index.X++;
+                sameAngle = (centerAngle == mapAngle_13B4E0[index.Word] ? 1 : 0);
+                index.Y++;
+                sameAngle += (centerAngle == mapAngle_13B4E0[index.Word] ? 1 : 0);
+                index.Y++;
+                sameAngle += (centerAngle == mapAngle_13B4E0[index.Word] ? 1 : 0);
+                index.X--;
+                sameAngle += (centerAngle == mapAngle_13B4E0[index.Word] ? 1 : 0);
+                index.X--;
+                sameAngle += (centerAngle == mapAngle_13B4E0[index.Word] ? 1 : 0);
+                index.Y--;
+                sameAngle += (centerAngle == mapAngle_13B4E0[index.Word] ? 1 : 0);
+                index.Y--;
+                sameAngle += (centerAngle == mapAngle_13B4E0[index.Word] ? 1 : 0);
+                index.X++;
+                index.Y++;
+                if (centerAngle > 0)
+                {
+                    if (sameAngle == 7)
+                        mapAngle_13B4E0[index.Word] = centerAngle;
+                }
+            }
+        }
+
+        void sub_43970_smooth_terrain(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0)//224970
+        {
+            UAxis2d index = new UAxis2d();
+            for (int i = 0; i < Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE; i++)
+            {
+                index.Word = (ushort)i;
+                mapHeightmap_11B4E0[index.Word] = sub_439A0(mapHeightmap_11B4E0, mapAngle_13B4E0, index.Word);
+            }
+        }
+
+        byte sub_439A0(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, ushort index)//2249a0
+        {
+            //    X
+            //    |
+            //  X-B-X
+            //    |
+            //    X
+
+            byte maxHeight;
+            byte minHeight;
+            byte centerPoint;
+            uint modSumaPoint;
+            uint sumaPoint = 0;
+            uint result = mapHeightmap_11B4E0[index];
+            UAxis2d uindex = new UAxis2d();
+            uindex.Word = index;
+            if ((mapAngle_13B4E0[uindex.Word] & 7) != 0)
+            {
+                maxHeight = mapHeightmap_11B4E0[uindex.Word];
+                minHeight = maxHeight;
+                centerPoint = mapHeightmap_11B4E0[uindex.Word];
+                uindex.Y--;
+                sumaPoint = mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] > maxHeight)
+                    maxHeight = mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] < minHeight)
+                    minHeight = mapHeightmap_11B4E0[uindex.Word];
+                uindex.X++;
+                sumaPoint += mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] > maxHeight)
+                    maxHeight = mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] < minHeight)
+                    minHeight = mapHeightmap_11B4E0[uindex.Word];
+                uindex.Y++;
+                sumaPoint += mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] > maxHeight)
+                    maxHeight = mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] < minHeight)
+                    minHeight = mapHeightmap_11B4E0[uindex.Word];
+                uindex.Y++;
+                sumaPoint += mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] > maxHeight)
+                    maxHeight = mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] < minHeight)
+                    minHeight = mapHeightmap_11B4E0[uindex.Word];
+                uindex.X--;
+                sumaPoint += mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] > maxHeight)
+                    maxHeight = mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] < minHeight)
+                    minHeight = mapHeightmap_11B4E0[uindex.Word];
+                uindex.X--;
+                sumaPoint += mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] > maxHeight)
+                    maxHeight = mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] < minHeight)
+                    minHeight = mapHeightmap_11B4E0[uindex.Word];
+                uindex.Y--;
+                sumaPoint += mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] > maxHeight)
+                    maxHeight = mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] < minHeight)
+                    minHeight = mapHeightmap_11B4E0[uindex.Word];
+                uindex.Y--;
+                sumaPoint += mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] > maxHeight)
+                    maxHeight = mapHeightmap_11B4E0[uindex.Word];
+                if (mapHeightmap_11B4E0[uindex.Word] < minHeight)
+                    minHeight = mapHeightmap_11B4E0[uindex.Word];
+                modSumaPoint = sumaPoint >> 3;
+                if ((byte)(centerPoint - minHeight) <= 4)
+                {
+                    if ((byte)(maxHeight - centerPoint) <= 4)
+                        return (byte)result;
+                    if ((byte)(maxHeight - centerPoint) <= 10)
+                        modSumaPoint = (centerPoint + modSumaPoint) >> 1;
+                }
+                else if ((byte)(centerPoint - minHeight) <= 10)
+                {
+                    return (byte)((modSumaPoint + centerPoint) >> 1);
+                }
+                result = modSumaPoint;
+            }
+            return (byte)result;
+        }
+
+        void sub_43EE0_add_rivers(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0)//224ee0
+        {
+            //  X-X
+            //  | |
+            //  B-X
+
+            byte ang0;
+            byte ang4;
+            byte heightM1;
+            byte heightM2;
+            byte angleM1;
+            byte angleM2;
+            byte angleM3;
+            UAxis2d index = new UAxis2d();
+            for (int i = 0; i < Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE; i++)
+            {
+                ang4 = 0;
+                ang0 = 0;
+                index.Word = (ushort)i;
+                heightM1 = mapHeightmap_11B4E0[index.Word];
+                index.X++;
+                angleM1 = mapAngle_13B4E0[index.Word];
+                if (angleM1 > 0)
+                {
+                    if (angleM1 == 4)
+                        ang4 = 1;
+                }
+                else
+                {
+                    heightM2 = mapHeightmap_11B4E0[index.Word];
+                    ang0 = 1;
+                    if (heightM2 < heightM1)
+                        heightM1 = heightM2;
+                }
+                index.Y++;
+                angleM2 = mapAngle_13B4E0[index.Word];
+                if (angleM2 > 0)
+                {
+                    if (angleM2 == 4)
+                        ang4++;
+                }
+                else
+                {
+                    ang0++;
+                    if (mapHeightmap_11B4E0[index.Word] < heightM1)
+                        heightM1 = mapHeightmap_11B4E0[index.Word];
+                }
+                index.X--;
+                angleM3 = mapAngle_13B4E0[index.Word];
+                if (angleM3 > 0)
+                {
+                    if (angleM3 == 4)
+                        ang4++;
+                }
+                else
+                {
+                    ang0++;
+                    if (mapHeightmap_11B4E0[index.Word] < heightM1)
+                        heightM1 = mapHeightmap_11B4E0[index.Word];
+                }
+                index.Y--;
+                if (ang4 > 0 && ang0 > 0 && heightM1 == 0)
+                {
+                    mapHeightmap_11B4E0[index.Word] = 0;
+                    index.X++;
+                    mapHeightmap_11B4E0[index.Word] = 0;
+                    index.Y++;
+                    mapHeightmap_11B4E0[index.Word] = 0;
+                    index.X--;
+                    mapHeightmap_11B4E0[index.Word] = 0;
+                    index.Y--;
+                }
+            }
+        }
+
+        void sub_43D50_change_angle_of_terrain(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, byte[] mapTerrainType_10B4E0)//224d50
+        {
+
+            //  X-X-X
+            //  |   |
+            //  X B X
+            //  |/| |
+            //  X X-X
+
+            byte point1;
+            byte point2;
+            UAxis2d index = new UAxis2d();
+            for (int i = 0; i < Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE; i++)
+            {
+                index.Word = (ushort)i;
+                mapAngle_13B4E0[index.Word] &= 0xF7;
+                if (mapHeightmap_11B4E0[index.Word] == 0)
+                {
+                    index.Y--;
+                    point1 = (byte)(mapHeightmap_11B4E0[index.Word] != 0 ? 1 : 0);
+                    index.X++;
+                    point1 += (byte)(mapHeightmap_11B4E0[index.Word] != 0 ? 1 : 0);
+                    index.Y++;
+                    point1 += (byte)(mapHeightmap_11B4E0[index.Word] != 0 ? 1 : 0);
+                    index.Y++;
+                    point1 += (byte)(mapHeightmap_11B4E0[index.Word] != 0 ? 1 : 0);
+                    index.X--;
+                    point1 += (byte)(mapHeightmap_11B4E0[index.Word] != 0 ? 1 : 0);
+                    index.X--;
+                    point1 += (byte)(mapHeightmap_11B4E0[index.Word] != 0 ? 1 : 0);
+                    index.Y--;
+                    point1 += (byte)(mapHeightmap_11B4E0[index.Word] != 0 ? 1 : 0);
+                    index.Y--;
+                    point2 = (byte)(mapHeightmap_11B4E0[index.Word] != 0 ? 1 : 0);
+                    index.X++;
+                    index.Y++;
+
+                    //  X-X
+                    //  | |
+                    //  B-X
+
+                    if ((point2 + point1) == 0)
+                    {
+                        point1 = (byte)(mapTerrainType_10B4E0[index.Word] != 0 ? 1 : 0);
+                        index.X--;
+                        point1 += (byte)(mapTerrainType_10B4E0[index.Word] != 0 ? 1 : 0);
+                        index.Y--;
+                        point1 += (byte)(mapTerrainType_10B4E0[index.Word] != 0 ? 1 : 0);
+                        index.X++;
+                        point1 += (byte)(mapTerrainType_10B4E0[index.Word] != 0 ? 1 : 0);
+                        index.Y++;
+                        if (point1 == 0)
+                            mapAngle_13B4E0[index.Word] |= 8;
+                    }
+                }
+            }
+        }
+
+        void sub_44D00_shade_terrain(byte[] mapHeightmap_11B4E0, byte[] mapShading_12B4E0, ref ushort seed_17B4E0)//225d00
+        {
+
+            //     X
+            //    /
+            //   B
+            //  /
+            // X
+
+            UAxis2d tempIndex = new UAxis2d();
+            UAxis2d index = new UAxis2d();
+            seed_17B4E0 = 0;
+            for (int i = 0; i < Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE; i++)
+            {
+                index.Word = (ushort)i;
+                index.X++;
+                index.Y++;
+                tempIndex.Word = index.Word;
+                index.X -= 2;
+                index.Y -= 2;
+                tempIndex.X = (byte)(mapHeightmap_11B4E0[index.Word] - mapHeightmap_11B4E0[tempIndex.Word] + 32);
+                index.X++;
+                index.Y++;
+                if (tempIndex.X == 32)
+                {
+                    tempIndex.Word = (ushort)(9377 * seed_17B4E0 + 9439);
+                    seed_17B4E0 = tempIndex.Word;
+                    tempIndex.Y = (byte)((seed_17B4E0 / 9u) >> 8);
+                    tempIndex.X = (byte)(seed_17B4E0 % 9 + 28);
+                }
+                else if ((sbyte)tempIndex.X >= 28)
+                {
+                    if ((sbyte)tempIndex.X > 40)
+                        tempIndex.X = (byte)((tempIndex.X & 7) + 40);
+                }
+                else
+                {
+                    tempIndex.X = (byte)((tempIndex.X & 3) + 28);
+                }
+                mapShading_12B4E0[index.Word] = tempIndex.X;
             }
         }
     }

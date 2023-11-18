@@ -11,12 +11,12 @@ namespace MCLevelEdit.DataModel
         private ushort _gnarl = 0;
         private ushort _river = 0;
         private ushort _lriver = 0;
-        private ushort _source = 0;
+        private byte _source = 0;
         private ushort _snLin = 0;
         private byte _snFlt = 0;
         private byte _bhLin = 0;
-        private ushort _bhFlt = 0;
-        private ushort _rkSte = 0;
+        private byte _bhFlt = 0;
+        private byte _rkSte = 0;
 
         public ushort Seed
         {
@@ -54,7 +54,7 @@ namespace MCLevelEdit.DataModel
             set { SetProperty(ref _lriver, value); }
         }
 
-        public ushort Source
+        public byte Source
         {
             get { return _source; }
             set { SetProperty(ref _source, value); }
@@ -78,13 +78,13 @@ namespace MCLevelEdit.DataModel
             set { SetProperty(ref _bhLin, value); }
         }
 
-        public ushort BhFlt
+        public byte BhFlt
         {
             get { return _bhFlt; }
             set { SetProperty(ref _bhFlt, value); }
         }
 
-        public ushort RkSte
+        public byte RkSte
         {
             get { return _rkSte; }
             set { SetProperty(ref _rkSte, value); }
