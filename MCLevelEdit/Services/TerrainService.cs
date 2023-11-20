@@ -8,6 +8,7 @@ using MCLevelEdit.Interfaces;
 using MCLevelEdit.Utils;
 using Splat;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using static MCLevelEdit.Interfaces.ITerrainService;
 
@@ -19,6 +20,46 @@ namespace MCLevelEdit.Services
         public Color COAST_COLOUR = new Color(255, 136, 99, 66);
         public Color SAND_COLOUR = new Color(255, 186, 150, 101);
         public Color GRASS_COLOUR = new Color(255, 117, 105, 40);
+
+        sbyte[] unk_D47E0 = {
+            0x00,0x00, 0x00,0x00, 0x01,0x01, 0x01,0x01, 0x02,0x02, 0x02,0x02, 0x03,0x03, 0x03,0x03,
+            0x04,0x04, 0x04,0x04, 0x05,0x05, 0x05,0x05, 0x06,0x06, 0x06,0x06, -1,-1, -1,-1,
+            -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1,
+            -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1,
+            -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1,
+            -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1,
+            -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1,
+            -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1,
+            -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, -1,-1, 0x06,0x00, 0x01,0x04,
+            0x01,0x01, 0x00,0x00, 0x01,0x00, 0x00,0x00, 0x01,0x00, 0x01,0x00, 0x00,0x01, 0x01,0x01,
+            0x06,0x06, 0x04,0x04, 0x06,0x04, 0x06,0x04, 0x06,0x04, 0x06,0x06, 0x04,0x06, 0x04,0x04,
+            0x04,0x04, 0x00,0x00, 0x04,0x00, 0x00,0x00, 0x00,0x04, 0x04,0x04, 0x00,0x04, 0x00,0x04,
+            0x01,0x03, 0x03,0x03, 0x01,0x03, 0x01,0x03, 0x03,0x01, 0x01,0x01, 0x01,0x01, 0x03,0x03,
+            0x05,0x01, 0x01,0x01, 0x01,0x01, 0x05,0x05, 0x01,0x05, 0x01,0x05, 0x01,0x05, 0x05,0x05,
+            0x02,0x05, 0x02,0x05, 0x05,0x02, 0x02,0x02, 0x02,0x05, 0x05,0x05, 0x05,0x05, 0x02,0x02,
+            0x04,0x04, 0x03,0x03, 0x04,0x03, 0x03,0x03, 0x03,0x04, 0x03,0x04, 0x03,0x04, 0x04,0x04,
+            0x04,0x05, 0x05,0x05, 0x05,0x04, 0x04,0x04, 0x05,0x04, 0x05,0x04, 0x04,0x04, 0x05,0x05,
+            0x01,0x02, 0x01,0x02, 0x02,0x01, 0x01,0x01, 0x01,0x02, 0x02,0x02, 0x01,0x01, 0x02,0x02,
+            0x04,0x01, 0x01,0x01, 0x01,0x04, 0x01,0x04, 0x01,0x04, 0x04,0x04, 0x01,0x01, 0x04,0x04,
+            0x01,0x06, 0x01,0x01, 0x06,0x06, 0x01,0x01, 0x06,0x01, 0x06,0x01, 0x06,0x01, 0x06,0x06,
+            0x06,0x06, 0x00,0x00, 0x06,0x00, 0x06,0x00, 0x06,0x00, 0x06,0x06, 0x00,0x06, 0x00,0x00,
+            0x02,0x01, 0x05,0x01, 0x01,0x01, 0x05,0x02, 0x05,0x01, 0x05,0x02, 0x02,0x01, 0x02,0x05,
+            0x02,0x02, 0x01,0x05, 0x05,0x05, 0x01,0x02, 0x03,0x03, 0x04,0x01, 0x04,0x03, 0x04,0x01,
+            0x01,0x01, 0x04,0x03, 0x01,0x04, 0x04,0x03, 0x03,0x04, 0x03,0x01, 0x01,0x03, 0x01,0x04,
+            0x01,0x06, 0x04,0x06, 0x01,0x06, 0x01,0x04, 0x01,0x06, 0x06,0x04, 0x01,0x04, 0x06,0x04,
+            0x01,0x06, 0x04,0x01, 0x01,0x06, 0x04,0x04, 0x06,0x04, 0x00,0x04, 0x00,0x04, 0x06,0x06,
+            0x00,0x04, 0x00,0x06, 0x00,0x00, 0x04,0x06, 0x00,0x06, 0x04,0x04, 0x06,0x00, 0x06,0x04,
+            0x06,0x00, 0x06,0x01, 0x01,0x00, 0x06,0x00, 0x01,0x06, 0x00,0x00, 0x01,0x06, 0x06,0x00,
+            0x01,0x06, 0x01,0x00, 0x01,0x01, 0x00,0x06, 0x01,0x00, 0x04,0x00, 0x01,0x04, 0x00,0x04,
+            0x01,0x04, 0x00,0x00, 0x01,0x01, 0x04,0x00, 0x04,0x01, 0x00,0x04, 0x01,0x04, 0x01,0x00,
+            0x01,0x05, 0x05,0x04, 0x04,0x05, 0x04,0x01, 0x01,0x01, 0x04,0x05, 0x01,0x05, 0x04,0x05,
+            0x01,0x04, 0x01,0x05, 0x01,0x04, 0x04,0x05, 0x01,0x06, 0x00,0x04, 0x06,0x01, 0x00,0x04,
+            0x06,0x06, 0x05,0x05, 0x06,0x05, 0x06,0x05, 0x06,0x05, 0x06,0x06, 0x05,0x06, 0x05,0x05,
+            0x06,0x06, 0x03,0x03, 0x06,0x03, 0x06,0x03, 0x06,0x03, 0x06,0x06, 0x03,0x06, 0x03,0x03,
+            0x01,0x05, 0x05,0x06, 0x06,0x05, 0x06,0x01, 0x01,0x01, 0x06,0x05, 0x01,0x05, 0x06,0x05,
+            0x01,0x06, 0x01,0x05, 0x01,0x06, 0x06,0x05, 0x01,0x03, 0x03,0x06, 0x06,0x03, 0x06,0x01,
+            0x01,0x01, 0x06,0x03, 0x01,0x03, 0x06,0x03, 0x01,0x06, 0x01,0x03, 0x01,0x06, 0x06,0x03
+            }; // weak
 
         public Task<WriteableBitmap> GenerateBitmapAsync(Terrain terrain, Layer layer)
         {
@@ -91,6 +132,7 @@ namespace MCLevelEdit.Services
             byte[] mapAngle_13B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
             byte[] mapTerrainType_10B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
             byte[] mapShading_12B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
+            byte[,] x_BYTE_F2CD0x = new byte[7 * 7 * 7 * 7,2]; // 233cd0//4802 //4816
 
             ushort seed_17B4E0 = genParams.Seed;
             sub_B5E70_decompress_terrain_map_level(mapEntityIndex_15B4E0, (short)genParams.Seed, genParams.Offset, genParams.Raise, genParams.Gnarl);
@@ -109,6 +151,8 @@ namespace MCLevelEdit.Services
 
             sub_43970_smooth_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0);//224970 // smooth terrain
             sub_43EE0_add_rivers(mapHeightmap_11B4E0, mapAngle_13B4E0);//224ee0 // add rivers
+            sub_44580(mapAngle_13B4E0, mapTerrainType_10B4E0, x_BYTE_F2CD0x, ref seed_17B4E0);//225580 //set angle of terrain
+
             sub_43D50_change_angle_of_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0);//224d50
             sub_44D00_shade_terrain(mapHeightmap_11B4E0, mapShading_12B4E0, ref seed_17B4E0);//225d00
 
@@ -1263,7 +1307,162 @@ namespace MCLevelEdit.Services
             }
         }
 
-        void sub_43D50_change_angle_of_terrain(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, byte[] mapTerrainType_10B4E0)//224d50
+        private void sub_44580(byte[] mapAngle_13B4E0, byte[] mapTerrainType_10B4E0, byte[,] x_BYTE_F2CD0x, ref ushort seed_17B4E0)//225580
+        {
+            byte[] actBufPos;
+            byte point1;
+            byte point2;
+            byte point3;
+            byte point4;
+            byte actBufEnt;
+
+            byte[] pdwScreenBuffer_351628 = new byte[2401 * 25];
+
+            for (int i = 0; i < 148; i++)
+            {
+                if (unk_D47E0[4 * i + 0] >= 0)
+                {
+                    if (unk_D47E0[4 * i + 1] >= 0)
+                    {
+                        if (unk_D47E0[4 * i + 2] >= 0)
+                        {
+                            if (unk_D47E0[4 * i + 3] >= 0)
+                            {
+                                int idx = 25 * (49 * unk_D47E0[4 * i + 1] + 7 * unk_D47E0[4 * i + 2] + unk_D47E0[4 * i + 3] + 343 * unk_D47E0[4 * i]);
+                                if (pdwScreenBuffer_351628[idx] < 12)
+                                {
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 0;
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx]++;
+                                }
+
+                                idx = 25 * (49 * unk_D47E0[4 * i] + unk_D47E0[4 * i + 2] + 7 * unk_D47E0[4 * i + 3] + 343 * unk_D47E0[4 * i + 1]);
+                                if (pdwScreenBuffer_351628[idx] < 12)
+                                {
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 16;
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx]++;
+                                }
+
+                                idx = 25 * (49 * unk_D47E0[4 * i + 3] + unk_D47E0[4 * i + 1] + 7 * unk_D47E0[4 * i] + 343 * unk_D47E0[4 * i + 2]);
+                                if (pdwScreenBuffer_351628[idx] < 12)
+                                {
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 48;
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx]++;
+                                }
+
+                                idx = 25 * (49 * unk_D47E0[4 * i + 2] + unk_D47E0[4 * i] + 7 * unk_D47E0[4 * i + 1] + 343 * unk_D47E0[4 * i + 3]);
+                                if (pdwScreenBuffer_351628[idx] < 12)
+                                {
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 32;
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx]++;
+                                }
+
+                                idx = 25 * (49 * unk_D47E0[4 * i + 2] + 8 * unk_D47E0[4 * i + 3] - unk_D47E0[4 * i + 3] + unk_D47E0[4 * i] + 343 * unk_D47E0[4 * i + 1]);
+                                if (pdwScreenBuffer_351628[idx] < 12)
+                                {
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 96;
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx]++;
+                                }
+
+                                idx = 25 * (49 * unk_D47E0[4 * i + 1] + 8 * unk_D47E0[4 * i] - unk_D47E0[4 * i] + unk_D47E0[4 * i + 3] + 343 * unk_D47E0[4 * i + 2]);
+                                if (pdwScreenBuffer_351628[idx] < 12)
+                                {
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 112;
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx]++;
+                                }
+
+                                idx = 25 * (49 * unk_D47E0[4 * i] + 7 * unk_D47E0[4 * i + 1] + unk_D47E0[4 * i + 2] + 343 * unk_D47E0[4 * i + 3]);
+                                if (pdwScreenBuffer_351628[idx] < 12)
+                                {
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 80;
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx]++;
+                                }
+
+                                idx = 25 * (343 * unk_D47E0[4 * i] + 7 * unk_D47E0[4 * i + 2] + unk_D47E0[4 * i + 1] + 49 * unk_D47E0[4 * i + 3]);
+                                if (pdwScreenBuffer_351628[idx] < 12)
+                                {
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 64;
+                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx]++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            int index = 0;
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    for (int k = 0; k < 7; k++)
+                    {
+                        for (int l = 0; l < 7; l++)
+                        {
+                            actBufPos = pdwScreenBuffer_351628.Skip(25 * (49 * j + 7 * k + l + 343 * i)).Take(25).ToArray();
+                            if (actBufPos[0] != 0)
+                            {
+                                x_BYTE_F2CD0x[index,0] = actBufPos[1];
+                                x_BYTE_F2CD0x[index,1] = actBufPos[13];
+                            }
+                            else
+                            {
+                                x_BYTE_F2CD0x[index,0] = 1;
+                                x_BYTE_F2CD0x[index,1] = 0;
+                            }
+                            index++;
+                        }
+                    }
+                }
+            }
+            //adress 225bbd
+
+            //  X-X
+            //  | |
+            //  B-X
+
+            UAxis2d uindex = new UAxis2d();
+            for (int i = 0; i < Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE; i++)
+            {
+                uindex.Word = (ushort)i;
+                if (mapTerrainType_10B4E0[uindex.Word] == 0)
+                {
+                    point1 = (byte)(mapAngle_13B4E0[uindex.Word] & 7);
+                    uindex.X++;
+                    point2 = (byte)(mapAngle_13B4E0[uindex.Word] & 7);
+                    uindex.Y++;
+                    point3 = (byte)(mapAngle_13B4E0[uindex.Word] & 7);
+                    uindex.X--;
+                    point4 = (byte)(mapAngle_13B4E0[uindex.Word] & 7);
+                    uindex.Y--;
+                    actBufEnt = pdwScreenBuffer_351628[25 * (343 * point1 + 49 * point2 + point4 + 7 * point3)];
+                    if (actBufEnt != 0)
+                    {
+                        seed_17B4E0 = (ushort)(9377 * seed_17B4E0 + 9439);
+                        if (seed_17B4E0 % (actBufEnt + 1) >= actBufEnt)
+                            actBufPos = pdwScreenBuffer_351628.Skip(25 * (343 * point1 + 49 * point2 + point4 + 7 * point3)).Take(25).ToArray();
+                        else
+                            actBufPos = pdwScreenBuffer_351628.Skip(seed_17B4E0 % (actBufEnt + 1) + 25 * (343 * point1 + 49 * point2 + point4 + 7 * point3)).Take(25).ToArray();
+
+
+                        mapTerrainType_10B4E0[uindex.Word] = actBufPos[1];
+                        mapAngle_13B4E0[uindex.Word] = (byte)((mapAngle_13B4E0[uindex.Word] & 7) + actBufPos[13]);
+                    }
+                    else
+                    {
+                        mapTerrainType_10B4E0[uindex.Word] = 1;
+                    }
+                }
+            }
+        }
+
+        private void sub_43D50_change_angle_of_terrain(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, byte[] mapTerrainType_10B4E0)//224d50
         {
 
             //  X-X-X
