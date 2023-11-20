@@ -839,7 +839,7 @@ namespace MCLevelEdit.Services
             }
         }
 
-        void sub_454F0(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, byte maxHeightCut, byte maxHeightDiffCut)//2264f0
+        private void sub_454F0(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, byte maxHeightCut, byte maxHeightDiffCut)//2264f0
         {
             //    X
             //	 / \
@@ -894,7 +894,7 @@ namespace MCLevelEdit.Services
             }
         }
 
-        void sub_45600(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, byte[] mapTerrainType_10B4E0, byte a1)//226600
+        private void sub_45600(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, byte[] mapTerrainType_10B4E0, byte a1)//226600
         {
             byte ang4;
             byte ang2;
@@ -1051,7 +1051,7 @@ namespace MCLevelEdit.Services
             }
         }
 
-        void sub_43FC0(byte[] mapAngle_13B4E0)//224fc0
+        private void sub_43FC0(byte[] mapAngle_13B4E0)//224fc0
         {
             int sameAngle;
             byte centerAngle;
@@ -1092,7 +1092,7 @@ namespace MCLevelEdit.Services
             }
         }
 
-        void sub_43970_smooth_terrain(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0)//224970
+        private void sub_43970_smooth_terrain(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0)//224970
         {
             UAxis2d index = new UAxis2d();
             for (int i = 0; i < Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE; i++)
@@ -1102,7 +1102,7 @@ namespace MCLevelEdit.Services
             }
         }
 
-        byte sub_439A0(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, ushort index)//2249a0
+        private byte sub_439A0(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0, ushort index)//2249a0
         {
             //    X
             //    |
@@ -1188,7 +1188,7 @@ namespace MCLevelEdit.Services
             return (byte)result;
         }
 
-        void sub_43EE0_add_rivers(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0)//224ee0
+        private void sub_43EE0_add_rivers(byte[] mapHeightmap_11B4E0, byte[] mapAngle_13B4E0)//224ee0
         {
             //  X-X
             //  | |
@@ -1321,7 +1321,7 @@ namespace MCLevelEdit.Services
             }
         }
 
-        void sub_44D00_shade_terrain(byte[] mapHeightmap_11B4E0, byte[] mapShading_12B4E0, ref ushort seed_17B4E0)//225d00
+        private void sub_44D00_shade_terrain(byte[] mapHeightmap_11B4E0, byte[] mapShading_12B4E0, ref ushort seed_17B4E0)//225d00
         {
 
             //     X
