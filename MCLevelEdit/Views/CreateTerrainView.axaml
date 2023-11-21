@@ -81,7 +81,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="6"
              HorizontalAlignment="Stretch"
-             Text="{Binding Map.TerrainGenerationParameters.Source, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.Source, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="7"
@@ -121,7 +121,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="10"
              HorizontalAlignment="Stretch"
-             Text="{Binding Map.TerrainGenerationParameters.BhFlt, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.BhFlt, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="11"
@@ -131,7 +131,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="11"
              HorizontalAlignment="Stretch"
-             Text="{Binding Map.TerrainGenerationParameters.RkSte, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding Map.TerrainGenerationParameters.RkSte, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Button x:Name="btnGenerate" 
             Grid.Column="0"
