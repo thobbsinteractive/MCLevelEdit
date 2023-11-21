@@ -2,7 +2,7 @@ using MCLevelEdit.Services;
 
 namespace MCLevelEdit.Test
 {
-    public class Tests
+    public class FileServiceTests
     {
         [SetUp]
         public void Setup()
