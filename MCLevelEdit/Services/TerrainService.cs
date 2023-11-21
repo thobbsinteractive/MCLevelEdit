@@ -147,7 +147,7 @@ namespace MCLevelEdit.Services
             sub_45600(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.BhFlt);//226600
             sub_43FC0(mapAngle_13B4E0);//224fc0
 
-            //Array.Fill<byte>(mapTerrainType_10B4E0, 0);
+            Array.Fill<byte>(mapTerrainType_10B4E0, 0);
 
             sub_43970_smooth_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0);//224970 // smooth terrain
             sub_43EE0_add_rivers(mapHeightmap_11B4E0, mapAngle_13B4E0);//224ee0 // add rivers
