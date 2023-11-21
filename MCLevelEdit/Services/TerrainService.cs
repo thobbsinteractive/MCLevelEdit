@@ -1309,7 +1309,6 @@ namespace MCLevelEdit.Services
 
         private void sub_44580(byte[] mapAngle_13B4E0, byte[] mapTerrainType_10B4E0, byte[,] x_BYTE_F2CD0x, ref ushort seed_17B4E0)//225580
         {
-            byte[] actBufPos;
             byte point1;
             byte point2;
             byte point3;
@@ -1405,11 +1404,11 @@ namespace MCLevelEdit.Services
                     {
                         for (int l = 0; l < 7; l++)
                         {
-                            actBufPos = pdwScreenBuffer_351628.Skip(25 * (49 * j + 7 * k + l + 343 * i)).Take(25).ToArray();
-                            if (actBufPos[0] != 0)
+                            int idx = 25 * (49 * j + 7 * k + l + 343 * i);
+                            if (pdwScreenBuffer_351628[idx] != 0)
                             {
-                                x_BYTE_F2CD0x[index,0] = actBufPos[1];
-                                x_BYTE_F2CD0x[index,1] = actBufPos[13];
+                                x_BYTE_F2CD0x[index,0] = pdwScreenBuffer_351628[idx + 1];
+                                x_BYTE_F2CD0x[index,1] = pdwScreenBuffer_351628[idx + 13];
                             }
                             else
                             {
@@ -1445,14 +1444,14 @@ namespace MCLevelEdit.Services
                     if (actBufEnt != 0)
                     {
                         seed_17B4E0 = (ushort)(9377 * seed_17B4E0 + 9439);
+                        int idx = 0;
                         if (seed_17B4E0 % (actBufEnt + 1) >= actBufEnt)
-                            actBufPos = pdwScreenBuffer_351628.Skip(25 * (343 * point1 + 49 * point2 + point4 + 7 * point3)).Take(25).ToArray();
+                            idx = 25 * (343 * point1 + 49 * point2 + point4 + 7 * point3);
                         else
-                            actBufPos = pdwScreenBuffer_351628.Skip(seed_17B4E0 % (actBufEnt + 1) + 25 * (343 * point1 + 49 * point2 + point4 + 7 * point3)).Take(25).ToArray();
+                            idx = seed_17B4E0 % (actBufEnt + 1) + 25 * (343 * point1 + 49 * point2 + point4 + 7 * point3);
 
-
-                        mapTerrainType_10B4E0[uindex.Word] = actBufPos[1];
-                        mapAngle_13B4E0[uindex.Word] = (byte)((mapAngle_13B4E0[uindex.Word] & 7) + actBufPos[13]);
+                        mapTerrainType_10B4E0[uindex.Word] = pdwScreenBuffer_351628[idx + 1];
+                        mapAngle_13B4E0[uindex.Word] = (byte)((mapAngle_13B4E0[uindex.Word] & 7) + pdwScreenBuffer_351628[idx + 13]);
                     }
                     else
                     {
