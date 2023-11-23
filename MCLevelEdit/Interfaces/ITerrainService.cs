@@ -12,7 +12,7 @@ public interface ITerrainService
         Height
     }
 
-    public Task<Terrain> CalculateTerrain(TerrainGenerationParameters genParams);
+    public Task<Terrain> CalculateTerrain(TerrainGenerationParameters genParams, byte stage = 17);
     public Task<WriteableBitmap> GenerateBitmapAsync(Terrain terrain, Layer layer);
     public Task<WriteableBitmap> DrawBitmapAsync(Terrain terrain, Layer layer, WriteableBitmap bitmap);
 }

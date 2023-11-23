@@ -125,7 +125,7 @@ namespace MCLevelEdit.Services
             });
         }
 
-        public async Task<Terrain> CalculateTerrain(TerrainGenerationParameters genParams)
+        public async Task<Terrain> CalculateTerrain(TerrainGenerationParameters genParams, byte stage = 18)
         {
             short[] mapEntityIndex_15B4E0 = new short[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
             byte[] mapHeightmap_11B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
@@ -135,29 +135,46 @@ namespace MCLevelEdit.Services
             byte[,] x_BYTE_F2CD0x = new byte[7 * 7 * 7 * 7,2]; // 233cd0//4802 //4816
 
             ushort seed_17B4E0 = genParams.Seed;
-            sub_B5E70_decompress_terrain_map_level(mapEntityIndex_15B4E0, (short)genParams.Seed, genParams.Offset, genParams.Raise, genParams.Gnarl);
-            sub_44DB0_truncTerrainHeight(mapEntityIndex_15B4E0, mapHeightmap_11B4E0);//225db0 //trunc and create
-            sub_44E40_generate_rivers(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.River, genParams.LRiver, ref seed_17B4E0);//225e40 //add any fields
-            sub_45AA0_setMax4Tiles(mapHeightmap_11B4E0, mapAngle_13B4E0);
-            sub_440D0(mapHeightmap_11B4E0, mapAngle_13B4E0, genParams.SnLin);//2250d0
-            sub_45060(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.SnFlt, genParams.BhLin);//226060
-            sub_44320(mapAngle_13B4E0);//225320
-            sub_45210(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.SnFlt, genParams.BhLin);//226210
-            sub_454F0(mapHeightmap_11B4E0, mapAngle_13B4E0, genParams.Source, genParams.RkSte);//2264f0
-            sub_45600(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.BhFlt);//226600
-            sub_43FC0(mapAngle_13B4E0);//224fc0
-
-            Array.Fill<byte>(mapTerrainType_10B4E0, 0);
-
-            sub_43970_smooth_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0);//224970 // smooth terrain
-            sub_43EE0_add_rivers(mapHeightmap_11B4E0, mapAngle_13B4E0);//224ee0 // add rivers
-            sub_44580(mapAngle_13B4E0, mapTerrainType_10B4E0, x_BYTE_F2CD0x, ref seed_17B4E0);//225580 //set angle of terrain
-
-            sub_43D50_change_angle_of_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0);//224d50
-            sub_44D00_shade_terrain(mapHeightmap_11B4E0, mapShading_12B4E0, ref seed_17B4E0);//225d00
+            if (stage > 0)
+                sub_B5E70_decompress_terrain_map_level(mapEntityIndex_15B4E0, (short)genParams.Seed, genParams.Offset, genParams.Raise, genParams.Gnarl);
+            if (stage > 1)
+                sub_44DB0_truncTerrainHeight(mapEntityIndex_15B4E0, mapHeightmap_11B4E0);//225db0 //trunc and create
+            if (stage > 2)
+                Array.Fill<short>(mapEntityIndex_15B4E0, 0);
+            if (stage > 3)
+                sub_44E40_generate_rivers(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.River, genParams.LRiver, ref seed_17B4E0);//225e40 //add any fields
+            if (stage > 4)
+                sub_45AA0_setMax4Tiles(mapHeightmap_11B4E0, mapAngle_13B4E0);
+            if (stage > 5)
+                sub_440D0(mapHeightmap_11B4E0, mapAngle_13B4E0, genParams.SnLin);//2250d0
+            if (stage > 6)
+                sub_45060(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.SnFlt, genParams.BhLin);//226060
+            if (stage > 7)
+                sub_44320(mapAngle_13B4E0);//225320
+            if (stage > 8)
+                sub_45210(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.SnFlt, genParams.BhLin);//226210
+            if (stage > 9)
+                sub_454F0(mapHeightmap_11B4E0, mapAngle_13B4E0, genParams.Source, genParams.RkSte);//2264f0
+            if (stage > 10)
+                sub_45600(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0, genParams.BhFlt);//226600
+            if (stage > 11)
+                sub_43FC0(mapAngle_13B4E0);//224fc0
+            if (stage > 12)
+                Array.Fill<byte>(mapTerrainType_10B4E0, 0);
+            if (stage > 13)
+                sub_43970_smooth_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0);//224970 // smooth terrain
+            if (stage > 14)
+                sub_43EE0_add_rivers(mapHeightmap_11B4E0, mapAngle_13B4E0);//224ee0 // add rivers
+            if (stage > 15)
+                sub_44580(mapAngle_13B4E0, mapTerrainType_10B4E0, x_BYTE_F2CD0x, ref seed_17B4E0);//225580 //set angle of terrain
+            if (stage > 16)
+                sub_43D50_change_angle_of_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0);//224d50
+            if (stage > 17)
+                sub_44D00_shade_terrain(mapHeightmap_11B4E0, mapShading_12B4E0, ref seed_17B4E0);//225d00
 
             return new Terrain()
             {
+                MapEntityIndex_15B4E0 = mapEntityIndex_15B4E0,
                 MapTerrainType_10B4E0 = mapTerrainType_10B4E0,
                 MapHeightmap_11B4E0 = mapHeightmap_11B4E0,
                 MapAngle_13B4E0 = mapAngle_13B4E0,
@@ -178,7 +195,6 @@ namespace MCLevelEdit.Services
                     for (int k = 1 << (7 - i); k > 0; k--)
                     {
                         sub_B5EFA(mapEntityIndex_15B4E0, (short)(1 << i), ref sumEnt, gnarl, ref seed);//355220
-                        //this.Log().Debug($"sub_B5EFA Seed:{seed} offset:{offset} raise:{raise} gnarl:{gnarl}");
                     }
                     sumEnt.Word += (ushort)((2 * (1 << i)) << 8);
                 }
@@ -187,7 +203,6 @@ namespace MCLevelEdit.Services
                     for (int k = 1 << (7 - i); k > 0; k--)
                     {
                         sub_B5F8F(mapEntityIndex_15B4E0, (short)(1 << i), ref sumEnt, gnarl, ref seed);
-                        //this.Log().Debug($"sub_B5F8F Seed:{seed} offset:{offset} raise:{raise} gnarl:{gnarl}");
                     }
                     sumEnt.Word += (ushort)((2 * (1 << i)) << 8);
                 }
@@ -216,7 +231,7 @@ namespace MCLevelEdit.Services
             indexx.Y -= (byte)a1;
             srandNumber = (ushort)(9377 * nextRand + 9439);
             nextRand = (short)srandNumber;
-            //if (mapEntityIndex_15B4E0[indexx.Word] <= 0)
+            if (mapEntityIndex_15B4E0[indexx.Word] == 0)
                 mapEntityIndex_15B4E0[indexx.Word] = (short)(srandNumber % (ushort)(2 * gnarl + 1)
                 + srandNumber % (ushort)((a1 << 6) + 1) + (sumEnt >> 2) - 32 * a1 - gnarl);
             indexx.X += (byte)a1;
@@ -251,7 +266,7 @@ namespace MCLevelEdit.Services
             srandNumber = (ushort)(9377 * nextRand + 9439);
             sumEnt2 += mapEntityIndex_15B4E0[indexx.Word];
             indexx.Y -= (byte)a1;
-            //if (mapEntityIndex_15B4E0[indexx.Word] <= 0)
+            if (mapEntityIndex_15B4E0[indexx.Word] == 0)
                 mapEntityIndex_15B4E0[indexx.Word] = (short)(srandNumber % (ushort)(2 * gnarl + 1)
                 + srandNumber % (ushort)((a1 << 6) + 1) + (ushort)(sumEnt >> 2) - 32 * a1 - gnarl);
 
@@ -270,7 +285,7 @@ namespace MCLevelEdit.Services
             indexx.Y -= (byte)a1;
             srandNumber = (ushort)(9377 * srandNumber + 9439);
             nextRand = (short)srandNumber;
-            //if (mapEntityIndex_15B4E0[indexx.Word] <= 0)
+            if (mapEntityIndex_15B4E0[indexx.Word] == 0)
                 mapEntityIndex_15B4E0[indexx.Word] = (short)(srandNumber % (ushort)(2 * gnarl + 1)
                 + srandNumber % (ushort)((a1 << 6) + 1) + (ushort)(sumEnt2 >> 2) - 32 * a1 - gnarl);
             indexx.X += (byte)(2 * a1);
