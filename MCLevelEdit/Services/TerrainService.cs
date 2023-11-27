@@ -1345,64 +1345,64 @@ namespace MCLevelEdit.Services
                                 int idx = 25 * (49 * unk_D47E0[4 * i + 1] + 7 * unk_D47E0[4 * i + 2] + unk_D47E0[4 * i + 3] + 343 * unk_D47E0[4 * i]);
                                 if (pdwScreenBuffer_351628[idx] < 12)
                                 {
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 0;
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 13] = 0;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 1] = (byte)i;
                                     pdwScreenBuffer_351628[idx]++;
                                 }
 
                                 idx = 25 * (49 * unk_D47E0[4 * i] + unk_D47E0[4 * i + 2] + 7 * unk_D47E0[4 * i + 3] + 343 * unk_D47E0[4 * i + 1]);
                                 if (pdwScreenBuffer_351628[idx] < 12)
                                 {
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 16;
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 13] = 16;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 1] = (byte)i;
                                     pdwScreenBuffer_351628[idx]++;
                                 }
 
                                 idx = 25 * (49 * unk_D47E0[4 * i + 3] + unk_D47E0[4 * i + 1] + 7 * unk_D47E0[4 * i] + 343 * unk_D47E0[4 * i + 2]);
                                 if (pdwScreenBuffer_351628[idx] < 12)
                                 {
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 48;
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 13] = 48;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 1] = (byte)i;
                                     pdwScreenBuffer_351628[idx]++;
                                 }
 
                                 idx = 25 * (49 * unk_D47E0[4 * i + 2] + unk_D47E0[4 * i] + 7 * unk_D47E0[4 * i + 1] + 343 * unk_D47E0[4 * i + 3]);
                                 if (pdwScreenBuffer_351628[idx] < 12)
                                 {
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 32;
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 13] = 32;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 1] = (byte)i;
                                     pdwScreenBuffer_351628[idx]++;
                                 }
 
                                 idx = 25 * (49 * unk_D47E0[4 * i + 2] + 8 * unk_D47E0[4 * i + 3] - unk_D47E0[4 * i + 3] + unk_D47E0[4 * i] + 343 * unk_D47E0[4 * i + 1]);
                                 if (pdwScreenBuffer_351628[idx] < 12)
                                 {
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 96;
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 13] = 96;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 1] = (byte)i;
                                     pdwScreenBuffer_351628[idx]++;
                                 }
 
                                 idx = 25 * (49 * unk_D47E0[4 * i + 1] + 8 * unk_D47E0[4 * i] - unk_D47E0[4 * i] + unk_D47E0[4 * i + 3] + 343 * unk_D47E0[4 * i + 2]);
                                 if (pdwScreenBuffer_351628[idx] < 12)
                                 {
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 112;
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 13] = 112;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 1] = (byte)i;
                                     pdwScreenBuffer_351628[idx]++;
                                 }
 
                                 idx = 25 * (49 * unk_D47E0[4 * i] + 7 * unk_D47E0[4 * i + 1] + unk_D47E0[4 * i + 2] + 343 * unk_D47E0[4 * i + 3]);
                                 if (pdwScreenBuffer_351628[idx] < 12)
                                 {
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 80;
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 13] = 80;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 1] = (byte)i;
                                     pdwScreenBuffer_351628[idx]++;
                                 }
 
                                 idx = 25 * (343 * unk_D47E0[4 * i] + 7 * unk_D47E0[4 * i + 2] + unk_D47E0[4 * i + 1] + 49 * unk_D47E0[4 * i + 3]);
                                 if (pdwScreenBuffer_351628[idx] < 12)
                                 {
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 13] = 64;
-                                    pdwScreenBuffer_351628[pdwScreenBuffer_351628[idx] + 1] = (byte)i;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 13] = 64;
+                                    pdwScreenBuffer_351628[idx + pdwScreenBuffer_351628[idx] + 1] = (byte)i;
                                     pdwScreenBuffer_351628[idx]++;
                                 }
                             }
