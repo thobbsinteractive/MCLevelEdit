@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Diagnostics;
 
 namespace MCLevelEdit.DataModel
 {
     public class TerrainGenerationParameters : ObservableObject
     {
+        private MapType _mapType = MapType.Day;
         private ushort _seed = 0;
         private ushort _offset = 0;
         private ushort _raise = 0;
@@ -17,6 +17,12 @@ namespace MCLevelEdit.DataModel
         private byte _bhLin = 0;
         private byte _bhFlt = 0;
         private byte _rkSte = 0;
+
+        public MapType MapType
+        {
+            get { return _mapType; }
+            set { SetProperty(ref _mapType, value); }
+        }
 
         public ushort Seed
         {
@@ -92,6 +98,7 @@ namespace MCLevelEdit.DataModel
 
         public void SetParameters(TerrainGenerationParameters terrainGenerationParameters)
         {
+            this.MapType = terrainGenerationParameters.MapType;
             this.Seed = terrainGenerationParameters.Seed;
             this.Offset = terrainGenerationParameters.Offset;
             this.Raise = terrainGenerationParameters.Raise;

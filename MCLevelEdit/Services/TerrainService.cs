@@ -168,9 +168,18 @@ namespace MCLevelEdit.Services
             if (stage > 15)
                 sub_44580(mapAngle_13B4E0, mapTerrainType_10B4E0, x_BYTE_F2CD0x, ref seed_17B4E0);//225580 //set angle of terrain
             if (stage > 16)
-                sub_43D50_change_angle_of_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0);//224d50
+            {
+                if (genParams.MapType == MapType.Cave)
+                {
+                    //sub_43B40_change_angle_of_terrain
+                }
+                else
+                {
+                    sub_43D50_change_angle_of_terrain(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0);//224d50
+                }
+            }
             if (stage > 17)
-                sub_44D00_shade_terrain(mapHeightmap_11B4E0, mapShading_12B4E0, ref seed_17B4E0);//225d00
+                sub_44D00_shade_terrain(mapHeightmap_11B4E0, mapShading_12B4E0, genParams.MapType, ref seed_17B4E0);//225d00
 
             return new Terrain()
             {
@@ -1534,7 +1543,7 @@ namespace MCLevelEdit.Services
             }
         }
 
-        private void sub_44D00_shade_terrain(byte[] mapHeightmap_11B4E0, byte[] mapShading_12B4E0, ref ushort seed_17B4E0)//225d00
+        private void sub_44D00_shade_terrain(byte[] mapHeightmap_11B4E0, byte[] mapShading_12B4E0, MapType mapType, ref ushort seed_17B4E0)//225d00
         {
 
             //     X
@@ -1573,7 +1582,14 @@ namespace MCLevelEdit.Services
                 {
                     tempIndex.X = (byte)((tempIndex.X & 3) + 28);
                 }
-                mapShading_12B4E0[index.Word] = tempIndex.X;
+                if (mapType != MapType.Day)
+                {
+                    mapShading_12B4E0[index.Word] = (byte)(64 - tempIndex.X);
+                }
+                else
+                {
+                    mapShading_12B4E0[index.Word] = tempIndex.X;
+                }
             }
         }
     }
