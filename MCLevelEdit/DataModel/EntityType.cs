@@ -57,14 +57,14 @@ namespace MCLevelEdit.DataModel
     public class EntityType : ObservableObject
     {
         private TypeId _typeId;
-        private EntityChildType _child;
+        private ModelType _model;
         private Color _colour;
 
-        public virtual EntityChildType[] ChildTypes
+        public virtual ModelType[] ChildTypes
         {
             get
             {
-                return new EntityChildType[] { };
+                return new ModelType[] { };
             }
         }
 
@@ -74,11 +74,11 @@ namespace MCLevelEdit.DataModel
             set { SetProperty(ref _typeId, value); }
         }
 
-        public EntityChildType Child
+        public ModelType Model
         {
-            get { return _child; }
+            get { return _model; }
             set { 
-                SetProperty(ref _child, value); 
+                SetProperty(ref _model, value); 
             }
         }
 
@@ -91,7 +91,7 @@ namespace MCLevelEdit.DataModel
         {
             _typeId = typeId;
             _colour = colour;
-            _child = new EntityChildType()
+            _model = new ModelType()
             {
                 Id = id,
                 Name = name
@@ -108,7 +108,7 @@ namespace MCLevelEdit.DataModel
         {
             return new EntityType(_typeId, _colour)
             {
-                Child = _child.Copy()
+                Model = _model.Copy()
             };
         }
     };

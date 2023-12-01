@@ -34,11 +34,11 @@ namespace MCLevelEdit.DataModel
 
     public class SpellType : EntityType
     {
-        private static EntityChildType[] _childTypes;
+        private static ModelType[] _childTypes;
 
         public SpellType(Spell spell) : base(TypeId.Spell, Color.FromRgb(128, 0, 128), ((int)spell), spell.ToString()) { }
 
-        public override EntityChildType[] ChildTypes
+        public override ModelType[] ChildTypes
         {
             get
             {
@@ -46,7 +46,7 @@ namespace MCLevelEdit.DataModel
                 {
                     _childTypes = Enum.GetValues(typeof(Spell))
                         .Cast<int>()
-                        .Select(x => new EntityChildType() { Id = x, Name = Enum.GetName(typeof(Spell), x) })
+                        .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Spell), x) })
                         .ToArray();
                 }
 

@@ -50,8 +50,8 @@
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <ComboBox x:Name="cboEntityChildType"
-                        SelectedItem="{Binding EntityType.Child}"
-                        SelectedValue="{Binding EntityType.Child}"
+                        SelectedItem="{Binding EntityType.Model}"
+                        SelectedValue="{Binding EntityType.Model}"
                         DisplayMemberBinding="{Binding .Name, Converter={StaticResource entityChildTypeToNameConverter}}"
                         ItemsSource="{Binding EntityType.ChildTypes}"
                         HorizontalAlignment="Stretch"

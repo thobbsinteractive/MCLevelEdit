@@ -27,11 +27,11 @@ namespace MCLevelEdit.DataModel
 
     public class CreatureType : EntityType
     {
-        private static EntityChildType[] _childTypes;
+        private static ModelType[] _childTypes;
 
         public CreatureType(Creature creature) : base(TypeId.Creature, Color.FromRgb(255, 0, 0),((int)creature), creature.ToString()) { }
 
-        public override EntityChildType[] ChildTypes
+        public override ModelType[] ChildTypes
         {
             get
             {
@@ -39,7 +39,7 @@ namespace MCLevelEdit.DataModel
                 {
                     _childTypes = Enum.GetValues(typeof(Creature))
                         .Cast<int>()
-                        .Select(x => new EntityChildType() { Id = x, Name = Enum.GetName(typeof(Creature), x) })
+                        .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Creature), x) })
                         .ToArray();
                 }
 

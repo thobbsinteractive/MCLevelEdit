@@ -41,11 +41,11 @@ namespace MCLevelEdit.DataModel
 
     public class SwitchType : EntityType
     {
-        private static EntityChildType[] _childTypes;
+        private static ModelType[] _childTypes;
 
         public SwitchType(Switch gameSwitch) : base(TypeId.Switch, Color.FromRgb(255, 255, 255), ((int)gameSwitch), gameSwitch.ToString()) { }
 
-        public override EntityChildType[] ChildTypes
+        public override ModelType[] ChildTypes
         {
             get
             {
@@ -53,7 +53,7 @@ namespace MCLevelEdit.DataModel
                 {
                     _childTypes = Enum.GetValues(typeof(Switch))
                         .Cast<int>()
-                        .Select(x => new EntityChildType() { Id = x, Name = Enum.GetName(typeof(Switch), x) })
+                        .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Switch), x) })
                         .ToArray();
                 }
 

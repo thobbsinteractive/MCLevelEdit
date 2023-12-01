@@ -18,11 +18,11 @@ namespace MCLevelEdit.DataModel
 
     public class SpawnType : EntityType
     {
-        private static EntityChildType[] _childTypes;
+        private static ModelType[] _childTypes;
 
         public SpawnType(Spawn spawn) : base(TypeId.Spawn, Color.FromRgb(255,255,0), ((int)spawn), spawn.ToString()) { }
 
-        public override EntityChildType[] ChildTypes
+        public override ModelType[] ChildTypes
         {
             get
             {
@@ -30,7 +30,7 @@ namespace MCLevelEdit.DataModel
                 {
                     _childTypes = Enum.GetValues(typeof(Spawn))
                         .Cast<int>()
-                        .Select(x => new EntityChildType() { Id = x, Name = Enum.GetName(typeof(Spawn), x) })
+                        .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Spawn), x) })
                         .ToArray();
                 }
 

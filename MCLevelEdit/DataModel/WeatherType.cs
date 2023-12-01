@@ -11,11 +11,11 @@ namespace MCLevelEdit.DataModel
 
     public class WeatherType : EntityType
     {
-        private static EntityChildType[] _childTypes;
+        private static ModelType[] _childTypes;
 
         public WeatherType(Weather weather) : base(TypeId.Weather, Color.FromRgb(0, 0, 255), ((int)weather), weather.ToString()) { }
 
-        public override EntityChildType[] ChildTypes
+        public override ModelType[] ChildTypes
         {
             get
             {
@@ -23,7 +23,7 @@ namespace MCLevelEdit.DataModel
                 {
                     _childTypes = Enum.GetValues(typeof(Weather))
                         .Cast<int>()
-                        .Select(x => new EntityChildType() { Id = x, Name = Enum.GetName(typeof(Weather), x) })
+                        .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Weather), x) })
                         .ToArray();
                 }
 

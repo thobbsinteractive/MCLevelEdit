@@ -70,7 +70,7 @@ public class ViewModelBase : ReactiveObject
         newEntity.PropertyChanged += Entity_PropertyChanged;
         newEntity.Position.PropertyChanged += Entity_PropertyChanged;
         newEntity.EntityType.PropertyChanged += Entity_PropertyChanged;
-        newEntity.EntityType.Child.PropertyChanged += Entity_PropertyChanged;
+        newEntity.EntityType.Model.PropertyChanged += Entity_PropertyChanged;
 
         Map.AddEntity(newEntity);
         this.RaisePropertyChanged(nameof(Map.Entities));

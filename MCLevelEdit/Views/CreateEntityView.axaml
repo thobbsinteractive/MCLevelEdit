@@ -69,8 +69,8 @@
               Grid.Column="1"
               VerticalAlignment="Center"
               HorizontalAlignment="Stretch"
-              SelectedItem="{Binding Entity.EntityType.Child}"
-              SelectedValue="{Binding Entity.EntityType.Child}"
+              SelectedItem="{Binding Entity.EntityType.Model}"
+              SelectedValue="{Binding Entity.EntityType.Model}"
               DisplayMemberBinding="{Binding .Name, Converter={StaticResource entityChildTypeToNameConverter}}"
               ItemsSource="{Binding Entity.EntityType.ChildTypes}">
     </ComboBox>

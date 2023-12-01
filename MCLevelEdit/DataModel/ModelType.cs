@@ -9,7 +9,7 @@ namespace MCLevelEdit.DataModel
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            var entityChildType = (EntityChildType)value;
+            var entityChildType = (ModelType)value;
             return entityChildType?.Name;
         }
 
@@ -19,7 +19,7 @@ namespace MCLevelEdit.DataModel
         }
     }
 
-    public class EntityChildType : ObservableObject
+    public class ModelType : ObservableObject
     {
         private int _id;
         private string _name;
@@ -36,9 +36,9 @@ namespace MCLevelEdit.DataModel
             set { SetProperty(ref _name, value); }
         }
 
-        public EntityChildType Copy()
+        public ModelType Copy()
         {
-            return new EntityChildType { Id = Id, Name = Name };
+            return new ModelType { Id = Id, Name = Name };
         }
     }
 }
