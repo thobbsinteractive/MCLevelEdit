@@ -63,23 +63,21 @@ namespace MCLevelEdit.DataModel
 
     public class EffectType : EntityType
     {
-        private static ModelType[] _childTypes;
-
         public EffectType(Effect effect) : base(TypeId.Effect, Color.FromRgb(255, 0, 255), ((int)effect), effect.ToString()) { }
 
-        public override ModelType[] ChildTypes
+        public override ModelType[] ModelTypes
         {
             get
             {
-                if (_childTypes is null)
+                if (_modelTypes is null)
                 {
-                    _childTypes = Enum.GetValues(typeof(Effect))
+                    _modelTypes = Enum.GetValues(typeof(Effect))
                         .Cast<int>()
                         .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Effect), x) })
                         .ToArray();
                 }
 
-                return _childTypes;
+                return _modelTypes;
             }
         }
     }

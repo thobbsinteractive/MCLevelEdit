@@ -72,7 +72,7 @@
               SelectedItem="{Binding Entity.EntityType.Model}"
               SelectedValue="{Binding Entity.EntityType.Model}"
               DisplayMemberBinding="{Binding .Name, Converter={StaticResource entityChildTypeToNameConverter}}"
-              ItemsSource="{Binding Entity.EntityType.ChildTypes}">
+              ItemsSource="{Binding Entity.EntityType.ModelTypes}">
     </ComboBox>
     <TextBox x:Name="txtPosX"
              Margin="5,10"

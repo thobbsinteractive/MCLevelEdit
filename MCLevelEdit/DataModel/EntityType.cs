@@ -60,7 +60,9 @@ namespace MCLevelEdit.DataModel
         private ModelType _model;
         private Color _colour;
 
-        public virtual ModelType[] ChildTypes
+        protected ModelType[] _modelTypes;
+
+        public virtual ModelType[] ModelTypes
         {
             get
             {

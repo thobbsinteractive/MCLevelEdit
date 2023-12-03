@@ -27,23 +27,21 @@ namespace MCLevelEdit.DataModel
 
     public class CreatureType : EntityType
     {
-        private static ModelType[] _childTypes;
-
         public CreatureType(Creature creature) : base(TypeId.Creature, Color.FromRgb(255, 0, 0),((int)creature), creature.ToString()) { }
 
-        public override ModelType[] ChildTypes
+        public override ModelType[] ModelTypes
         {
             get
             {
-                if (_childTypes is null)
+                if (_modelTypes is null)
                 {
-                    _childTypes = Enum.GetValues(typeof(Creature))
+                    _modelTypes = Enum.GetValues(typeof(Creature))
                         .Cast<int>()
                         .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Creature), x) })
                         .ToArray();
                 }
 
-                return _childTypes;
+                return _modelTypes;
             }
         }
     }

@@ -16,23 +16,21 @@ namespace MCLevelEdit.DataModel
 
     public class ScenaryType : EntityType
     {
-        private static ModelType[] _childTypes;
-
         public ScenaryType(Scenary scenary) : base(TypeId.Scenary, Color.FromRgb(0,255,0), ((int)scenary), scenary.ToString()) { }
 
-        public override ModelType[] ChildTypes
+        public override ModelType[] ModelTypes
         {
             get
             {
-                if (_childTypes is null)
+                if (_modelTypes is null)
                 {
-                    _childTypes = Enum.GetValues(typeof(Scenary))
+                    _modelTypes = Enum.GetValues(typeof(Scenary))
                         .Cast<int>()
                         .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Scenary), x) })
                         .ToArray();
                 }
 
-                return _childTypes;
+                return _modelTypes;
             }
         }
     }

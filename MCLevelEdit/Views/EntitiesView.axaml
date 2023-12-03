@@ -49,11 +49,11 @@
                                 Width="2*" >
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
-              <ComboBox x:Name="cboEntityChildType"
+              <ComboBox x:Name="cboEntityModelType"
                         SelectedItem="{Binding EntityType.Model}"
                         SelectedValue="{Binding EntityType.Model}"
                         DisplayMemberBinding="{Binding .Name, Converter={StaticResource entityChildTypeToNameConverter}}"
-                        ItemsSource="{Binding EntityType.ChildTypes}"
+                        ItemsSource="{Binding EntityType.ModelTypes}"
                         HorizontalAlignment="Stretch"
                         Margin="0">
               </ComboBox>
