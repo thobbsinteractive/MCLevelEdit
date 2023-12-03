@@ -140,24 +140,24 @@ namespace MCLevelEdit.DataModel
             }
         }
 
-        public static EntityType GetEntityFromTypeIdAndChildId(this TypeId typeId, int childId)
+        public static EntityType GetEntityFromTypeIdAndModelId(this TypeId typeId, int modelId)
         {
             switch (typeId)
             {
                 case TypeId.Scenary:
-                    return EntityTypes.I.Sceneries[childId];
+                    return EntityTypes.I.Sceneries[modelId];
                 case TypeId.Spawn:
-                    return EntityTypes.I.Spawns[childId];
+                    return EntityTypes.I.Spawns[modelId];
                 case TypeId.Creature:
-                    return EntityTypes.I.Creatures[childId];
+                    return EntityTypes.I.Creatures[modelId];
                 case TypeId.Weather:
-                    return EntityTypes.I.Weathers[childId];
+                    return EntityTypes.I.Weathers[modelId];
                 case TypeId.Effect:
-                    return EntityTypes.I.Effects[childId];
+                    return EntityTypes.I.Effects[modelId];
                 case TypeId.Switch:
-                    return EntityTypes.I.Switches[childId];
+                    return EntityTypes.I.Switches[modelId];
                 case TypeId.Spell:
-                    return EntityTypes.I.Spells[childId];
+                    return EntityTypes.I.Spells[modelId];
             }
             return null;
         }

@@ -53,7 +53,7 @@ namespace MCLevelEdit.Services
                 // Get Thing entries
                 TypeId entityTypeId = (TypeId)BitConverter.ToUInt16(levfile, fpos);
                 //string ThingType = IdentifyThing(classValue);
-                ushort childId = BitConverter.ToUInt16(levfile, fpos + 2);
+                ushort modelId = BitConverter.ToUInt16(levfile, fpos + 2);
                 ushort Xpos = BitConverter.ToUInt16(levfile, fpos + 4);
                 ushort Ypos = BitConverter.ToUInt16(levfile, fpos + 6);
                 ushort DisId = BitConverter.ToUInt16(levfile, fpos + 8);
@@ -64,7 +64,7 @@ namespace MCLevelEdit.Services
 
                 string ThingName = "";
 
-                var entityType = EntityTypeExtensions.GetEntityFromTypeIdAndChildId(entityTypeId, childId);
+                var entityType = EntityTypeExtensions.GetEntityFromTypeIdAndModelId(entityTypeId, modelId);
 
                 if (entityType != null)
                 {
