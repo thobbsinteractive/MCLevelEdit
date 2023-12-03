@@ -36,7 +36,7 @@ namespace MCLevelEdit.Test
             var mapTerrainTypeBytes = File.ReadAllBytes(mapTerrainTypeFullPath);
 
 
-            var terrain = service.CalculateTerrain(new DataModel.TerrainGenerationParameters()
+            var terrain = service.CalculateMc2Terrain(new DataModel.TerrainGenerationParameters()
             {
                 MapType = DataModel.MapType.Night,
                 Seed = 49098,

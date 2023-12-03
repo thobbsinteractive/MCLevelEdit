@@ -125,7 +125,7 @@ namespace MCLevelEdit.Services
             });
         }
 
-        public async Task<Terrain> CalculateTerrain(TerrainGenerationParameters genParams, byte stage = 18)
+        public async Task<Terrain> CalculateMc2Terrain(TerrainGenerationParameters genParams, byte stage = 18)
         {
             short[] mapEntityIndex_15B4E0 = new short[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];
             byte[] mapHeightmap_11B4E0 = new byte[Globals.MAX_MAP_SIZE * Globals.MAX_MAP_SIZE];

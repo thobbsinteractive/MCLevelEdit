@@ -24,7 +24,7 @@ namespace MCLevelEdit.ViewModels
         public async Task GenerateHeightMap()
         {
             GenerateTerrainButtonEnable = false;
-            Map.Terrain = await _terrainService.CalculateTerrain(Map.TerrainGenerationParameters);
+            Map.Terrain = await _terrainService.CalculateMc2Terrain(Map.TerrainGenerationParameters);
             GenerateTerrainButtonEnable = true;
             await RefreshPreviewAsync();
         }
