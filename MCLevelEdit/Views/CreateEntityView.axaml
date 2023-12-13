@@ -12,11 +12,11 @@
   <Grid ColumnDefinitions="2*,2*,1*,1*,1*,1*,1*"
         RowDefinitions="20,30">
     <Grid.Resources>
-      <m:TypeIdConverter x:Key="typeIdConverter"/>
-      <m:EntityTypeToNameConverter x:Key="entityTypeToNameConverter"/>
-      <m:EntityChildTypeToNameConverter x:Key="entityChildTypeToNameConverter"/>
-      <m:PositionConverter x:Key="positionConverter"/>
+      <c:TypeIdConverter x:Key="typeIdConverter"/>
+      <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
+      <c:KeyValuePairToIdConverter x:Key="keyValuePairToIdConverter"/>
       <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
+      <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
     </Grid.Resources>
     <Label Margin="5,0"
            Grid.Column="0"
@@ -52,51 +52,49 @@
            HorizontalAlignment="Left">
       Child:
     </Label>
-    <ComboBox x:Name="cboEntityType"
+    <ComboBox Name="cboEntityType"
               Margin="5,0"
               Grid.Row="1"
               Grid.Column="0"
               VerticalAlignment="Center"
               HorizontalAlignment="Stretch"
-              SelectedItem="{Binding Entity.EntityType, Converter={StaticResource typeIdConverter}}"
-              SelectedValue="{Binding Entity.EntityType, Converter={StaticResource typeIdConverter}}"
-              DisplayMemberBinding="{Binding .TypeId, Converter={StaticResource entityTypeToNameConverter}}"
+              SelectedValue="{Binding EntityView.Type, Converter={StaticResource typeIdConverter}}"
+              DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
               ItemsSource="{Binding Source={x:Static vm:CreateEntityViewModel.TypeIds}}">
     </ComboBox>
-    <ComboBox x:Name="cboEntityChildType"
+    <ComboBox Name="cboEntityModelType"
               Margin="5,0"
               Grid.Row="1"
               Grid.Column="1"
               VerticalAlignment="Center"
               HorizontalAlignment="Stretch"
-              SelectedItem="{Binding Entity.EntityType.Model}"
-              SelectedValue="{Binding Entity.EntityType.Model}"
-              DisplayMemberBinding="{Binding .Name, Converter={StaticResource entityChildTypeToNameConverter}}"
-              ItemsSource="{Binding Entity.EntityType.ModelTypes}">
+              SelectedIndex="{Binding EntityView.ModelIdx}"
+              DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+              ItemsSource="{Binding EntityView.ModelTypes}">
     </ComboBox>
     <TextBox x:Name="txtPosX"
              Margin="5,10"
              Grid.Row="1"
              Grid.Column="2"
-             Text="{Binding Entity.Position.X, Converter={StaticResource positionConverter}}">
+             Text="{Binding EntityView.X, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <TextBox x:Name="txtPosY"
              Margin="5,10"
              Grid.Row="1"
              Grid.Column="3"
-             Text="{Binding Entity.Position.Y, Converter={StaticResource positionConverter}}">
+             Text="{Binding EntityView.Y, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <TextBox x:Name="txtParent"
              Margin="5,10"
              Grid.Row="1"
              Grid.Column="4"
-             Text="{Binding Entity.Parent, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding EntityView.Parent, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <TextBox x:Name="txtChild"
              Margin="5,10"
              Grid.Row="1"
              Grid.Column="5"
-             Text="{Binding Entity.Child, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding EntityView.Child, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Button x:Name="btnAdd"
             Margin="5,0"

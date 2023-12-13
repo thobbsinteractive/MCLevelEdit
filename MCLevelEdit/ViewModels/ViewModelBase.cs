@@ -1,10 +1,15 @@
 ﻿using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Media;
+using DynamicData;
 using MCLevelEdit.DataModel;
+using MCLevelEdit.DataModel.Mappers;
 using MCLevelEdit.Interfaces;
 using MCLevelEdit.Utils;
 using ReactiveUI;
 using Splat;
+using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,13 +20,22 @@ public class ViewModelBase : ReactiveObject
     protected readonly IMapService _mapService;
     protected readonly ITerrainService _terrainService;
 
+    public IAvaloniaList<EntityView> Entities { get; init; }
+
     public static Map Map { get; set; }
+
+    public static KeyValuePair<int, string>[] TypeIds { get; } =
+        Enum.GetValues(typeof(TypeId))
+        .Cast<int>()
+        .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
+        .ToArray();
 
     public ViewModelBase(IMapService mapService, ITerrainService terrainService)
     {
         _mapService = mapService;
         _terrainService = terrainService;
         Map = _mapService.CreateNewMap();
+        Entities = new AvaloniaList<EntityView>();
     }
 
     protected async Task RefreshPreviewAsync()
@@ -66,15 +80,8 @@ public class ViewModelBase : ReactiveObject
     protected Entity AddEntity(Entity entity)
     {
         var newEntity = entity.Copy();
-
-        newEntity.PropertyChanged += Entity_PropertyChanged;
-        newEntity.Position.PropertyChanged += Entity_PropertyChanged;
-        newEntity.EntityType.PropertyChanged += Entity_PropertyChanged;
-        newEntity.EntityType.Model.PropertyChanged += Entity_PropertyChanged;
-
         Map.AddEntity(newEntity);
-        this.RaisePropertyChanged(nameof(Map.Entities));
-        RefreshPreviewAsync();
+        Entities.Add(newEntity.ToEntityView());
         return newEntity;
     }
 

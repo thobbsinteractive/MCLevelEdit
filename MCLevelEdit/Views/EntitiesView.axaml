@@ -12,17 +12,16 @@
   <Grid ColumnDefinitions="*"
         RowDefinitions="*,50">
     <Grid.Resources>
-      <m:TypeIdConverter x:Key="typeIdConverter"/>
-      <m:EntityTypeToNameConverter x:Key="entityTypeToNameConverter"/>
-      <m:EntityChildTypeToNameConverter x:Key="entityChildTypeToNameConverter"/>
-      <m:PositionConverter x:Key="positionConverter"/>
+      <c:TypeIdConverter x:Key="typeIdConverter"/>
+      <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
+      <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
       <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
     </Grid.Resources>
     <DataGrid Grid.Row="0"
               Grid.Column="0"
               Margin="10,10,10,0"
               x:Name="dgEntities"
-              ItemsSource="{Binding Map.Entities}"
+              ItemsSource="{Binding Entities}"
               IsReadOnly="True"
               GridLinesVisibility="All"
               BorderThickness="1" BorderBrush="Gray">
@@ -35,8 +34,8 @@
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <ComboBox x:Name="cboEntityType"
-                        SelectedItem="{Binding EntityType, Converter={StaticResource typeIdConverter}}"
-                        SelectedValue="{Binding EntityType, Converter={StaticResource typeIdConverter}}"
+                        SelectedItem="{Binding Type, Converter={StaticResource typeIdConverter}}"
+                        SelectedValue="{Binding Type, Converter={StaticResource typeIdConverter}}"
                         DisplayMemberBinding="{Binding .TypeId, Converter={StaticResource entityTypeToNameConverter}}"
                         ItemsSource="{Binding Source={x:Static vm:EntitiesViewModel.TypeIds}}"
                         HorizontalAlignment="Stretch"
@@ -50,10 +49,10 @@
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <ComboBox x:Name="cboEntityModelType"
-                        SelectedItem="{Binding EntityType.Model}"
-                        SelectedValue="{Binding EntityType.Model}"
-                        DisplayMemberBinding="{Binding .Name, Converter={StaticResource entityChildTypeToNameConverter}}"
-                        ItemsSource="{Binding EntityType.ModelTypes}"
+                        SelectedItem="{Binding Model}"
+                        SelectedValue="{Binding Model}"
+                        DisplayMemberBinding="{Binding .Name, Converter={StaticResource keyValuePairToNameConverter}}"
+                        ItemsSource="{Binding Model}"
                         HorizontalAlignment="Stretch"
                         Margin="0">
               </ComboBox>
@@ -65,7 +64,7 @@
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <TextBox x:Name="txtPosX"
-                       Text="{Binding Position.X, Converter={StaticResource positionConverter}}">
+                       Text="{Binding X, Converter={StaticResource positionConverter}}">
               </TextBox>
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
@@ -75,7 +74,7 @@
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <TextBox x:Name="txtPosY"
-                       Text="{Binding Position.Y, Converter={StaticResource positionConverter}}">
+                       Text="{Binding Y, Converter={StaticResource positionConverter}}">
               </TextBox>
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>

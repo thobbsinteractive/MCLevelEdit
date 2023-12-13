@@ -1,8 +1,6 @@
 ﻿using MCLevelEdit.DataModel;
 using MCLevelEdit.Interfaces;
 using ReactiveUI;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
@@ -10,34 +8,32 @@ namespace MCLevelEdit.ViewModels
 {
     public class CreateEntityViewModel : ViewModelBase
     {
-        private Entity _entity;
+        private EntityView _entityView;
 
-        public Entity Entity
+        public EntityView EntityView
         {
-            get => _entity;
-            set => this.RaiseAndSetIfChanged(ref _entity, value);
+            get => _entityView;
+            set => this.RaiseAndSetIfChanged(ref _entityView, value);
         }
 
         public ICommand AddNewEntityCommand { get; }
 
-        public static KeyValuePair<int, string>[] TypeIds { get; } =
-            Enum.GetValues(typeof(TypeId))
-            .Cast<int>()
-            .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
-            .ToArray();
-
         public CreateEntityViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
         {
-            Entity = new Entity()
+            EntityView = new EntityView()
             {
                 Id = Map.Entities.Count(),
-                EntityType = new SpawnType(Spawn.Flyer1),
-                Position = new Position(0, 0)
+                Type = (int)TypeId.Spawn, 
+                ModelIdx = 0,
+                X = 128,
+                Y = 128,
+                Parent = 0,
+                Child = 0
             };
 
             AddNewEntityCommand = ReactiveCommand.Create(() =>
             {
-                AddEntity(Entity.EntityType, Entity.Position, Entity.Parent, Entity.Child);
+                //AddEntity(Entity.EntityType, Entity.Position, Entity.Parent, Entity.Child);
             });
         }
     }
