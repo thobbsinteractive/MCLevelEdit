@@ -6,7 +6,6 @@ public class Map
 {
     public IList<Entity> Entities { get; set; } = new List<Entity>();
     public Terrain Terrain { get; set; } = new Terrain();
-    public WriteableBitmap Preview { get; set; }
 
     public IList<Entity> GetEntitiesByPosition(Position postion)
     {
