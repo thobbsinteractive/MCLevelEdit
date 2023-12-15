@@ -72,9 +72,13 @@ public class MapService : IMapService
 
     public bool CreateNewMap(ushort size = Globals.MAX_MAP_SIZE)
     {
-        var map = new Map();
-        MapRepository.Map = map;
+        MapRepository.Map = new Map();
         return true;
+    }
+
+    public Map GetMap()
+    {
+        return MapRepository.Map;
     }
 
     public bool AddEntity(Entity entity)

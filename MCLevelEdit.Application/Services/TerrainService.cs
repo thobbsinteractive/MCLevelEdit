@@ -230,7 +230,7 @@ public class TerrainService : ITerrainService, IEnableLogger
         if (stage > 17)
             sub_44D00_shade_terrain(mapHeightmap_11B4E0, mapShading_12B4E0, genParams.MapType, ref seed_17B4E0);//225d00
 
-        var terrain = new Terrain()
+        return new Terrain()
         {
             MapEntityIndex_15B4E0 = mapEntityIndex_15B4E0,
             MapTerrainType_10B4E0 = mapTerrainType_10B4E0,
@@ -238,8 +238,6 @@ public class TerrainService : ITerrainService, IEnableLogger
             MapAngle_13B4E0 = mapAngle_13B4E0,
             MapShading_12B4E0 = mapShading_12B4E0
         };
-        MapRepository.Map.Terrain = terrain;
-        return terrain;
     }
 
     private void sub_B5E70_decompress_terrain_map_level(short[] mapEntityIndex_15B4E0, short seed, ushort offset, ushort raise, ushort gnarl)
