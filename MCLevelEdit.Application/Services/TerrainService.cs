@@ -2,12 +2,13 @@
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using MCLevelEdit.Application.Enums;
 using MCLevelEdit.Application.Extensions;
-using MCLevelEdit.Application.Interfaces;
 using MCLevelEdit.Application.Structs;
 using MCLevelEdit.Application.Utils;
+using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Model.Enums;
+using MCLevelEdit.Model.Repository;
 using Splat;
 
 namespace MCLevelEdit.Application.Services;
@@ -229,7 +230,7 @@ public class TerrainService : ITerrainService, IEnableLogger
         if (stage > 17)
             sub_44D00_shade_terrain(mapHeightmap_11B4E0, mapShading_12B4E0, genParams.MapType, ref seed_17B4E0);//225d00
 
-        return new Terrain()
+        var terrain = new Terrain()
         {
             MapEntityIndex_15B4E0 = mapEntityIndex_15B4E0,
             MapTerrainType_10B4E0 = mapTerrainType_10B4E0,
@@ -237,6 +238,8 @@ public class TerrainService : ITerrainService, IEnableLogger
             MapAngle_13B4E0 = mapAngle_13B4E0,
             MapShading_12B4E0 = mapShading_12B4E0
         };
+        MapRepository.Map.Terrain = terrain;
+        return terrain;
     }
 
     private void sub_B5E70_decompress_terrain_map_level(short[] mapEntityIndex_15B4E0, short seed, ushort offset, ushort raise, ushort gnarl)
