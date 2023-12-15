@@ -1,6 +1,4 @@
-﻿using Avalonia.Media.Imaging;
-
-namespace MCLevelEdit.Model.Domain;
+﻿namespace MCLevelEdit.Model.Domain;
 
 public class Map
 {
