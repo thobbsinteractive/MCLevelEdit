@@ -21,18 +21,27 @@ public class EntityViewModel : ObservableObject
         set
         {
             SetProperty(ref _type, value);
-            ModelTypes.Clear();
-            var modelTypesList = GetModelTypes(_type);
-            if (modelTypesList.Any())
-            {
-                ModelTypes.AddRange(modelTypesList);
-                ModelIdx = 0;
-                OnPropertyChanged(nameof(ModelTypes));
-            }
+            PopulateModelTypes();
         }
     }
     public int Model
     {
+        
+        set
+        {
+            if (!ModelTypes.Any())
+                PopulateModelTypes();
+
+            for(int i = 0; i < ModelTypes.Count; i++)
+            {
+                if(ModelTypes[i].Key == value)
+                {
+                    ModelIdx = i;
+                    break;
+                }
+            }
+
+        } 
         get { return ModelTypes[_modelIdx].Key; }
     }
     public int ModelIdx
@@ -60,6 +69,17 @@ public class EntityViewModel : ObservableObject
             Parent = this.Parent,
             Child = this.Child
         };
+    }
+
+    private void PopulateModelTypes()
+    {
+        ModelTypes.Clear();
+        var modelTypesList = GetModelTypes(_type);
+        if (modelTypesList.Any())
+        {
+            ModelTypes.AddRange(modelTypesList);
+            OnPropertyChanged(nameof(ModelTypes));
+        }
     }
 
     private KeyValuePair<int, string>[] GetModelTypes(int type)

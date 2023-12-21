@@ -67,7 +67,7 @@ public class FileAdapter : IFilePort
 
             string ThingName = "";
 
-            var entityType = entityTypeId.GetEntityFromTypeIdAndModelId(modelId);
+            var entityType = entityTypeId.GetEntityTypeFromTypeIdAndModelId(modelId);
 
             if (entityType != null)
             {

@@ -24,7 +24,7 @@ public static class EntityTypeExtensions
         return null;
     }
 
-    public static EntityType GetEntityFromTypeIdAndModelId(this TypeId typeId, int modelId)
+    public static EntityType GetEntityTypeFromTypeIdAndModelId(this TypeId typeId, int modelId)
     {
         switch (typeId)
         {
