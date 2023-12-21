@@ -20,7 +20,7 @@
            Grid.Column="0"
            MaxWidth="256"
            MinHeight="256"
-           Source="{Binding Map.Preview}"></Image>
+           Source="{Binding Preview}"></Image>
     <views:CreateTerrainView x:Name="vmCreateTerrain"
                              Grid.Row="2"
                              Grid.Column="0"

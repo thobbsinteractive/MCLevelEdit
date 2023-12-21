@@ -8,7 +8,6 @@ using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Enums;
-using MCLevelEdit.Model.Repository;
 using Splat;
 
 namespace MCLevelEdit.Application.Services;
@@ -61,25 +60,7 @@ public class TerrainService : ITerrainService, IEnableLogger
         0x01,0x01, 0x06,0x03, 0x01,0x03, 0x06,0x03, 0x01,0x06, 0x01,0x03, 0x01,0x06, 0x06,0x03
         }; // weak
 
-    public Task<WriteableBitmap> GenerateBitmapAsync(Terrain terrain, Layer layer)
-    {
-        return Task.Run(() =>
-        {
-            WriteableBitmap bitmap = new WriteableBitmap(
-                new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
-                new Vector(96, 96), // DPI (dots per inch)
-                PixelFormat.Rgba8888);
-
-            if (layer == Layer.Game)
-                BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(255, 0, 0, 0), bitmap);
-            if (layer == Layer.Height)
-                BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(255, 46, 78, 166), bitmap);
-
-            return DrawBitmapAsync(terrain, layer, bitmap);
-        });
-    }
-
-    public Task<WriteableBitmap> DrawBitmapAsync(Terrain terrain, Layer layer, WriteableBitmap bitmap)
+    public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Terrain terrain, Layer layer)
     {
         return Task.Run(() =>
         {
@@ -94,74 +75,76 @@ public class TerrainService : ITerrainService, IEnableLogger
                         if (layer == Layer.Game)
                         {
                             Color baseColour = WATER_COLOUR;
-                            switch (terrain.MapTerrainType_10B4E0[index])
+                            if (terrain.MapTerrainType_10B4E0 != null)
                             {
-                                case 82:
-                                    baseColour = new Color(255, 168, 152, 148);
-                                    break;
-                                case 83:
-                                    baseColour = new Color(255, 188, 160, 156);
-                                    break;
-                                case 6:
-                                    baseColour = new Color(255, 164, 116, 92);
-                                    break;
-                                case 80:
-                                    baseColour = new Color(255, 128, 136, 140);
-                                    break;
-                                case 79:
-                                    baseColour = new Color(255, 104, 128, 132);
-                                    break;
-                                case 76:
-                                    baseColour = new Color(255, 40, 104, 116);
-                                    break;
-                                case 78:
-                                    baseColour = new Color(255, 84, 120, 128);
-                                    break;
-                                case 81:
-                                    baseColour = new Color(255, 148, 144, 144);
-                                    break;
-                                case 77:
-                                    baseColour = new Color(255, 64, 112, 124);
-                                    break;
-                                case 108:
-                                    baseColour = new Color(255, 88, 84, 92);
-                                    break;
-                                case 111:
-                                    baseColour = new Color(255, 16, 76, 88);
-                                    break;
-                                case 110:
-                                    baseColour = new Color(255, 48, 52, 60);
-                                    break;
-                                case 1:
-                                    baseColour = new Color(255, 140, 96, 68);
-                                    break;
-                                case 113:
-                                    baseColour = new Color(255, 196, 172, 168);
-                                    break;
+                                switch (terrain.MapTerrainType_10B4E0[index])
+                                {
+                                    case 82:
+                                        baseColour = new Color(255, 168, 152, 148);
+                                        break;
+                                    case 83:
+                                        baseColour = new Color(255, 188, 160, 156);
+                                        break;
+                                    case 6:
+                                        baseColour = new Color(255, 164, 116, 92);
+                                        break;
+                                    case 80:
+                                        baseColour = new Color(255, 128, 136, 140);
+                                        break;
+                                    case 79:
+                                        baseColour = new Color(255, 104, 128, 132);
+                                        break;
+                                    case 76:
+                                        baseColour = new Color(255, 40, 104, 116);
+                                        break;
+                                    case 78:
+                                        baseColour = new Color(255, 84, 120, 128);
+                                        break;
+                                    case 81:
+                                        baseColour = new Color(255, 148, 144, 144);
+                                        break;
+                                    case 77:
+                                        baseColour = new Color(255, 64, 112, 124);
+                                        break;
+                                    case 108:
+                                        baseColour = new Color(255, 88, 84, 92);
+                                        break;
+                                    case 111:
+                                        baseColour = new Color(255, 16, 76, 88);
+                                        break;
+                                    case 110:
+                                        baseColour = new Color(255, 48, 52, 60);
+                                        break;
+                                    case 1:
+                                        baseColour = new Color(255, 140, 96, 68);
+                                        break;
+                                    case 113:
+                                        baseColour = new Color(255, 196, 172, 168);
+                                        break;
 
-                                //case 0:
-                                //    baseColour = new Color();
-                                //    break;
-                                //case 2:
-                                //    baseColour = COAST_COLOUR;
-                                //    break;
-                                //case 3:
-                                //    baseColour = SAND_COLOUR;
-                                //    break;
-                                //case 4:
-                                //    baseColour = STONE_COLOUR;
-                                //    break;
-                                //case 5:
-                                //    baseColour = GRASS_COLOUR;
-                                //    break;
-                                //case 6:
-                                //    baseColour = SAND_COLOUR;
-                                //    break;
+                                        //case 0:
+                                        //    baseColour = new Color();
+                                        //    break;
+                                        //case 2:
+                                        //    baseColour = COAST_COLOUR;
+                                        //    break;
+                                        //case 3:
+                                        //    baseColour = SAND_COLOUR;
+                                        //    break;
+                                        //case 4:
+                                        //    baseColour = STONE_COLOUR;
+                                        //    break;
+                                        //case 5:
+                                        //    baseColour = GRASS_COLOUR;
+                                        //    break;
+                                        //case 6:
+                                        //    baseColour = SAND_COLOUR;
+                                        //    break;
+                                }
+                                fb.SetPixel(x, y, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
+                                    (byte)Math.Max(baseColour.G - terrain.MapShading_12B4E0[index], byte.MinValue),
+                                    (byte)Math.Max(baseColour.B - terrain.MapShading_12B4E0[index], byte.MinValue)));
                             }
-
-                            fb.SetPixel(x, y, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
-                                (byte)Math.Max(baseColour.G - terrain.MapShading_12B4E0[index], byte.MinValue),
-                                (byte)Math.Max(baseColour.B - terrain.MapShading_12B4E0[index], byte.MinValue)));
                         }
                         if (layer == Layer.Height)
                             fb.SetPixel(x, y, new Color(255, terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index]));
@@ -236,7 +219,8 @@ public class TerrainService : ITerrainService, IEnableLogger
             MapTerrainType_10B4E0 = mapTerrainType_10B4E0,
             MapHeightmap_11B4E0 = mapHeightmap_11B4E0,
             MapAngle_13B4E0 = mapAngle_13B4E0,
-            MapShading_12B4E0 = mapShading_12B4E0
+            MapShading_12B4E0 = mapShading_12B4E0,
+            GenerationParameters = genParams
         };
     }
 

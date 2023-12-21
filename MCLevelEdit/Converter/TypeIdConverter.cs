@@ -1,5 +1,6 @@
 ﻿using Avalonia.Data.Converters;
-using MCLevelEdit.DataModel;
+using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Model.Domain.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

@@ -8,5 +8,5 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="Entities"
         WindowStartupLocation="CenterScreen">
-  <views:EntitiesView />
+  <views:EntitiesTableView />
 </Window>

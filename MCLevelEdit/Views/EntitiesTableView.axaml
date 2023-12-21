@@ -5,10 +5,10 @@
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
              xmlns:c="clr-namespace:MCLevelEdit.Converter"
              xmlns:m="clr-namespace:MCLevelEdit.DataModel"
-             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EntitiesViewModel;assembly=MCLevelEdit"  
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EntitiesTableViewModel;assembly=MCLevelEdit"  
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="MCLevelEdit.Views.EntitiesView"
-             x:DataType="vm:EntitiesViewModel">
+             x:Class="MCLevelEdit.Views.EntitiesTableView"
+             x:DataType="vm:EntitiesTableViewModel">
   <Grid ColumnDefinitions="*"
         RowDefinitions="*,50">
     <Grid.Resources>
@@ -33,13 +33,15 @@
                                 Width="2*" >
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
-              <ComboBox x:Name="cboEntityType"
-                        SelectedItem="{Binding Type, Converter={StaticResource typeIdConverter}}"
-                        SelectedValue="{Binding Type, Converter={StaticResource typeIdConverter}}"
-                        DisplayMemberBinding="{Binding .TypeId, Converter={StaticResource entityTypeToNameConverter}}"
-                        ItemsSource="{Binding Source={x:Static vm:EntitiesViewModel.TypeIds}}"
+              <ComboBox Name="cboEntityType"
+                        Margin="5,0"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
                         HorizontalAlignment="Stretch"
-                        Margin="0">
+                        SelectedValue="{Binding Type, Converter={StaticResource typeIdConverter}}"
+                        DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+                        ItemsSource="{Binding Source={x:Static vm:CreateEntityViewModel.TypeIds}}">
               </ComboBox>
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
@@ -48,13 +50,15 @@
                                 Width="2*" >
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
-              <ComboBox x:Name="cboEntityModelType"
-                        SelectedItem="{Binding Model}"
-                        SelectedValue="{Binding Model}"
-                        DisplayMemberBinding="{Binding .Name, Converter={StaticResource keyValuePairToNameConverter}}"
-                        ItemsSource="{Binding Model}"
+              <ComboBox Name="cboEntityModelType"
+                        Margin="5,0"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
                         HorizontalAlignment="Stretch"
-                        Margin="0">
+                        SelectedIndex="{Binding ModelIdx}"
+                        DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+                        ItemsSource="{Binding ModelTypes}">
               </ComboBox>
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
@@ -64,7 +68,7 @@
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <TextBox x:Name="txtPosX"
-                       Text="{Binding X, Converter={StaticResource positionConverter}}">
+                       Text="{Binding X, Converter={StaticResource uInt8ToStringConverter}}">
               </TextBox>
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
@@ -74,7 +78,7 @@
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <TextBox x:Name="txtPosY"
-                       Text="{Binding Y, Converter={StaticResource positionConverter}}">
+                       Text="{Binding Y, Converter={StaticResource uInt8ToStringConverter}}">
               </TextBox>
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>

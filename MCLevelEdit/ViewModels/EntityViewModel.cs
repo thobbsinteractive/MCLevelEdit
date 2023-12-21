@@ -1,20 +1,19 @@
 ﻿using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
-using MCLevelEdit.DataModel;
+using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Model.Domain.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MCLevelEdit.ViewModels;
 
-public class EntityView : ObservableObject
+public class EntityViewModel : ObservableObject
 {
     private int _type;
-
     private int _modelIdx;
 
     public IAvaloniaList<KeyValuePair<int, string>> ModelTypes { get; init; } = new AvaloniaList<KeyValuePair<int, string>>();
-
     public int Id { get; set; }
     public int Type
     {
@@ -32,12 +31,10 @@ public class EntityView : ObservableObject
             }
         }
     }
-
     public int Model
     {
         get { return ModelTypes[_modelIdx].Key; }
     }
-
     public int ModelIdx
     {
         get { return _modelIdx; }
@@ -46,11 +43,24 @@ public class EntityView : ObservableObject
             SetProperty(ref _modelIdx, value);
         }
     }
-
-    public int X { get; set; }
-    public int Y { get; set; }
+    public byte X { get; set; }
+    public byte Y { get; set; }
     public ushort Parent { get; set; }
     public ushort Child { get; set; }
+
+    public EntityViewModel Copy()
+    {
+        return new EntityViewModel()
+        {
+            Id = this.Id, 
+            Type = this.Type,
+            ModelIdx = this.ModelIdx,
+            X = this.X,
+            Y = this.Y,
+            Parent = this.Parent,
+            Child = this.Child
+        };
+    }
 
     private KeyValuePair<int, string>[] GetModelTypes(int type)
     {

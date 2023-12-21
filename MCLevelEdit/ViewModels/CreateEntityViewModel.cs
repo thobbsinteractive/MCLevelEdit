@@ -1,5 +1,6 @@
-﻿using MCLevelEdit.DataModel;
-using MCLevelEdit.Interfaces;
+﻿using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
+using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Linq;
 using System.Windows.Input;
@@ -8,9 +9,9 @@ namespace MCLevelEdit.ViewModels
 {
     public class CreateEntityViewModel : ViewModelBase
     {
-        private EntityView _entityView;
+        private EntityViewModel _entityView;
 
-        public EntityView EntityView
+        public EntityViewModel EntityView
         {
             get => _entityView;
             set => this.RaiseAndSetIfChanged(ref _entityView, value);
@@ -20,9 +21,9 @@ namespace MCLevelEdit.ViewModels
 
         public CreateEntityViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
         {
-            EntityView = new EntityView()
+            EntityView = new EntityViewModel()
             {
-                Id = Map.Entities.Count(),
+                Id = Entities.Count(),
                 Type = (int)TypeId.Spawn, 
                 ModelIdx = 0,
                 X = 128,
@@ -33,7 +34,8 @@ namespace MCLevelEdit.ViewModels
 
             AddNewEntityCommand = ReactiveCommand.Create(() =>
             {
-                //AddEntity(Entity.EntityType, Entity.Position, Entity.Parent, Entity.Child);
+                EntityView.Id = Entities.Count();
+                AddEntity(EntityView);
             });
         }
     }

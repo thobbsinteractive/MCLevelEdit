@@ -1,5 +1,5 @@
-﻿using MCLevelEdit.DataModel;
-using MCLevelEdit.Interfaces;
+﻿using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -24,7 +24,7 @@ namespace MCLevelEdit.ViewModels
         public async Task GenerateHeightMap()
         {
             GenerateTerrainButtonEnable = false;
-            Map.Terrain = await _terrainService.CalculateMc2Terrain(Map.TerrainGenerationParameters);
+            await _mapService.RecalculateTerrain(GenerationParameters.ToGenerationParameters());
             GenerateTerrainButtonEnable = true;
             await RefreshPreviewAsync();
         }

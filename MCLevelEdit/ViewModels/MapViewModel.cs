@@ -1,4 +1,4 @@
-﻿using MCLevelEdit.Interfaces;
+﻿using MCLevelEdit.Model.Abstractions;
 using Splat;
 
 namespace MCLevelEdit.ViewModels

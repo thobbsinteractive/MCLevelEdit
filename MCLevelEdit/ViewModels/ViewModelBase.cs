@@ -1,15 +1,18 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using DynamicData;
-using MCLevelEdit.DataModel;
-using MCLevelEdit.DataModel.Mappers;
-using MCLevelEdit.Interfaces;
-using MCLevelEdit.Utils;
+using MCLevelEdit.Application.Utils;
+using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Model.Enums;
+using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using Splat;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,9 +23,12 @@ public class ViewModelBase : ReactiveObject
     protected readonly IMapService _mapService;
     protected readonly ITerrainService _terrainService;
 
-    public IAvaloniaList<EntityView> Entities { get; init; }
-
-    public static Map Map { get; set; }
+    public static TerrainGenerationParamsViewModel GenerationParameters { get; } = new TerrainGenerationParamsViewModel();
+    public static IAvaloniaList<EntityViewModel> Entities { get; } = new AvaloniaList<EntityViewModel>();
+    public static WriteableBitmap Preview { get; } = new WriteableBitmap(
+                new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
+                new Vector(96, 96), // DPI (dots per inch)
+                PixelFormat.Rgba8888);
 
     public static KeyValuePair<int, string>[] TypeIds { get; } =
         Enum.GetValues(typeof(TypeId))
@@ -34,8 +40,6 @@ public class ViewModelBase : ReactiveObject
     {
         _mapService = mapService;
         _terrainService = terrainService;
-        Map = _mapService.CreateNewMap();
-        Entities = new AvaloniaList<EntityView>();
     }
 
     protected async Task RefreshPreviewAsync()
@@ -43,53 +47,42 @@ public class ViewModelBase : ReactiveObject
         await Task.Run(async () =>
         {
             this.Log().Debug("Refreshing Preview...");
-            if (Map.Preview is not null)
-            {
-                BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(0, 0, 0, 0), Map.Preview);
-            }
+            BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(0, 0, 0, 0), Preview);
 
-            if (Map.Terrain is not null)
+            var map = _mapService.GetMap();
+            if (map.Terrain is not null)
             {
                 this.Log().Debug("Drawing Terrain...");
-                Map.Preview = await _terrainService.GenerateBitmapAsync(Map.Terrain, ITerrainService.Layer.Game);
-                Map.Preview = await _mapService.DrawBitmapAsync(Map, Map.Preview);
+                await _terrainService.DrawBitmapAsync(Preview, map.Terrain, Layer.Game);
             }
-            else
-            {
-                this.Log().Debug("Drawing Entities...");
-                Map.Preview = await _mapService.GenerateBitmapAsync(Map);
-            }
-            this.RaisePropertyChanged(nameof(Map.Preview));
+
+            this.Log().Debug("Drawing Entities...");
+            await _mapService.DrawBitmapAsync(Preview, map.Entities);
+
+            this.RaisePropertyChanging(nameof(Preview));
             this.Log().Debug("Preview refreshed");
         });
     }
 
-    protected Entity AddEntity(EntityType entityType, Position position, ushort parent = 0, ushort child = 0)
+    protected void AddEntity(EntityViewModel entityView)
     {
-        var newEntity = new Entity()
-        {
-            Id = Map.Entities.Count(),
-            EntityType = entityType,
-            Position = position,
-            Parent = parent,
-            Child = child
-        };
-        return AddEntity(newEntity);
-    }
-
-    protected Entity AddEntity(Entity entity)
-    {
-        var newEntity = entity.Copy();
-        Map.AddEntity(newEntity);
-        Entities.Add(newEntity.ToEntityView());
-        return newEntity;
-    }
-
-    protected void DeleteEntity(Entity entity)
-    {
-        Map.RemoveEntity(entity);
-        this.RaisePropertyChanged(nameof(Map.Entities));
+        Entities.Add(entityView.Copy());
+        _mapService.AddEntity(entityView.ToEntity());
+        //this.RaisePropertyChanged(nameof(Entities));
         RefreshPreviewAsync();
+    }
+
+    protected void DeleteEntity(EntityViewModel entityView)
+    {
+        Entities.Remove(entityView);
+        _mapService.DeleteEntity(entityView.ToEntity());
+        RefreshPreviewAsync();
+    }
+
+    protected void LoadEntities(IEnumerable<EntityViewModel> entitiesViewModels)
+    {
+        Entities.Clear();
+        Entities.AddRange(entitiesViewModels);
     }
 
     protected void Entity_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

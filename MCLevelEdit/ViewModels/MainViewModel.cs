@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using MCLevelEdit.DataModel;
-using MCLevelEdit.Interfaces;
+using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.ViewModels.Mappers;
 using MCLevelEdit.Views;
 using ReactiveUI;
 using Splat;
@@ -20,9 +20,11 @@ public class MainViewModel : ViewModelBase
 
     public Interaction<MapViewModel, MapViewModel?> ShowDialog { get; }
 
-    public MainViewModel(IMapService mapService, ITerrainService terrainService, IFileService fileService) : base(mapService, terrainService)
+    public MainViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
     {
         MapViewModel = Locator.Current.GetService<MapViewModel>();
+
+        _mapService.CreateNewMap();
 
         ShowDialog = new Interaction<MapViewModel, MapViewModel?>();
 
@@ -45,11 +47,13 @@ public class MainViewModel : ViewModelBase
 
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
             {
-                var map = await fileService.LoadMapFromFile(files[0].Path.AbsolutePath);
+                await mapService.LoadMapFromFileAsync(files[0].Path.AbsolutePath);
+                var map = mapService.GetMap();
 
-                Map.SetEntities(map.Entities);
-                Map.TerrainGenerationParameters.SetParameters(map.TerrainGenerationParameters);
-                Map.Terrain = await _terrainService.CalculateMc2Terrain(map.TerrainGenerationParameters);
+                GenerationParameters.SetParameters(map.Terrain.GenerationParameters.ToTerrainGenerationParamsViewModel());
+                this.RaisePropertyChanged(nameof(GenerationParameters));
+                LoadEntities(map.Entities.ToEntityViewModels());
+
                 RefreshPreviewAsync();
             }
         });

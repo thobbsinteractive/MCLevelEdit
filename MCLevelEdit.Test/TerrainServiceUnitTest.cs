@@ -1,5 +1,5 @@
-﻿using MCLevelEdit.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using MCLevelEdit.Application.Services;
+using MCLevelEdit.Model.Domain;
 
 namespace MCLevelEdit.Test
 {
@@ -36,9 +36,9 @@ namespace MCLevelEdit.Test
             var mapTerrainTypeBytes = File.ReadAllBytes(mapTerrainTypeFullPath);
 
 
-            var terrain = service.CalculateMc2Terrain(new DataModel.TerrainGenerationParameters()
+            var terrain = service.CalculateMc2Terrain(new GenerationParameters()
             {
-                MapType = DataModel.MapType.Night,
+                MapType = MapType.Night,
                 Seed = 49098,
                 Offset = 48953,
                 Raise = 1140,

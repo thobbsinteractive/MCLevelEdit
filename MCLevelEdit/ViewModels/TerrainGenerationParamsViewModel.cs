@@ -1,8 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MCLevelEdit.Model.Domain;
 
-namespace MCLevelEdit.DataModel
+namespace MCLevelEdit.ViewModels
 {
-    public class TerrainGenerationParameters : ObservableObject
+    public class TerrainGenerationParamsViewModel : ObservableObject
     {
         private MapType _mapType = MapType.Day;
         private ushort _seed = 0;
@@ -96,21 +97,21 @@ namespace MCLevelEdit.DataModel
             set { SetProperty(ref _rkSte, value); }
         }
 
-        public void SetParameters(TerrainGenerationParameters terrainGenerationParameters)
+        public void SetParameters(TerrainGenerationParamsViewModel terrainGenerationParameters)
         {
-            this.MapType = terrainGenerationParameters.MapType;
-            this.Seed = terrainGenerationParameters.Seed;
-            this.Offset = terrainGenerationParameters.Offset;
-            this.Raise = terrainGenerationParameters.Raise;
-            this.Gnarl = terrainGenerationParameters.Gnarl;
-            this.River = terrainGenerationParameters.River;
-            this.LRiver = terrainGenerationParameters.LRiver;
-            this.Source = terrainGenerationParameters.Source;
-            this.SnLin = terrainGenerationParameters.SnLin;
-            this.SnFlt = terrainGenerationParameters.SnFlt;
-            this.BhLin = terrainGenerationParameters.BhLin;
-            this.BhFlt = terrainGenerationParameters.BhFlt;
-            this.RkSte = terrainGenerationParameters.RkSte;
+            MapType = terrainGenerationParameters.MapType;
+            Seed = terrainGenerationParameters.Seed;
+            Offset = terrainGenerationParameters.Offset;
+            Raise = terrainGenerationParameters.Raise;
+            Gnarl = terrainGenerationParameters.Gnarl;
+            River = terrainGenerationParameters.River;
+            LRiver = terrainGenerationParameters.LRiver;
+            Source = terrainGenerationParameters.Source;
+            SnLin = terrainGenerationParameters.SnLin;
+            SnFlt = terrainGenerationParameters.SnFlt;
+            BhLin = terrainGenerationParameters.BhLin;
+            BhFlt = terrainGenerationParameters.BhFlt;
+            RkSte = terrainGenerationParameters.RkSte;
         }
     }
 }

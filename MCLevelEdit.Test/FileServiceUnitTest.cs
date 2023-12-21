@@ -1,4 +1,4 @@
-using MCLevelEdit.Services;
+using MCLevelEdit.Infrastructure.Adapters;
 
 namespace MCLevelEdit.Test
 {
@@ -12,9 +12,9 @@ namespace MCLevelEdit.Test
         [TestCase(@"Resources\data_000e0f.DAT")]
         public void LoadMapFromFile(string path)
         {
-            var service = new FileService();
+            var service = new FileAdapter();
             var fullPath = Path.Combine(Directory.GetCurrentDirectory(), path);
-            var map = service.LoadMapFromFile(fullPath);
+            var map = service.LoadMap(fullPath);
             Assert.Pass();
         }
     }
