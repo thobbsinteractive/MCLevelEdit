@@ -18,14 +18,11 @@ public class MapService : IMapService
         _terrainService = terrainService;
     }
 
-    public Task<bool> LoadMapFromFileAsync(string filePath)
+    public async Task<bool> LoadMapFromFileAsync(string filePath)
     {
-        return Task.Run(() =>
-        {
-            MapRepository.Map = _filePort.LoadMap(filePath).Result;
-            MapRepository.Map.Terrain = _terrainService.CalculateMc2Terrain(MapRepository.Map.Terrain.GenerationParameters).Result;
-            return true;
-        });
+        MapRepository.Map = _filePort.LoadMap(filePath).Result;
+        MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(MapRepository.Map.Terrain.GenerationParameters);
+        return true;
     }
 
     public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, IList<Entity> entities)
@@ -76,12 +73,13 @@ public class MapService : IMapService
 
     public bool UpdateEntity(Entity entity)
     {
-        throw new NotImplementedException();
+        MapRepository.Map.UpdateEntity(entity);
+        return true;
     }
 
     public bool DeleteEntity(Entity entity)
     {
-        MapRepository.Map.RemoveEntity(entity);
+        MapRepository.Map.DeleteEntity(entity);
         return true;
     }
 }

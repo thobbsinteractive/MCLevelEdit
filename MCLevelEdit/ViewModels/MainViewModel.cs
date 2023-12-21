@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using MCLevelEdit.Views;
 using ReactiveUI;
@@ -31,6 +32,9 @@ public class MainViewModel : ViewModelBase
         EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             var result = await ShowDialog.Handle(MapViewModel);
+            LoadEntities(Entities.ToEntities());
+            RefreshPreviewAsync();
+
         });
 
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -52,7 +56,7 @@ public class MainViewModel : ViewModelBase
 
                 GenerationParameters.SetParameters(map.Terrain.GenerationParameters.ToTerrainGenerationParamsViewModel());
                 this.RaisePropertyChanged(nameof(GenerationParameters));
-                LoadEntities(map.Entities.ToEntityViewModels());
+                LoadEntityViewModels(map.Entities.ToEntityViewModels());
 
                 RefreshPreviewAsync();
             }

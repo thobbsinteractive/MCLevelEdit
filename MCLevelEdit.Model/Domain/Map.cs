@@ -23,14 +23,29 @@ public class Map
             this.Entities.Add(entity);
     }
 
-    public void RemoveEntity(Entity entity)
+    public void DeleteEntity(Entity entity)
     {
-        this.Entities.Remove(entity);
+        int index = GetIndexOf(entity);
+        if (index > -1)
+            this.Entities.RemoveAt(index);
+    }
 
-        //Update Indexes
-        for(int i = 0; i < this.Entities.Count; i++)
+    public void UpdateEntity(Entity entity)
+    {
+        int index = GetIndexOf(entity);
+        if (index > -1)
+            this.Entities[index] = entity;
+    }
+
+    private int GetIndexOf(Entity entity)
+    {
+        for (int i = 0; i < this.Entities.Count; i++)
         {
-            this.Entities[i].Id = 0;
+            if(this.Entities[i].Id == entity.Id)
+            {
+                return i;
+            }
         }
+        return -1;
     }
 }

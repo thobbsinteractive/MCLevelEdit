@@ -23,7 +23,7 @@ namespace MCLevelEdit.ViewModels
         {
             EntityView = new EntityViewModel()
             {
-                Id = Entities.Count(),
+                Id = Entities.Count + 1,
                 Type = (int)TypeId.Spawn, 
                 ModelIdx = 0,
                 X = 128,
@@ -34,7 +34,7 @@ namespace MCLevelEdit.ViewModels
 
             AddNewEntityCommand = ReactiveCommand.Create(() =>
             {
-                EntityView.Id = Entities.Count();
+                EntityView.Id = Entities.Count + 1;
                 AddEntity(EntityView);
             });
         }

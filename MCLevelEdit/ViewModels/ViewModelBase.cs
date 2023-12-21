@@ -79,14 +79,17 @@ public class ViewModelBase : ReactiveObject
         RefreshPreviewAsync();
     }
 
-    protected void LoadEntities(IEnumerable<EntityViewModel> entitiesViewModels)
+    protected void LoadEntityViewModels(IEnumerable<EntityViewModel> entitiesViewModels)
     {
         Entities.Clear();
         Entities.AddRange(entitiesViewModels);
     }
 
-    protected void Entity_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    protected void LoadEntities(IEnumerable<Entity> entities)
     {
-        RefreshPreviewAsync();
+        foreach(var entity in entities)
+        {
+            _mapService.UpdateEntity(entity);
+        }
     }
 }
