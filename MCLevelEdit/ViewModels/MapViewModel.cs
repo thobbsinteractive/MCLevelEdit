@@ -5,12 +5,12 @@ namespace MCLevelEdit.ViewModels
 {
     public class MapViewModel : ViewModelBase
     {
-        public CreateEntityViewModel CreateEntityViewModel { get; }
+        public EntityToolBarViewModel EntityToolBarViewModel { get; }
         public CreateTerrainViewModel CreateTerrainViewModel { get; }
 
         public MapViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
         {
-            CreateEntityViewModel = Locator.Current.GetService<CreateEntityViewModel>();
+            EntityToolBarViewModel = Locator.Current.GetService<EntityToolBarViewModel>();
             CreateTerrainViewModel = Locator.Current.GetService<CreateTerrainViewModel>();
             CreateTerrainViewModel.GenerateHeightMap();
         }

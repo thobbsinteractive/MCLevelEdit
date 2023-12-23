@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EntityToolBarViewModel;assembly=MCLevelEdit"
+             xmlns:views="clr-namespace:MCLevelEdit.Views"
+             x:DataType="vm:EntityToolBarViewModel"
+             x:Class="MCLevelEdit.Views.EntityToolBarView">
+  <TabControl Margin="5">
+    <TabItem Header="Spawn">
+      <views:CreateEntityView Name="vmSpawnEntity"
+                              Margin="5"
+                              DataContext="{Binding SpawnEntityViewModel}"/>
+    </TabItem>
+    <TabItem Header="Scenary">
+      <views:CreateEntityView Name="vmScenaryEntity"
+                              Margin="5"
+                              DataContext="{Binding SceneriesEntityViewModel}"/>
+    </TabItem>
+    <TabItem Header="Creatures">
+      <views:CreateEntityView Name="vmCreaturesEntity"
+                              Margin="5"
+                              DataContext="{Binding CreaturesEntityViewModel}"/>
+    </TabItem>
+    <TabItem Header="Effects">
+      <views:CreateEntityView Name="vmEffectsEntity"
+                              Margin="5"
+                              DataContext="{Binding EffectsEntityViewModel}"/>
+    </TabItem>
+    <TabItem Header="Spells">
+      <views:CreateEntityView Name="vmSpellsEntity"
+                              Margin="5"
+                              DataContext="{Binding SpellsEntityViewModel}"/>
+    </TabItem>
+    <TabItem Header="Switches">
+      <views:CreateEntityView Name="vmSwitchesEntity"
+                              Margin="5"
+                              DataContext="{Binding SwitchesEntityViewModel}"/>
+    </TabItem>
+    <TabItem Header="Weather">
+      <views:CreateEntityView Name="vmWeatherEntity"
+                              Margin="5"
+                              DataContext="{Binding WeathersEntityViewModel}"/>
+    </TabItem>
+  </TabControl>
+</UserControl>
