@@ -8,23 +8,23 @@
              x:Class="MCLevelEdit.Views.MapView"
              x:DataType="vm:MapViewModel">
   <Grid ColumnDefinitions="256,*"
-        RowDefinitions="150,256,*">
+        RowDefinitions="150,*">
     <views:EntityToolBarView Name="vmEntityToolBar"
                              Grid.Row="0"
                              Grid.Column="0"
                              Grid.ColumnSpan="2"
                              DockPanel.Dock="Top"
                              DataContext="{Binding EntityToolBarViewModel}"/>
-    <Image Name="imgPreview"
-           Grid.Row="1" 
-           Grid.Column="0"
-           MaxWidth="256"
-           MinHeight="256"
-           Source="{Binding Preview}"></Image>
     <views:CreateTerrainView Name="vmCreateTerrain"
-                             Grid.Row="2"
+                             Grid.Row="1"
                              Grid.Column="0"
                              DataContext="{Binding CreateTerrainViewModel}">
     </views:CreateTerrainView>
+    <Image Name="imgPreview"
+       Grid.Row="1"
+       Grid.Column="1"
+       MaxWidth="256"
+       MinHeight="256"
+       Source="{Binding Preview}"></Image>
   </Grid>
 </UserControl>
