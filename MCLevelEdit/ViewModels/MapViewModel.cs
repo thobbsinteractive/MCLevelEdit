@@ -6,13 +6,13 @@ namespace MCLevelEdit.ViewModels
     public class MapViewModel : ViewModelBase
     {
         public EntityToolBarViewModel EntityToolBarViewModel { get; }
-        public CreateTerrainViewModel CreateTerrainViewModel { get; }
+        public EditTerrainViewModel EditTerrainViewModel { get; }
 
         public MapViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
         {
             EntityToolBarViewModel = Locator.Current.GetService<EntityToolBarViewModel>();
-            CreateTerrainViewModel = Locator.Current.GetService<CreateTerrainViewModel>();
-            CreateTerrainViewModel.GenerateHeightMap();
+            EditTerrainViewModel = Locator.Current.GetService<EditTerrainViewModel>();
+            EditTerrainViewModel.GenerateHeightMap();
         }
     }
 }

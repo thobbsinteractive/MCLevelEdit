@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace MCLevelEdit.Views;
 
-public partial class CreateTerrainView : UserControl
+public partial class EditTerrainView : UserControl
 {
-    public CreateTerrainView()
+    public EditTerrainView()
     {
         InitializeComponent();
     }

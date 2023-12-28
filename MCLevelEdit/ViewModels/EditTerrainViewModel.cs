@@ -6,12 +6,12 @@ using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels
 {
-    public class CreateTerrainViewModel : ViewModelBase
+    public class EditTerrainViewModel : ViewModelBase
     {
         public ICommand GenerateTerrainCommand { get; }
         public bool GenerateTerrainButtonEnable { get; set; }
 
-        public CreateTerrainViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
+        public EditTerrainViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
         {
             GenerateTerrainButtonEnable = true;
 

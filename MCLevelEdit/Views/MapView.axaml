@@ -15,11 +15,11 @@
                              Grid.ColumnSpan="2"
                              DockPanel.Dock="Top"
                              DataContext="{Binding EntityToolBarViewModel}"/>
-    <views:CreateTerrainView Name="vmCreateTerrain"
-                             Grid.Row="1"
-                             Grid.Column="0"
-                             DataContext="{Binding CreateTerrainViewModel}">
-    </views:CreateTerrainView>
+    <views:EditTerrainView Name="vmEditTerrain"
+                           Grid.Row="1"
+                           Grid.Column="0"
+                           DataContext="{Binding EditTerrainViewModel}">
+    </views:EditTerrainView>
     <Image Name="imgPreview"
        Grid.Row="1"
        Grid.Column="1"
