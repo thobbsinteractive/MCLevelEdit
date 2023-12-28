@@ -44,7 +44,13 @@ public class MapService : IMapService
     {
         using (var fb = bitmap.Lock())
         {
-            fb.SetPixel(entity.Position.X, entity.Position.Y, entity.EntityType.Colour);
+            for (int sx = 0; sx < Globals.SQUARE_SIZE; sx++)
+            {
+                for (int sy = 0; sy < Globals.SQUARE_SIZE; sy++)
+                {
+                    fb.SetPixel((entity.Position.X * Globals.SQUARE_SIZE) + sx, (entity.Position.Y * Globals.SQUARE_SIZE) + sy, entity.EntityType.Colour);
+                }
+            }
         }
     }
 

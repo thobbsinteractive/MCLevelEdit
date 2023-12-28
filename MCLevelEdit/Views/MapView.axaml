@@ -20,11 +20,8 @@
                            Grid.Column="0"
                            DataContext="{Binding EditTerrainViewModel}">
     </views:EditTerrainView>
-    <Image Name="imgPreview"
-       Grid.Row="1"
-       Grid.Column="1"
-       MaxWidth="256"
-       MinHeight="256"
-       Source="{Binding Preview}"></Image>
+    <views:MapEditorView Name="vmMapEditor"
+                         Grid.Row="1"
+                         Grid.Column="1"/>
   </Grid>
 </UserControl>

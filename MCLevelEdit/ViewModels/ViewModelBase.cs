@@ -26,7 +26,7 @@ public class ViewModelBase : ReactiveObject
     public static TerrainGenerationParamsViewModel GenerationParameters { get; } = new TerrainGenerationParamsViewModel();
     public static IAvaloniaList<EntityViewModel> Entities { get; } = new AvaloniaList<EntityViewModel>();
     public static WriteableBitmap Preview { get; } = new WriteableBitmap(
-                new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
+                new PixelSize(Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE, Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE),
                 new Vector(96, 96), // DPI (dots per inch)
                 PixelFormat.Rgba8888);
 
