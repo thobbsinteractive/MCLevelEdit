@@ -4,21 +4,21 @@ namespace MCLevelEdit.ViewModels;
 
 public class EntityToolBarViewModel : ViewModelBase
 {
-    public CreateEntityViewModel SpawnEntityViewModel { get; init; }
-    public CreateEntityViewModel SceneriesEntityViewModel { get; init; }
-    public CreateEntityViewModel CreaturesEntityViewModel { get; init; }
-    public CreateEntityViewModel EffectsEntityViewModel { get; init; }
-    public CreateEntityViewModel SpellsEntityViewModel { get; init; }
-    public CreateEntityViewModel SwitchesEntityViewModel { get; init; }
-    public CreateEntityViewModel WeathersEntityViewModel { get; init; }
+    public EditEntityViewModel SpawnEntityViewModel { get; init; }
+    public EditEntityViewModel SceneriesEntityViewModel { get; init; }
+    public EditEntityViewModel CreaturesEntityViewModel { get; init; }
+    public EditEntityViewModel EffectsEntityViewModel { get; init; }
+    public EditEntityViewModel SpellsEntityViewModel { get; init; }
+    public EditEntityViewModel SwitchesEntityViewModel { get; init; }
+    public EditEntityViewModel WeathersEntityViewModel { get; init; }
     public EntityToolBarViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
     {
-        SpawnEntityViewModel  = new CreateEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Spawn);
-        SceneriesEntityViewModel = new CreateEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Scenary);
-        CreaturesEntityViewModel = new CreateEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Creature);
-        EffectsEntityViewModel = new CreateEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Effect);
-        SpellsEntityViewModel = new CreateEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Spell);
-        SwitchesEntityViewModel = new CreateEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Switch);
-        WeathersEntityViewModel = new CreateEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Weather);
+        SpawnEntityViewModel  = new EditEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Spawn);
+        SceneriesEntityViewModel = new EditEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Scenary);
+        CreaturesEntityViewModel = new EditEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Creature);
+        EffectsEntityViewModel = new EditEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Effect);
+        SpellsEntityViewModel = new EditEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Spell);
+        SwitchesEntityViewModel = new EditEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Switch);
+        WeathersEntityViewModel = new EditEntityViewModel(mapService, terrainService, Model.Domain.TypeId.Weather);
     }
 }

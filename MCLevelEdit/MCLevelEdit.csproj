@@ -28,10 +28,4 @@
     <ProjectReference Include="..\MCLevelEdit.Infrastructure\MCLevelEdit.Infrastructure.csproj" />
     <ProjectReference Include="..\MCLevelEdit.Model\MCLevelEdit.Model.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Views\EntitiesTableView.axaml.cs">
-      <DependentUpon>EntitiesTableView.axaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
 </Project>

@@ -11,45 +11,45 @@
   <TabControl Margin="5">
     <TabItem Header="Spawn"
              FontSize="18">
-      <views:CreateEntityView Name="vmSpawnEntity"
-                              Margin="5"
-                              DataContext="{Binding SpawnEntityViewModel}"/>
+      <views:EditEntityView Name="vmSpawnEntity"
+                            Margin="5"
+                            DataContext="{Binding SpawnEntityViewModel}"/>
     </TabItem>
     <TabItem Header="Scenary"
              FontSize="18">
-      <views:CreateEntityView Name="vmScenaryEntity"
-                              Margin="5"
-                              DataContext="{Binding SceneriesEntityViewModel}"/>
+      <views:EditEntityView Name="vmScenaryEntity"
+                            Margin="5"
+                            DataContext="{Binding SceneriesEntityViewModel}"/>
     </TabItem>
     <TabItem Header="Creatures"
              FontSize="18">
-      <views:CreateEntityView Name="vmCreaturesEntity"
-                              Margin="5"
-                              DataContext="{Binding CreaturesEntityViewModel}"/>
+      <views:EditEntityView Name="vmCreaturesEntity"
+                            Margin="5"
+                            DataContext="{Binding CreaturesEntityViewModel}"/>
     </TabItem>
     <TabItem Header="Effects"
              FontSize="18">
-      <views:CreateEntityView Name="vmEffectsEntity"
-                              Margin="5"
-                              DataContext="{Binding EffectsEntityViewModel}"/>
+      <views:EditEntityView Name="vmEffectsEntity"
+                            Margin="5"
+                            DataContext="{Binding EffectsEntityViewModel}"/>
     </TabItem>
     <TabItem Header="Spells"
              FontSize="18">
-      <views:CreateEntityView Name="vmSpellsEntity"
-                              Margin="5"
-                              DataContext="{Binding SpellsEntityViewModel}"/>
+      <views:EditEntityView Name="vmSpellsEntity"
+                            Margin="5"
+                            DataContext="{Binding SpellsEntityViewModel}"/>
     </TabItem>
     <TabItem Header="Switches"
              FontSize="18">
-      <views:CreateEntityView Name="vmSwitchesEntity"
-                              Margin="5"
-                              DataContext="{Binding SwitchesEntityViewModel}"/>
+      <views:EditEntityView Name="vmSwitchesEntity"
+                            Margin="5"
+                            DataContext="{Binding SwitchesEntityViewModel}"/>
     </TabItem>
     <TabItem Header="Weather"
              FontSize="18">
-      <views:CreateEntityView Name="vmWeatherEntity"
-                              Margin="5"
-                              DataContext="{Binding WeathersEntityViewModel}"/>
+      <views:EditEntityView Name="vmWeatherEntity"
+                            Margin="5"
+                            DataContext="{Binding WeathersEntityViewModel}"/>
     </TabItem>
   </TabControl>
 </UserControl>

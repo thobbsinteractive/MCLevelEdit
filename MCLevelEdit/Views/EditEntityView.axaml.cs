@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace MCLevelEdit.Views;
 
-public partial class CreateEntityView : UserControl
+public partial class EditEntityView : UserControl
 {
-    public CreateEntityView()
+    public EditEntityView()
     {
         InitializeComponent();
     }

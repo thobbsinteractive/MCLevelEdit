@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels
 {
-    public class CreateEntityViewModel : ViewModelBase
+    public class EditEntityViewModel : ViewModelBase
     {
         private EntityViewModel _entityView;
         private TypeId _typeId;
@@ -18,7 +18,7 @@ namespace MCLevelEdit.ViewModels
             set => this.RaiseAndSetIfChanged(ref _entityView, value);
         }
 
-        public CreateEntityViewModel(IMapService mapService, ITerrainService terrainService, TypeId typeId) : base(mapService, terrainService)
+        public EditEntityViewModel(IMapService mapService, ITerrainService terrainService, TypeId typeId) : base(mapService, terrainService)
         {
             _typeId = typeId;
             _entityView = new EntityViewModel()

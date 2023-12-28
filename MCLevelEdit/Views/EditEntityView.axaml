@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
              xmlns:c="clr-namespace:MCLevelEdit.Converter"
-             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.CreateEntityViewModel;assembly=MCLevelEdit"
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EditEntityViewModel;assembly=MCLevelEdit"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="70"
-             x:Class="MCLevelEdit.Views.CreateEntityView"
-             x:DataType="vm:CreateEntityViewModel">
+             x:Class="MCLevelEdit.Views.EditEntityView"
+             x:DataType="vm:EditEntityViewModel">
   <Grid ColumnDefinitions="2*,1*,1*,1*,1*,1*"
         RowDefinitions="20,30">
     <Grid.Resources>
