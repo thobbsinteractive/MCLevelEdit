@@ -19,7 +19,7 @@
            Grid.Row="0"
            Grid.ColumnSpan="2"
            HorizontalAlignment="Center">
-      Map Generation Variables
+      Terrain Generation Variables
     </Label>
     <Label Grid.Column="0"
            Grid.Row="1"
