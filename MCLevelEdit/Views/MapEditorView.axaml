@@ -5,9 +5,11 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
              xmlns:views="clr-namespace:MCLevelEdit.Views"
+             xmlns:paz="using:Avalonia.Controls.PanAndZoom"
              x:Class="MCLevelEdit.Views.MapEditorView"
              x:DataType="vm:MapEditorViewModel">
-  <Grid ColumnDefinitions="100,100,*"
+  <Grid Name="grdMapEditor"
+        ColumnDefinitions="100,100,40,100,100,50,60,60,100,*"
         RowDefinitions="30,*">
     <RadioButton Name="rbShaded"
                  Margin="1"
@@ -22,16 +24,59 @@
                  Grid.Row="0"
                  GroupName="grpMapRender"
                  Content="Height"/>
-    <Viewbox Stretch="Uniform" 
-             Grid.Column="0"
-             Grid.ColumnSpan="3"
-             Grid.Row="1"
-             HorizontalAlignment="Left"
-             VerticalAlignment="Top">
+    <Label Name="lblPan"
+           Margin="3"
+           Grid.Column="2"
+           Grid.Row="0"
+           Content="Pan"/>
+    <Label Name="lblPanX"
+           Margin="3"
+           Grid.Column="3"
+           Grid.Row="0"
+           Content="{Binding #pazMap.OffsetX, StringFormat='X: {0:0.00}'}"/>
+    <Label Name="lblPanY"
+           Margin="3"
+           Grid.Column="4"
+           Grid.Row="0"
+           Content="{Binding #pazMap.OffsetY, StringFormat='Y: {0:0.00}'}"/>
+    <Label Name="lblZoom"
+           Margin="3"
+           Grid.Column="5"
+           Grid.Row="0"
+           Content="Zoom"/>
+    <Label Name="lblZoomX"
+           Margin="3"
+           Grid.Column="6"
+           Grid.Row="0"
+           Content="{Binding #pazMap.ZoomX, StringFormat='X: {0:0.00}'}"/>
+    <Label Name="lblZoomY"
+           Margin="3"
+           Grid.Column="7"
+           Grid.Row="0"
+           Content="{Binding #pazMap.ZoomY, StringFormat='Y: {0:0.00}'}"/>
+    <Button Name="btnReset"
+            Margin="1"
+            Grid.Column="8"
+            Grid.Row="0"
+            Content="Reset"/>
+    <paz:ZoomBorder Name="pazMap"
+                    Background="LightBlue"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="10"
+                    Grid.Row="1"
+                    ClipToBounds="True"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    MinZoomX="0.25"
+                    MinZoomY="0.25"
+                    MaxZoomX="4"
+                    MaxZoomY="4"
+                    Focusable="True"
+                    EnableConstrains="True">
       <Image Name="imgPreview"
-             MinHeight="2048"
-             MinWidth="2048"
-             Source="{Binding Preview}"/>
-      </Viewbox>
+              MinHeight="2048"
+              MinWidth="2048"
+              Source="{Binding Preview}"/>
+      </paz:ZoomBorder>
   </Grid>
 </UserControl>

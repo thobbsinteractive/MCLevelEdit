@@ -8,5 +8,5 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="MCLevelEdit"
         WindowStartupLocation="CenterScreen">
-  <views:MainView />
+  <views:MainView Name="vmMain" />
 </Window>

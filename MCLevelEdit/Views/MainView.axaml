@@ -15,10 +15,12 @@
         <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
       </MenuItem>
     </Menu>
-    <Grid DockPanel.Dock="Bottom"
+    <Grid Name="grdMain"
+          DockPanel.Dock="Bottom"
           ColumnDefinitions="*"
           RowDefinitions="*,50">
-      <views:MapView Grid.Row="0"
+      <views:MapView Name="vmMap"
+                     Grid.Row="0"
                      Grid.Column="0"
                      Margin="10"
                      DataContext="{Binding MapViewModel}" />
