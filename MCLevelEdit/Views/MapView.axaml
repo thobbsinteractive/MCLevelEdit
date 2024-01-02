@@ -22,6 +22,7 @@
     </views:EditTerrainView>
     <views:MapEditorView Name="vmMapEditor"
                          Grid.Row="1"
-                         Grid.Column="1"/>
+                         Grid.Column="1"
+                         DataContext="{Binding MapEditorViewModel}"/>
   </Grid>
 </UserControl>

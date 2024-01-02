@@ -59,7 +59,7 @@ public class ViewModelBase : ReactiveObject
             this.Log().Debug("Drawing Entities...");
             await _mapService.DrawBitmapAsync(Preview, map.Entities);
 
-            this.RaisePropertyChanging(nameof(Preview));
+            this.RaisePropertyChanged(nameof(Preview));
             this.Log().Debug("Preview refreshed");
         });
     }

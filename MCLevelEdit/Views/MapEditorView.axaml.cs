@@ -1,6 +1,8 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.PanAndZoom;
 using Avalonia.Input;
+using MCLevelEdit.ViewModels;
 
 namespace MCLevelEdit.Views
 {
@@ -8,17 +10,28 @@ namespace MCLevelEdit.Views
     {
         private readonly ZoomBorder? _pazMap;
         private readonly Button? _btnReset;
+        private readonly Image? _imgPreview;
+        private Point _ptCursor = new Point();
+
+        public Point PtCursor
+        {
+            get { return _ptCursor; }
+        }
+
+        public MapEditorViewModel? VmMapEditor { get { return (MapEditorViewModel?)this.DataContext; } }
 
         public MapEditorView()
         {
             InitializeComponent();
 
             _pazMap = this.Find<ZoomBorder>("pazMap");
-            _btnReset = this.Find<Button>("btnReset");       
+            _btnReset = this.Find<Button>("btnReset");
+            _imgPreview = this.Find<Image>("imgPreview");
 
             if (_pazMap != null)
             {
                 _pazMap.PointerReleased += OnPazMap_PointerReleased;
+                _pazMap.PointerMoved += OnPazMap_PointerMoved;
             }
 
             if (_btnReset != null)
@@ -37,14 +50,30 @@ namespace MCLevelEdit.Views
         {
             if (e.InitialPressMouseButton == MouseButton.Left)
             {
-
+                _ptCursor = GetCursorPoint(e);
+                if(VmMapEditor != null)
+                    VmMapEditor.CursorPosition = _ptCursor;
             }
+        }
+
+        private void OnPazMap_PointerMoved(object? sender, PointerEventArgs e)
+        {
+            _ptCursor = GetCursorPoint(e);
+            if (VmMapEditor != null)
+                VmMapEditor.CursorPosition = _ptCursor;
+        }
+
+        private Point GetCursorPoint(PointerEventArgs e)
+        {
+            if (_imgPreview != null)
+                return e.GetPosition(_imgPreview);
+            else
+                return new Point();
         }
 
         private void ResetView()
         {
             _pazMap.ResetMatrix();
-            _pazMap.Zoom(0.25, _pazMap.OffsetX, _pazMap.OffsetY, false);
             _pazMap?.AutoFit();
         }
     }
