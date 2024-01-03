@@ -10,7 +10,7 @@
              x:Class="MCLevelEdit.Views.MapEditorView"
              x:DataType="vm:MapEditorViewModel">
   <Grid Name="grdMapEditor"
-        ColumnDefinitions="100,100,Auto,100,100,Auto,60,60,Auto,70,70,*,60"
+        ColumnDefinitions="100,100,Auto,70,70,Auto,100,100,Auto,60,60,*,60"
         RowDefinitions="30,*">
     <RadioButton Name="rbShaded"
                  Margin="1"
@@ -25,51 +25,51 @@
                  Grid.Row="0"
                  GroupName="grpMapRender"
                  Content="Height"/>
-    <Label Name="lblPan"
-           Margin="3"
-           Grid.Column="2"
-           Grid.Row="0"
-           Content="Pan"/>
-    <Label Name="lblPanX"
-           Margin="3"
-           Grid.Column="3"
-           Grid.Row="0"
-           Content="{Binding #pazMap.OffsetX, StringFormat='X: {0:0.00}'}"/>
-    <Label Name="lblPanY"
-           Margin="3"
-           Grid.Column="4"
-           Grid.Row="0"
-           Content="{Binding #pazMap.OffsetY, StringFormat='Y: {0:0.00}'}"/>
-    <Label Name="lblZoom"
-           Margin="3"
-           Grid.Column="5"
-           Grid.Row="0"
-           Content="Zoom"/>
-    <Label Name="lblZoomX"
-           Margin="3"
-           Grid.Column="6"
-           Grid.Row="0"
-           Content="{Binding #pazMap.ZoomX, StringFormat='X: {0:0.00}'}"/>
-    <Label Name="lblZoomY"
-           Margin="3"
-           Grid.Column="7"
-           Grid.Row="0"
-           Content="{Binding #pazMap.ZoomY, StringFormat='Y: {0:0.00}'}"/>
     <Label Name="lblCoords"
            Margin="3"
-           Grid.Column="8"
+           Grid.Column="2"
            Grid.Row="0"
            Content="Cursor"/>
     <Label Name="lblCoordX"
            Margin="3"
-           Grid.Column="9"
+           Grid.Column="3"
            Grid.Row="0"
            Content="{Binding CursorPosition.X, StringFormat='X: {0:000}'}"/>
     <Label Name="lblCoordY"
            Margin="3"
-           Grid.Column="10"
+           Grid.Column="4"
            Grid.Row="0"
            Content="{Binding CursorPosition.Y, StringFormat='Y: {0:000}'}"/>
+    <Label Name="lblPan"
+           Margin="3"
+           Grid.Column="5"
+           Grid.Row="0"
+           Content="Pan"/>
+    <Label Name="lblPanX"
+           Margin="3"
+           Grid.Column="6"
+           Grid.Row="0"
+           Content="{Binding #pazMap.OffsetX, StringFormat='X: {0:0.00}'}"/>
+    <Label Name="lblPanY"
+           Margin="3"
+           Grid.Column="7"
+           Grid.Row="0"
+           Content="{Binding #pazMap.OffsetY, StringFormat='Y: {0:0.00}'}"/>
+    <Label Name="lblZoom"
+           Margin="3"
+           Grid.Column="8"
+           Grid.Row="0"
+           Content="Zoom"/>
+    <Label Name="lblZoomX"
+           Margin="3"
+           Grid.Column="9"
+           Grid.Row="0"
+           Content="{Binding #pazMap.ZoomX, StringFormat='X: {0:0.00}'}"/>
+    <Label Name="lblZoomY"
+           Margin="3"
+           Grid.Column="10"
+           Grid.Row="0"
+           Content="{Binding #pazMap.ZoomY, StringFormat='Y: {0:0.00}'}"/>
     <Button Name="btnReset"
             Margin="1"
             Grid.Column="12"
