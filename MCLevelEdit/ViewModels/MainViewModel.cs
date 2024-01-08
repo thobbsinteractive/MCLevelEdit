@@ -1,11 +1,14 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using MCLevelEdit.Abstractions;
+using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using MCLevelEdit.Views;
 using ReactiveUI;
 using Splat;
+using System;
 using System.IO;
 using System.Reactive.Linq;
 using System.Windows.Input;
@@ -14,18 +17,20 @@ namespace MCLevelEdit.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
+    protected EventAggregator<object> _eventAggregator;
+    public IObservable<bool> IsRefreshed { get; }
     public ICommand OpenFileCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand EditEntitiesCommand { get; }
     public MapViewModel MapViewModel { get; }
-
     public Interaction<MapViewModel, MapViewModel?> ShowDialog { get; }
 
-    public MainViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
+    public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
     {
         MapViewModel = Locator.Current.GetService<MapViewModel>();
 
         _mapService.CreateNewMap();
+        _eventAggregator = eventAggregator;
 
         ShowDialog = new Interaction<MapViewModel, MapViewModel?>();
 
@@ -58,6 +63,7 @@ public class MainViewModel : ViewModelBase
                 this.RaisePropertyChanged(nameof(GenerationParameters));
                 LoadEntityViewModels(map.Entities.ToEntityViewModels());
 
+                _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
                 RefreshPreviewAsync();
             }
         });

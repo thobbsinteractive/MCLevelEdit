@@ -15,11 +15,10 @@
                              Grid.ColumnSpan="2"
                              DockPanel.Dock="Top"
                              DataContext="{Binding EntityToolBarViewModel}"/>
-    <views:EditTerrainView Name="vmEditTerrain"
-                           Grid.Row="1"
-                           Grid.Column="0"
-                           DataContext="{Binding EditTerrainViewModel}">
-    </views:EditTerrainView>
+    <views:MapTreeView Name="vmMapTree"
+                       Grid.Row="1"
+                       Grid.Column="0"
+                       DataContext="{Binding MapTreeViewModel}"/>
     <views:MapEditorView Name="vmMapEditor"
                          Grid.Row="1"
                          Grid.Column="1"
