@@ -18,7 +18,7 @@ public class MapViewModel : ViewModelBase
 
     public MapViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
     {
-        EntityToolBarViewModel = new EntityToolBarViewModel(mapService, terrainService);
+        EntityToolBarViewModel = new EntityToolBarViewModel(eventAggregator, mapService, terrainService);
         EditTerrainViewModel = new EditTerrainViewModel(mapService, terrainService);
         MapTreeViewModel = new MapTreeViewModel(eventAggregator, mapService, terrainService);
         MapEditorViewModel = new MapEditorViewModel(mapService, terrainService);
