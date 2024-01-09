@@ -56,7 +56,7 @@ public class MapTreeViewModel
                     var nodeEntities = new ObservableCollection<Node>();
                     foreach (var entity in squareEntities)
                     {
-                        nodeEntities.Add(new Node($"{entity.EntityType.TypeId}: {entity.Id}"));
+                        nodeEntities.Add(new Node($"{entity.EntityType.TypeId}: {entity.Id}: {entity.EntityType.Model.Name}"));
                     }
                     entitiesCoords.Add(new Node($"{x},{y}", nodeEntities));
                 }
