@@ -1,4 +1,5 @@
-﻿using MCLevelEdit.Model.Abstractions;
+﻿using MCLevelEdit.Application.Model;
+using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace MCLevelEdit.ViewModels
         public ICommand GenerateTerrainCommand { get; }
         public bool GenerateTerrainButtonEnable { get; set; }
 
-        public EditTerrainViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
+        public EditTerrainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
         {
             GenerateTerrainButtonEnable = true;
 
@@ -26,7 +27,7 @@ namespace MCLevelEdit.ViewModels
             GenerateTerrainButtonEnable = false;
             await _mapService.RecalculateTerrain(GenerationParameters.ToGenerationParameters());
             GenerateTerrainButtonEnable = true;
-            await RefreshPreviewAsync();
+            _eventAggregator.RaiseEvent("RefreshData", this, new Application.Model.PubSubEventArgs<object>("RefreshData"));
         }
     }
 }

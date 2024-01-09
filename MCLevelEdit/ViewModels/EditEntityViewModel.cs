@@ -10,7 +10,6 @@ namespace MCLevelEdit.ViewModels
     {
         private EntityViewModel _entityView;
         private TypeId _typeId;
-        protected EventAggregator<object> _eventAggregator;
 
         public ICommand AddNewEntityCommand { get; }
 
@@ -20,7 +19,7 @@ namespace MCLevelEdit.ViewModels
             set => this.RaiseAndSetIfChanged(ref _entityView, value);
         }
 
-        public EditEntityViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService, TypeId typeId) : base(mapService, terrainService)
+        public EditEntityViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService, TypeId typeId) : base(eventAggregator, mapService, terrainService)
         {
             _typeId = typeId;
             _entityView = new EntityViewModel()
@@ -33,8 +32,6 @@ namespace MCLevelEdit.ViewModels
                 Parent = 0,
                 Child = 0
             };
-
-            _eventAggregator = eventAggregator;
 
             AddNewEntityCommand = ReactiveCommand.Create(() =>
             {

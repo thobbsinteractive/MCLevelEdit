@@ -1,4 +1,4 @@
-﻿using MCLevelEdit.Abstractions;
+﻿using DynamicData;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
@@ -41,14 +41,24 @@ public class MapTreeViewModel
 
         var map = _mapService.GetMap();
 
+        var entitiesCoords = new ObservableCollection<Node>();
+        var world = new Node($"World", entitiesCoords);
+
+        Nodes.Add(world);
+
         for (int x = 0; x < Globals.MAX_MAP_SIZE; x++)
         {
             for (int y = 0; y < Globals.MAX_MAP_SIZE; y++)
             {
-                var squareEntities = map.Entities.Where(e => e.Position.X == x && e.Position.Y == y);
+                var squareEntities = map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).OrderBy(e => e.EntityType.TypeId);
                 if (squareEntities.Any())
                 {
-                    Nodes.Add(new Node($"{x},{y}"));
+                    var nodeEntities = new ObservableCollection<Node>();
+                    foreach (var entity in squareEntities)
+                    {
+                        nodeEntities.Add(new Node($"{entity.EntityType.TypeId}: {entity.Id}"));
+                    }
+                    entitiesCoords.Add(new Node($"{x},{y}", nodeEntities));
                 }
             }
         }

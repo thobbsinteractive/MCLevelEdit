@@ -1,4 +1,5 @@
-﻿using MCLevelEdit.Model.Abstractions;
+﻿using MCLevelEdit.Application.Model;
+using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
@@ -11,7 +12,7 @@ namespace MCLevelEdit.ViewModels
         public ICommand AddNewEntityCommand { get; }
         public ICommand DeleteEntityCommand { get; }
 
-        public EntitiesTableViewModel(IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
+        public EntitiesTableViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
         {
             AddNewEntityCommand = ReactiveCommand.Create(() =>
             {

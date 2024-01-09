@@ -29,9 +29,9 @@ public class MapService : IMapService
     {
         return Task.Run(() =>
         {
-            foreach (var entity in entities)
+            for (int i = 0; i < entities.Count; i++)
             {
-                DrawEntity(entity, bitmap);
+                DrawEntity(entities[i], bitmap);
             }
 
             //var result = SaveBitmap(bitmap).Result;

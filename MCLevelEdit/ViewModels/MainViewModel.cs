@@ -1,9 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using MCLevelEdit.Abstractions;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
-using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using MCLevelEdit.Views;
 using ReactiveUI;
@@ -17,7 +15,6 @@ namespace MCLevelEdit.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    protected EventAggregator<object> _eventAggregator;
     public IObservable<bool> IsRefreshed { get; }
     public ICommand OpenFileCommand { get; }
     public ICommand ExitCommand { get; }
@@ -25,12 +22,11 @@ public class MainViewModel : ViewModelBase
     public MapViewModel MapViewModel { get; }
     public Interaction<MapViewModel, MapViewModel?> ShowDialog { get; }
 
-    public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
+    public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
         MapViewModel = Locator.Current.GetService<MapViewModel>();
 
         _mapService.CreateNewMap();
-        _eventAggregator = eventAggregator;
 
         ShowDialog = new Interaction<MapViewModel, MapViewModel?>();
 
@@ -38,8 +34,6 @@ public class MainViewModel : ViewModelBase
         {
             var result = await ShowDialog.Handle(MapViewModel);
             LoadEntities(Entities.ToEntities());
-            RefreshPreviewAsync();
-
         });
 
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -62,9 +56,6 @@ public class MainViewModel : ViewModelBase
                 GenerationParameters.SetParameters(map.Terrain.GenerationParameters.ToTerrainGenerationParamsViewModel());
                 this.RaisePropertyChanged(nameof(GenerationParameters));
                 LoadEntityViewModels(map.Entities.ToEntityViewModels());
-
-                _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
-                RefreshPreviewAsync();
             }
         });
     }

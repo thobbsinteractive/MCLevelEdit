@@ -19,5 +19,10 @@
         </Border>
       </TreeDataTemplate>
     </TreeView.ItemTemplate>
+    <TreeView.Styles>
+      <Style Selector="TreeViewItem">
+        <Setter Property="IsExpanded" Value="True" />
+      </Style>
+    </TreeView.Styles>
   </TreeView>
 </UserControl>

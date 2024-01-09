@@ -12,7 +12,7 @@ public class EntityToolBarViewModel : ViewModelBase
     public EditEntityViewModel SpellsEntityViewModel { get; init; }
     public EditEntityViewModel SwitchesEntityViewModel { get; init; }
     public EditEntityViewModel WeathersEntityViewModel { get; init; }
-    public EntityToolBarViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(mapService, terrainService)
+    public EntityToolBarViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
         SpawnEntityViewModel  = new EditEntityViewModel(eventAggregator, mapService, terrainService, Model.Domain.TypeId.Spawn);
         SceneriesEntityViewModel = new EditEntityViewModel(eventAggregator, mapService, terrainService, Model.Domain.TypeId.Scenary);
