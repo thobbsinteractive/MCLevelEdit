@@ -45,21 +45,21 @@ public class ViewModelBase : ReactiveObject
     {
         Entities.Add(entityView.Copy());
         _mapService.AddEntity(entityView.ToEntity());
-        _eventAggregator.RaiseEvent("RefreshData", this, new Application.Model.PubSubEventArgs<object>("RefreshData"));
+        _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
     }
 
     protected void DeleteEntity(EntityViewModel entityView)
     {
         Entities.Remove(entityView);
         _mapService.DeleteEntity(entityView.ToEntity());
-        _eventAggregator.RaiseEvent("RefreshData", this, new Application.Model.PubSubEventArgs<object>("RefreshData"));
+        _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
     }
 
     protected void LoadEntityViewModels(IEnumerable<EntityViewModel> entitiesViewModels)
     {
         Entities.Clear();
         Entities.AddRange(entitiesViewModels);
-        _eventAggregator.RaiseEvent("RefreshData", this, new Application.Model.PubSubEventArgs<object>("RefreshData"));
+        _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
     }
 
     protected void LoadEntities(IEnumerable<Entity> entities)
@@ -68,6 +68,6 @@ public class ViewModelBase : ReactiveObject
         {
             _mapService.UpdateEntity(entity);
         }
-        _eventAggregator.RaiseEvent("RefreshData", this, new Application.Model.PubSubEventArgs<object>("RefreshData"));
+        _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
     }
 }

@@ -1,4 +1,5 @@
-﻿using DynamicData;
+﻿using Avalonia;
+using DynamicData;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
@@ -22,16 +23,36 @@ public class MapTreeViewModel
         _mapService = mapService;
         _terrainService = terrainService;
         SelectedNodes = new ObservableCollection<Node>();
+        SelectedNodes.CollectionChanged += SelectedNodes_CollectionChanged;
         Nodes = new ObservableCollection<Node>();
 
         _eventAggregator.RegisterEvent("RefreshData", RefreshDataHandler);
-
+        _eventAggregator.RegisterEvent("OnCursorClicked", SelectNodeHandler);
         RefreshData();
     }
 
     public void RefreshDataHandler(object sender, PubSubEventArgs<object> args)
     {
         RefreshData();
+    }
+
+    public void SelectNodeHandler(object sender, PubSubEventArgs<object> arg)
+    {
+        var cursorEvent = ((Point, bool, bool))arg.Item;
+
+        if(arg.Item is not null)
+        {
+            var world = Nodes?.Where(n => n.Title == "World").FirstOrDefault();
+            if(world is not null)
+            {
+                var coordNode = world?.SubNodes.OfType<CoordNode>().Where(n => n.X == cursorEvent.Item1.X && n.Y == cursorEvent.Item1.Y).FirstOrDefault();
+                if (coordNode is not null)
+                {
+                    SelectedNodes.Clear();
+                    SelectedNodes.Add(coordNode);
+                }
+            }
+        }
     }
 
     public void RefreshData()
@@ -58,9 +79,15 @@ public class MapTreeViewModel
                     {
                         nodeEntities.Add(new Node($"{entity.EntityType.TypeId}: {entity.Id}: {entity.EntityType.Model.Name}"));
                     }
-                    entitiesCoords.Add(new Node($"{x},{y}", nodeEntities));
+                    entitiesCoords.Add(new CoordNode(x, y, $"{x},{y}", nodeEntities));
                 }
             }
         }
     }
+
+    private void SelectedNodes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        
+    }
+
 }

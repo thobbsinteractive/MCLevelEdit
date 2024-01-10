@@ -51,8 +51,11 @@ namespace MCLevelEdit.Views
             if (e.InitialPressMouseButton == MouseButton.Left)
             {
                 _ptCursor = GetCursorPoint(e);
-                if(VmMapEditor != null)
+                if (VmMapEditor != null)
+                {
                     VmMapEditor.CursorPosition = _ptCursor;
+                    VmMapEditor.OnCursorClicked(VmMapEditor.CursorPosition, true, false);
+                }
             }
         }
 

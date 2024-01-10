@@ -27,7 +27,7 @@ namespace MCLevelEdit.ViewModels
             GenerateTerrainButtonEnable = false;
             await _mapService.RecalculateTerrain(GenerationParameters.ToGenerationParameters());
             GenerateTerrainButtonEnable = true;
-            _eventAggregator.RaiseEvent("RefreshData", this, new Application.Model.PubSubEventArgs<object>("RefreshData"));
+            _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
         }
     }
 }

@@ -16,6 +16,13 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 {
     private readonly object _lockPreview = new object();
     private Point _cursorPosition = new Point(0, 0);
+
+    public void OnCursorClicked(Point position, bool left, bool right)
+    {
+        (Point, bool, bool) cursorEvent = (position, left, right);
+        _eventAggregator.RaiseEvent("OnCursorClicked", this, new PubSubEventArgs<object>(cursorEvent));
+    }
+
     public Point CursorPosition { 
         get 
         { 
