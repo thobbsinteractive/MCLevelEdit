@@ -14,13 +14,13 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(DoShowDialogAsync)));
     }
 
-    private async Task DoShowDialogAsync(InteractionContext<MapViewModel,
-                                    MapViewModel?> interaction)
+    private async Task DoShowDialogAsync(InteractionContext<EntitiesTableViewModel,
+                                    EntitiesTableViewModel?> interaction)
     {
         var dialog = new EntitiesWindow();
         dialog.DataContext = interaction.Input;
 
-        var result = await dialog.ShowDialog<MapViewModel?>(this);
+        var result = await dialog.ShowDialog<EntitiesTableViewModel?>(this);
         interaction.SetOutput(result);
     }
 }

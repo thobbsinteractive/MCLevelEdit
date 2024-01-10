@@ -67,7 +67,7 @@ public class ViewModelBase : ReactiveObject
         foreach(var entity in entities)
         {
             _mapService.UpdateEntity(entity);
-            _eventAggregator.RaiseEvent("RefreshData", this, new Application.Model.PubSubEventArgs<object>("RefreshData"));
         }
+        _eventAggregator.RaiseEvent("RefreshData", this, new Application.Model.PubSubEventArgs<object>("RefreshData"));
     }
 }

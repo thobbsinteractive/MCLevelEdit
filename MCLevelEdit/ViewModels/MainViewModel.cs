@@ -19,20 +19,29 @@ public class MainViewModel : ViewModelBase
     public ICommand OpenFileCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand EditEntitiesCommand { get; }
-    public MapViewModel MapViewModel { get; }
-    public Interaction<MapViewModel, MapViewModel?> ShowDialog { get; }
+    public EntitiesTableViewModel EntitiesTableViewModel {  get; }
+    public EntityToolBarViewModel EntityToolBarViewModel { get; }
+    public EditTerrainViewModel EditTerrainViewModel { get; }
+    public MapTreeViewModel MapTreeViewModel { get; }
+    public MapEditorViewModel MapEditorViewModel { get; }
+    public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowDialog { get; }
 
     public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
-        MapViewModel = Locator.Current.GetService<MapViewModel>();
+        EntitiesTableViewModel = Locator.Current.GetService<EntitiesTableViewModel>();
 
         _mapService.CreateNewMap();
+        EntityToolBarViewModel = new EntityToolBarViewModel(eventAggregator, mapService, terrainService);
+        EditTerrainViewModel = new EditTerrainViewModel(eventAggregator, mapService, terrainService);
+        MapTreeViewModel = new MapTreeViewModel(eventAggregator, mapService, terrainService);
+        MapEditorViewModel = new MapEditorViewModel(eventAggregator, mapService, terrainService);
+        EditTerrainViewModel.GenerateHeightMap();
 
-        ShowDialog = new Interaction<MapViewModel, MapViewModel?>();
+        ShowDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
 
         EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            var result = await ShowDialog.Handle(MapViewModel);
+            var result = await ShowDialog.Handle(EntitiesTableViewModel);
             LoadEntities(Entities.ToEntities());
         });
 
