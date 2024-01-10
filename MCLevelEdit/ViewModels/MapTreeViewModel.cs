@@ -46,10 +46,10 @@ public class MapTreeViewModel
             if(world is not null)
             {
                 var coordNode = world?.SubNodes.OfType<CoordNode>().Where(n => n.X == cursorEvent.Item1.X && n.Y == cursorEvent.Item1.Y).FirstOrDefault();
-                if (coordNode is not null)
+                if (coordNode is not null && coordNode.SubNodes is not null && coordNode.SubNodes.Count > 0)
                 {
                     SelectedNodes.Clear();
-                    SelectedNodes.Add(coordNode);
+                    SelectedNodes.Add(coordNode.SubNodes[0]);
                 }
             }
         }
