@@ -16,10 +16,10 @@
                 BorderBrush="Gray"
                 BorderThickness="1"
                 CornerRadius="5"
-                Padding="15 3">
+                Padding="3">
           <StackPanel Orientation="Horizontal">
             <Image Source="{Binding Icon}" />
-            <TextBlock Text="{Binding Title}" />
+            <TextBlock Text="{Binding Title}" Margin="5,7,0,0"/>
           </StackPanel>
         </Border>
       </TreeDataTemplate>

@@ -13,18 +13,16 @@ public class Node
     public string Name { get; }
     public string Title { get; }
 
-    public Node(string iconPath, string name, string title)
+    public Node(Bitmap icon, string name, string title)
     {
-        if (!string.IsNullOrWhiteSpace(iconPath))
-            Icon = new Bitmap(AssetLoader.Open(new Uri(iconPath)));
+        Icon = icon;
         Name = name;
         Title = title;
     }
 
-    public Node(string iconPath, string name, string title, ObservableCollection<Node> subNodes)
+    public Node(Bitmap icon, string name, string title, ObservableCollection<Node> subNodes)
     {
-        if (!string.IsNullOrWhiteSpace(iconPath))
-            Icon = new Bitmap(AssetLoader.Open(new Uri(iconPath)));
+        Icon = icon;
         Name = name;
         Title = title;
         SubNodes = subNodes;
