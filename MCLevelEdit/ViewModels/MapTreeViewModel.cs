@@ -38,10 +38,9 @@ public class MapTreeViewModel
 
     public void SelectNodeHandler(object sender, PubSubEventArgs<object> arg)
     {
-        var cursorEvent = ((Point, bool, bool))arg.Item;
-
         if(arg.Item is not null)
         {
+            var cursorEvent = ((Point, bool, bool))arg.Item;
             var world = Nodes?.Where(n => n.Title == "World").FirstOrDefault();
             if(world is not null)
             {
@@ -63,7 +62,7 @@ public class MapTreeViewModel
         var map = _mapService.GetMap();
 
         var entitiesCoords = new ObservableCollection<Node>();
-        var world = new Node($"World", entitiesCoords);
+        var world = new Node("avares://MCLevelEdit/Assets/world-32.png", $"World", "", entitiesCoords);
 
         Nodes.Add(world);
 
@@ -77,9 +76,9 @@ public class MapTreeViewModel
                     var nodeEntities = new ObservableCollection<Node>();
                     foreach (var entity in squareEntities)
                     {
-                        nodeEntities.Add(new Node($"{entity.EntityType.TypeId}: {entity.Id}: {entity.EntityType.Model.Name}"));
+                        nodeEntities.Add(new Node("", "Entity", $"{entity.EntityType.TypeId}: {entity.Id}: {entity.EntityType.Model.Name}"));
                     }
-                    entitiesCoords.Add(new CoordNode(x, y, $"{x},{y}", nodeEntities));
+                    entitiesCoords.Add(new CoordNode(x, y, "Coord", $"{x},{y}", nodeEntities));
                 }
             }
         }
@@ -87,7 +86,7 @@ public class MapTreeViewModel
 
     private void SelectedNodes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        
+        _eventAggregator.RaiseEvent("NodeSelected", this, new PubSubEventArgs<object>(SelectedNodes.FirstOrDefault()));
     }
 
 }

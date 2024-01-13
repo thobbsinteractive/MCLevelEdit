@@ -13,9 +13,14 @@
     <TreeView.ItemTemplate>
       <TreeDataTemplate ItemsSource="{Binding SubNodes}">
         <Border HorizontalAlignment="Left"
-                BorderBrush="Gray" BorderThickness="1"
-                CornerRadius="5" Padding="15 3">
-          <TextBlock Text="{Binding Title}" />
+                BorderBrush="Gray"
+                BorderThickness="1"
+                CornerRadius="5"
+                Padding="15 3">
+          <StackPanel Orientation="Horizontal">
+            <Image Source="{Binding Icon}" />
+            <TextBlock Text="{Binding Title}" />
+          </StackPanel>
         </Border>
       </TreeDataTemplate>
     </TreeView.ItemTemplate>
