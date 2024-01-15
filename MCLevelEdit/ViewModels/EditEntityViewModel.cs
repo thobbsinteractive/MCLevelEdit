@@ -37,7 +37,7 @@ namespace MCLevelEdit.ViewModels
             {
                 EntityView.Id = Entities.Count + 1;
                 AddEntity(EntityView);
-                _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
+                _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
             });
         }
     }

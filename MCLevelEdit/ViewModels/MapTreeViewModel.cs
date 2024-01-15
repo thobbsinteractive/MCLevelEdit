@@ -43,7 +43,7 @@ public class MapTreeViewModel
         SelectedNodes.CollectionChanged += SelectedNodes_CollectionChanged;
         Nodes = new ObservableCollection<Node>();
 
-        _eventAggregator.RegisterEvent("RefreshData", RefreshDataHandler);
+        _eventAggregator.RegisterEvent("RefreshEntities", RefreshDataHandler);
         _eventAggregator.RegisterEvent("OnCursorClicked", SelectNodeHandler);
         RefreshData();
     }

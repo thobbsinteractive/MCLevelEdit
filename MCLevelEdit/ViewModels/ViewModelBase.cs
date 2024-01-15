@@ -21,7 +21,6 @@ public class ViewModelBase : ReactiveObject
     protected readonly ITerrainService _terrainService;
     protected readonly EventAggregator<object> _eventAggregator;
 
-    public static TerrainGenerationParamsViewModel GenerationParameters { get; } = new TerrainGenerationParamsViewModel();
     public static IAvaloniaList<EntityViewModel> Entities { get; } = new AvaloniaList<EntityViewModel>();
     public static WriteableBitmap Preview { get; } = new WriteableBitmap(
                 new PixelSize(Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE, Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE),
@@ -45,21 +44,21 @@ public class ViewModelBase : ReactiveObject
     {
         Entities.Add(entityView.Copy());
         _mapService.AddEntity(entityView.ToEntity());
-        _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
+        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
     }
 
     protected void DeleteEntity(EntityViewModel entityView)
     {
         Entities.Remove(entityView);
         _mapService.DeleteEntity(entityView.ToEntity());
-        _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
+        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
     }
 
     protected void LoadEntityViewModels(IEnumerable<EntityViewModel> entitiesViewModels)
     {
         Entities.Clear();
         Entities.AddRange(entitiesViewModels);
-        _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
+        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
     }
 
     protected void LoadEntities(IEnumerable<Entity> entities)
@@ -68,6 +67,6 @@ public class ViewModelBase : ReactiveObject
         {
             _mapService.UpdateEntity(entity);
         }
-        _eventAggregator.RaiseEvent("RefreshData", this, new PubSubEventArgs<object>("RefreshData"));
+        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
     }
 }

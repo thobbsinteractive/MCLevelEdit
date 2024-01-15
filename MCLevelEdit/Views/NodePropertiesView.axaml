@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:views="clr-namespace:MCLevelEdit.Views"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="800"
+             x:Class="MCLevelEdit.Views.NodePropertiesView"
+             x:DataType="vm:NodePropertiesViewModel">
+  <Grid Name="grdNodeProperties"
+        Margin="5"
+        ColumnDefinitions="*"
+        RowDefinitions="*">
+    <Panel Name="pEditEntity"
+           IsEnabled="{Binding ShowEditEntity, FallbackValue=false}"
+           IsVisible="{Binding ShowEditEntity, FallbackValue=false}">
+      <views:EditEntityView Name="vmEditEntity"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            DataContext="{Binding EditEntityViewModel}"/>
+    </Panel>
+    <Panel Name="pEditTerrain"
+           IsEnabled="{Binding ShowEditTerrain, FallbackValue=false}"
+           IsVisible="{Binding ShowEditTerrain, FallbackValue=false}">
+      <views:EditTerrainView Name="vmEditTerrain"
+                             Grid.Row="0"
+                             Grid.Column="0"
+                             DataContext="{Binding EditTerrainViewModel}"/>
+    </Panel>
+  </Grid>
+</UserControl>

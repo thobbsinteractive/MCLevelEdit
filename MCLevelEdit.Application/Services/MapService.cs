@@ -57,6 +57,7 @@ public class MapService : IMapService
     public async Task<bool> CreateNewMap(ushort size = Globals.MAX_MAP_SIZE)
     {
         MapRepository.Map = new Map();
+        await RecalculateTerrain(MapRepository.Map.Terrain.GenerationParameters);
         return true;
     }
     

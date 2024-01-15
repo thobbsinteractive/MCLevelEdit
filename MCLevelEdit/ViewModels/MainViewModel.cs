@@ -21,9 +21,9 @@ public class MainViewModel : ViewModelBase
     public ICommand EditEntitiesCommand { get; }
     public EntitiesTableViewModel EntitiesTableViewModel {  get; }
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
-    public EditTerrainViewModel EditTerrainViewModel { get; }
     public MapTreeViewModel MapTreeViewModel { get; }
     public MapEditorViewModel MapEditorViewModel { get; }
+    public NodePropertiesViewModel NodePropertiesViewModel { get; }
     public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowDialog { get; }
 
     public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
@@ -31,11 +31,10 @@ public class MainViewModel : ViewModelBase
         EntitiesTableViewModel = Locator.Current.GetService<EntitiesTableViewModel>();
 
         _mapService.CreateNewMap();
+        NodePropertiesViewModel = new NodePropertiesViewModel(eventAggregator, mapService, terrainService);
         EntityToolBarViewModel = new EntityToolBarViewModel(eventAggregator, mapService, terrainService);
-        EditTerrainViewModel = new EditTerrainViewModel(eventAggregator, mapService, terrainService);
         MapTreeViewModel = new MapTreeViewModel(eventAggregator, mapService, terrainService);
         MapEditorViewModel = new MapEditorViewModel(eventAggregator, mapService, terrainService);
-        EditTerrainViewModel.GenerateHeightMap();
 
         ShowDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
 
@@ -61,10 +60,8 @@ public class MainViewModel : ViewModelBase
             {
                 await mapService.LoadMapFromFileAsync(files[0].Path.AbsolutePath);
                 var map = mapService.GetMap();
-
-                GenerationParameters.SetParameters(map.Terrain.GenerationParameters.ToTerrainGenerationParamsViewModel());
-                this.RaisePropertyChanged(nameof(GenerationParameters));
                 LoadEntityViewModels(map.Entities.ToEntityViewModels());
+                _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
             }
         });
     }

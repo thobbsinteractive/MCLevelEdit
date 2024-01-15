@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels;assembly=MCLevelEdit"
              xmlns:views="clr-namespace:MCLevelEdit.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              x:Class="MCLevelEdit.Views.MainView"
@@ -21,7 +21,7 @@
           RowDefinitions="*,50">
       <Grid Grid.Row="0"
             Grid.Column="0"
-            ColumnDefinitions="256,*"
+            ColumnDefinitions="256,*,300"
             RowDefinitions="200,*">
         <views:EntityToolBarView Name="vmEntityToolBar"
                                  Grid.Row="0"
@@ -37,6 +37,10 @@
                              Grid.Row="1"
                              Grid.Column="1"
                              DataContext="{Binding MapEditorViewModel}"/>
+        <views:NodePropertiesView Name="vmNodeProperties"
+                                  Grid.Row="1"
+                                  Grid.Column="2"
+                                  DataContext="{Binding NodePropertiesViewModel}"/>
       </Grid>
       <Button x:Name="btnEdit"
               Grid.Row="1"

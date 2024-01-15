@@ -38,7 +38,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public MapEditorViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
-        _eventAggregator.RegisterEvent("RefreshData", RefreshDataHandler);
+        _eventAggregator.RegisterEvent("RefreshEntities", RefreshDataHandler);
+        _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
         RefreshPreviewAsync();
     }
 
