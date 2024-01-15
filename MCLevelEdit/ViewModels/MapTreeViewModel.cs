@@ -65,7 +65,7 @@ public class MapTreeViewModel
                 if (coordNode is not null && coordNode.SubNodes is not null && coordNode.SubNodes.Count > 0)
                 {
                     SelectedNodes.Clear();
-                    SelectedNodes.Add(coordNode);
+                    SelectedNodes.Add(coordNode.SubNodes[0]);
                 }
             }
         }
