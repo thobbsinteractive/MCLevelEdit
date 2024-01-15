@@ -34,9 +34,9 @@
           Grid.Column="1"
           VerticalAlignment="Center"
           HorizontalAlignment="Stretch"
-          SelectedIndex="{Binding EntityView.ModelIdx}"
+          SelectedValue="{Binding EntityView.Type, Converter={StaticResource typeIdConverter}}"
           DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
-          ItemsSource="{Binding EntityView.ModelTypes}">
+          ItemsSource="{Binding Source={x:Static vm:EditEntityViewModel.TypeIds}}">
     </ComboBox>
     <Label Grid.Column="0"
            Grid.Row="2"

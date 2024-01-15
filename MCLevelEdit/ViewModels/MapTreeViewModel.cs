@@ -101,7 +101,7 @@ public class MapTreeViewModel
                     var nodeEntities = new ObservableCollection<Node>();
                     foreach (var entity in squareEntities)
                     {
-                        nodeEntities.Add(new Node(GetIconFromEntity(entity.EntityType), entity.EntityType.TypeId.ToString(), $"{entity.Id}: {entity.EntityType.Model.Name}"));
+                        nodeEntities.Add(new Node(GetIconFromEntity(entity.EntityType), entity.Id.ToString(), $"{entity.Id}: {entity.EntityType.Model.Name}"));
                     }
                     entitiesCoords.Add(new CoordNode(x, y, "Coord", $"{string.Format("{0:D3}", x)},{string.Format("{0:D3}", y)}", nodeEntities));
                 }

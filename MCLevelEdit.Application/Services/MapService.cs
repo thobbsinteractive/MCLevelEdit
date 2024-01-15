@@ -72,6 +72,11 @@ public class MapService : IMapService
         return MapRepository.Map;
     }
 
+    public Entity? GetEntity(ushort id)
+    {
+        return MapRepository.Map.Entities.First(e => e.Id == id);
+    }
+
     public bool AddEntity(Entity entity)
     {
         MapRepository.Map.AddEntity(entity);

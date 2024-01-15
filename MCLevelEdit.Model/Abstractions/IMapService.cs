@@ -11,6 +11,7 @@ public interface IMapService
     Task<bool> RecalculateTerrain(GenerationParameters generationParameters);
     Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, IList<Entity> entities);
     Map GetMap();
+    Entity? GetEntity(ushort id);
     bool AddEntity(Entity entity);
     bool UpdateEntity(Entity entity);
     bool DeleteEntity(Entity entity);
