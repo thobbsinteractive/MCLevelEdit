@@ -41,5 +41,6 @@ public class EntityToolBarViewModel : ViewModelBase
             Parent = 0,
             Child = 0
         };
+        AddEntityViewModel.ModelIdx = 0;
     }
 }
