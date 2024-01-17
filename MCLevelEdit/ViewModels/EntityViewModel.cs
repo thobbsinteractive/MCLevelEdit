@@ -40,7 +40,6 @@ public class EntityViewModel : ObservableObject
                     break;
                 }
             }
-
         } 
         get { return ModelTypes[_modelIdx].Key; }
     }
