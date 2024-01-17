@@ -94,4 +94,9 @@ public class MapService : IMapService
         MapRepository.Map.DeleteEntity(entity);
         return true;
     }
+
+    public List<Entity> GetEntitiesByCoords(int x, int y)
+    {
+        return MapRepository.Map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();
+    }
 }

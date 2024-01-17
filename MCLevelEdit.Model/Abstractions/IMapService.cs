@@ -12,6 +12,7 @@ public interface IMapService
     Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, IList<Entity> entities);
     Map GetMap();
     Entity? GetEntity(ushort id);
+    List<Entity> GetEntitiesByCoords(int x, int y);
     bool AddEntity(Entity entity);
     bool UpdateEntity(Entity entity);
     bool DeleteEntity(Entity entity);

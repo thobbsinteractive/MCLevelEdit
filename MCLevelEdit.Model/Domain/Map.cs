@@ -20,7 +20,10 @@ public class Map
     public void AddEntity(Entity entity)
     {
         if (this.Entities.Count < Globals.MAX_ENTITIES)
+        {
+            entity.Id = GetNextId();
             this.Entities.Add(entity);
+        }
     }
 
     public void DeleteEntity(Entity entity)
@@ -47,5 +50,17 @@ public class Map
             }
         }
         return -1;
+    }
+
+    private int GetNextId()
+    {
+        if (!this.Entities.Any())
+            return 1;
+
+        var entityIds = this.Entities.Select(e => e.Id).OrderBy(e => e).ToList();
+        var allIds = Enumerable.Range(1, Globals.MAX_ENTITIES + 1).ToArray();
+        var freeIds = allIds.Except(entityIds).ToList();
+
+        return freeIds.FirstOrDefault();
     }
 }
