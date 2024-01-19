@@ -40,12 +40,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         get { return _cvEntity; }
     }
 
-    public void OnCursorClicked(object sender, Point position, bool left, bool right)
+    public void OnCursorClicked( Point position, bool left, bool right)
     {
-        if (sender is not null && CvEntity is null)
-        {
-            CvEntity = (Canvas)sender;
-        }
         (Point, bool, bool) cursorEvent = (position, left, right);
         _eventAggregator.RaiseEvent("OnCursorClicked", this, new PubSubEventArgs<object>(cursorEvent));
     }
@@ -105,40 +101,42 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     {
         lock (_lockPreview)
         {
-            this.Log().Debug("Refreshing Entities Preview...");
-
-            var children = _cvEntity.Children.Where(c => c.GetType() != typeof(Image)).DefaultIfEmpty();
-            _cvEntity.Children.RemoveAll(children);
-
-            for (int x = 0; x < Globals.MAX_MAP_SIZE; x++)
+            if (_cvEntity is not null)
             {
-                for (int y = 0; y < Globals.MAX_MAP_SIZE; y++)
+                this.Log().Debug("Refreshing Entities Preview...");
+
+                var children = _cvEntity.Children.Where(c => c.GetType() != typeof(Image)).DefaultIfEmpty();
+                _cvEntity.Children.RemoveAll(children);
+
+                for (int x = 0; x < Globals.MAX_MAP_SIZE; x++)
                 {
-                    var entities = _mapService.GetEntitiesByCoords(x, y);
-
-                    if (entities?.Count() > 0)
+                    for (int y = 0; y < Globals.MAX_MAP_SIZE; y++)
                     {
-                        var rects = entities.Select(e => new Rect(e.Position.X * Globals.SQUARE_SIZE, e.Position.Y * Globals.SQUARE_SIZE, Globals.SQUARE_SIZE, Globals.SQUARE_SIZE)).ToList();
+                        var entities = _mapService.GetEntitiesByCoords(x, y);
 
-                        foreach (var rect in rects)
+                        if (entities?.Count() > 0)
                         {
-                            var rectangle = new Rectangle()
+                            foreach (var entity in entities)
                             {
-                                Width = 8,
-                                Height = 8,
-                                Fill = Brushes.Red,
-                                ZIndex = 100
-                            };
+                                var rect = new Rect(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE, Globals.SQUARE_SIZE, Globals.SQUARE_SIZE);
+                                var brush = new SolidColorBrush(entity.EntityType.Colour, 1);
+                                var rectangle = new Rectangle()
+                                {
+                                    Width = 8,
+                                    Height = 8,
+                                    Fill = brush,
+                                    ZIndex = 100
+                                };
 
-                            Canvas.SetLeft(rectangle, rect.X);
-                            Canvas.SetTop(rectangle, rect.Y);
-                            _cvEntity.Children.Add(rectangle);
+                                Canvas.SetLeft(rectangle, rect.X);
+                                Canvas.SetTop(rectangle, rect.Y);
+                                _cvEntity.Children.Add(rectangle);
+                            }
                         }
                     }
                 }
+                this.Log().Debug("Entities refreshed");
             }
-
-            this.Log().Debug("Entities refreshed");
         }
     }
 }

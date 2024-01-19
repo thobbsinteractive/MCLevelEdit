@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.PanAndZoom;
 using Avalonia.Input;
 using MCLevelEdit.ViewModels;
+using System;
 
 namespace MCLevelEdit.Views
 {
@@ -41,7 +42,17 @@ namespace MCLevelEdit.Views
             {
                 _btnReset.Click += OnBtnReset_Click;
             }
+
+            this.DataContextChanged += OnDataContextChanged;
             ResetView();
+        }
+
+        private void OnDataContextChanged(object? sender, EventArgs e)
+        {
+            if (VmMapEditor is not null && VmMapEditor.CvEntity is null)
+            {
+                VmMapEditor.CvEntity = _cvEntities;
+            }
         }
 
         private void OnBtnReset_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -57,7 +68,7 @@ namespace MCLevelEdit.Views
                 if (VmMapEditor != null)
                 {
                     VmMapEditor.CursorPosition = _ptCursor;
-                    VmMapEditor.OnCursorClicked(_cvEntities, VmMapEditor.CursorPosition, true, false);
+                    VmMapEditor.OnCursorClicked(VmMapEditor.CursorPosition, true, false);
                 }
             }
         }
