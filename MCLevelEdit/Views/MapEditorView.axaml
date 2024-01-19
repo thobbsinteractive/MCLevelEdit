@@ -89,10 +89,17 @@
                     MaxZoomY="4"
                     Focusable="True"
                     EnableConstrains="True">
-      <Image Name="imgPreview"
+      <Canvas Name="cvEntities"
               MinHeight="2048"
-              MinWidth="2048"
-              Source="{Binding Preview}"/>
-      </paz:ZoomBorder>
+              MinWidth="2048">
+        <Image Name="imgPreview"
+               Canvas.Left="0"
+               Canvas.Top="0"
+               ZIndex="0"
+               Height="2048"
+               Width="2048"
+               Source="{Binding Preview}"/>
+      </Canvas>
+    </paz:ZoomBorder>
   </Grid>
 </UserControl>

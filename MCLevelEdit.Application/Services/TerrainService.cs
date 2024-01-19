@@ -142,26 +142,14 @@ public class TerrainService : ITerrainService, IEnableLogger
                                         //    break;
                                 }
 
-                                for (int sx = 0; sx < Globals.SQUARE_SIZE; sx++)
-                                {
-                                    for (int sy = 0; sy < Globals.SQUARE_SIZE; sy++)
-                                    {
-                                        fb.SetPixel((x * Globals.SQUARE_SIZE) + sx, (y * Globals.SQUARE_SIZE) + sy, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
+                                fb.SetPixel(x , y, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
                                             (byte)Math.Max(baseColour.G - terrain.MapShading_12B4E0[index], byte.MinValue),
                                             (byte)Math.Max(baseColour.B - terrain.MapShading_12B4E0[index], byte.MinValue)));
-                                    }
-                                }
                             }
                         }
                         if (layer == Layer.Height)
                         {
-                            for (int sx = 0; sx < Globals.SQUARE_SIZE; sx++)
-                            {
-                                for (int sy = 0; sy < Globals.SQUARE_SIZE; sy++)
-                                {
-                                    fb.SetPixel((x * Globals.SQUARE_SIZE) + sx, (y * Globals.SQUARE_SIZE) + sy, new Color(255, terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index]));
-                                }
-                            }
+                            fb.SetPixel(x , y, new Color(255, terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index]));
                         }
                     }
                 }

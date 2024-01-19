@@ -1,14 +1,10 @@
-﻿using Avalonia;
-using Avalonia.Collections;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
+﻿using Avalonia.Collections;
 using DynamicData;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
-using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +18,6 @@ public class ViewModelBase : ReactiveObject
     protected readonly EventAggregator<object> _eventAggregator;
 
     public static IAvaloniaList<EntityViewModel> Entities { get; } = new AvaloniaList<EntityViewModel>();
-    public static WriteableBitmap Preview { get; } = new WriteableBitmap(
-                new PixelSize(Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE, Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE),
-                new Vector(96, 96), // DPI (dots per inch)
-                PixelFormat.Rgba8888);
 
     public static KeyValuePair<int, string>[] TypeIds { get; } =
         Enum.GetValues(typeof(TypeId))

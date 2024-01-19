@@ -11,6 +11,8 @@ namespace MCLevelEdit.Views
         private readonly ZoomBorder? _pazMap;
         private readonly Button? _btnReset;
         private readonly Image? _imgPreview;
+        private readonly Canvas? _cvEntities;
+
         private Point _ptCursor = new Point();
 
         public Point PtCursor
@@ -24,6 +26,7 @@ namespace MCLevelEdit.Views
         {
             InitializeComponent();
 
+            _cvEntities = this.Find<Canvas>("cvEntities");
             _pazMap = this.Find<ZoomBorder>("pazMap");
             _btnReset = this.Find<Button>("btnReset");
             _imgPreview = this.Find<Image>("imgPreview");
@@ -54,7 +57,7 @@ namespace MCLevelEdit.Views
                 if (VmMapEditor != null)
                 {
                     VmMapEditor.CursorPosition = _ptCursor;
-                    VmMapEditor.OnCursorClicked(VmMapEditor.CursorPosition, true, false);
+                    VmMapEditor.OnCursorClicked(_cvEntities, VmMapEditor.CursorPosition, true, false);
                 }
             }
         }
