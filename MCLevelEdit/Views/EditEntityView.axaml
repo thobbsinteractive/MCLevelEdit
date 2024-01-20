@@ -10,7 +10,7 @@
              x:DataType="vm:EditEntityViewModel">
   <Grid Margin="5"
         ColumnDefinitions="1*,2*"
-        RowDefinitions="40,30,30,30,30,30,30,*">
+        RowDefinitions="40,30,30,30,30,30,30,30,30,30,*">
     <Grid.Resources>
       <c:TypeIdConverter x:Key="typeIdConverter"/>
       <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
@@ -75,20 +75,50 @@
     <Label Grid.Column="0"
            Grid.Row="5"
            HorizontalAlignment="Left">
-      Parent:
+      DisId:
     </Label>
-    <TextBox x:Name="txtParent"
-         Grid.Row="5"
-         Grid.Column="1"
-         Text="{Binding EntityView.Parent, Converter={StaticResource uInt16ToStringConverter}}">
+    <TextBox x:Name="txtDisId"
+        Grid.Row="5"
+        Grid.Column="1"
+        Text="{Binding EntityView.DisId, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="6"
            HorizontalAlignment="Left">
+      Switch Size:
+    </Label>
+    <TextBox x:Name="txtSwitchSize"
+             Grid.Row="6"
+             Grid.Column="1"
+             Text="{Binding EntityView.SwitchSize, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="7"
+           HorizontalAlignment="Left">
+      Switch Id:
+    </Label>
+    <TextBox x:Name="txtSwitchId"
+             Grid.Row="7"
+             Grid.Column="1"
+             Text="{Binding EntityView.SwitchId, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="8"
+           HorizontalAlignment="Left">
+      Parent:
+    </Label>
+    <TextBox x:Name="txtParent"
+         Grid.Row="8"
+         Grid.Column="1"
+         Text="{Binding EntityView.Parent, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="9"
+           HorizontalAlignment="Left">
       Child:
     </Label>
     <TextBox x:Name="txtChild"
-             Grid.Row="6"
+             Grid.Row="9"
              Grid.Column="1"
              Text="{Binding EntityView.Child, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>

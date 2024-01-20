@@ -53,6 +53,9 @@ public class EntityViewModel : ObservableObject
     }
     public byte X { get; set; }
     public byte Y { get; set; }
+    public ushort DisId { get; set; }
+    public ushort SwitchSize { get; set; }
+    public ushort SwitchId { get; set; }
     public ushort Parent { get; set; }
     public ushort Child { get; set; }
 
@@ -65,6 +68,9 @@ public class EntityViewModel : ObservableObject
             ModelIdx = this.ModelIdx,
             X = this.X,
             Y = this.Y,
+            DisId = this.DisId,
+            SwitchSize = this.SwitchSize,
+            SwitchId = this.SwitchId,
             Parent = this.Parent,
             Child = this.Child
         };

@@ -22,6 +22,9 @@ namespace MCLevelEdit.ViewModels
                     Type = (int)TypeId.Scenary,
                     X = 0,
                     Y = 0,
+                    DisId = 0,
+                    SwitchSize = 0,
+                    SwitchId = 0,
                     Parent = 0,
                     Child = 0
                 });
