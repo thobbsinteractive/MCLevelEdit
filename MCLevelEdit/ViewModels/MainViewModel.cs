@@ -62,6 +62,7 @@ public class MainViewModel : ViewModelBase
                 var map = mapService.GetMap();
                 LoadEntityViewModels(map.Entities.ToEntityViewModels());
                 _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+                _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
             }
         });
     }

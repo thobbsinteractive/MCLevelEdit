@@ -18,7 +18,8 @@ public class FileAdapter : IFilePort
             throw new Exception("Compressed level detected! You must uncompress this file first");
         }
 
-        map.ManaTotal = BitConverter.ToUInt32(levfile, 38800);
+        map.ManaTotal = BitConverter.ToUInt32(levfile, 0);
+        map.ManaTarget = levfile[38800];
         var numWizards = levfile[38802];
 
         GenerationParameters terrainGenerationParameters = new GenerationParameters()

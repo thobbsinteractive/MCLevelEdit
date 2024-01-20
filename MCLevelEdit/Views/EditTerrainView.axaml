@@ -5,141 +5,178 @@
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
              xmlns:views="clr-namespace:MCLevelEdit.Views"
              xmlns:c="clr-namespace:MCLevelEdit.Converter"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="600"
              x:Class="MCLevelEdit.Views.EditTerrainView"
              x:DataType="vm:EditTerrainViewModel">
   <Grid Margin="5"
         ColumnDefinitions="1*,1*"
-        RowDefinitions="40,30,30,30,30,30,30,30,30,30,30,30,40,*">
+        RowDefinitions="40,30,30,40,40,30,30,30,30,30,30,30,30,30,30,30,40,*">
     <Grid.Resources>
+      <c:UInt32ToStringConverter x:Key="uInt32ToStringConverter"/>
       <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
       <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
     </Grid.Resources>
     <Label Grid.Column="0"
            Grid.Row="0"
            Grid.ColumnSpan="2"
-           HorizontalAlignment="Center">
-      Terrain Generation Variables
+           HorizontalAlignment="Center"
+           VerticalAlignment="Center">
+      Level Properties
     </Label>
     <Label Grid.Column="0"
            Grid.Row="1"
            HorizontalAlignment="Left">
-      Seed:
+      Mana Total:
     </Label>
     <TextBox Grid.Column="1"
              Grid.Row="1"
              HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.Seed, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding ManaTotal, Converter={StaticResource uInt32ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="2"
            HorizontalAlignment="Left">
-      Offset:
+      Mana Target (%):
     </Label>
     <TextBox Grid.Column="1"
              Grid.Row="2"
              HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.Offset, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding ManaTarget, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
+    <Button x:Name="btnRecalc"
+        Grid.Column="0"
+        Grid.Row="3"
+        HorizontalAlignment="Center"
+        Grid.ColumnSpan="2"
+        Command=""
+        IsEnabled="">
+      Recalculate Mana
+    </Button>
     <Label Grid.Column="0"
-           Grid.Row="3"
-           HorizontalAlignment="Left">
-      Raise:
+       Grid.Row="4"
+       Grid.ColumnSpan="2"
+       HorizontalAlignment="Center"
+       VerticalAlignment="Center">
+      Terrain Generation Variables
     </Label>
-    <TextBox Grid.Column="1"
-             Grid.Row="3"
-             HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.Raise, Converter={StaticResource uInt16ToStringConverter}}">
-    </TextBox>
-    <Label Grid.Column="0"
-           Grid.Row="4"
-           HorizontalAlignment="Left">
-      Gnarl:
-    </Label>
-    <TextBox Grid.Column="1"
-             Grid.Row="4"
-             HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.Gnarl, Converter={StaticResource uInt16ToStringConverter}}">
-    </TextBox>
     <Label Grid.Column="0"
            Grid.Row="5"
            HorizontalAlignment="Left">
-      River:
+      Seed:
     </Label>
     <TextBox Grid.Column="1"
              Grid.Row="5"
              HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.River, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding GenerationParameters.Seed, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="6"
            HorizontalAlignment="Left">
-      Source:
+      Offset:
     </Label>
     <TextBox Grid.Column="1"
              Grid.Row="6"
              HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.Source, Converter={StaticResource uInt8ToStringConverter}}">
+             Text="{Binding GenerationParameters.Offset, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="7"
            HorizontalAlignment="Left">
-      SnLin:
+      Raise:
     </Label>
     <TextBox Grid.Column="1"
              Grid.Row="7"
              HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.SnLin, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding GenerationParameters.Raise, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="8"
            HorizontalAlignment="Left">
-      SnFlt:
+      Gnarl:
     </Label>
     <TextBox Grid.Column="1"
              Grid.Row="8"
              HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.SnFlt, Converter={StaticResource uInt8ToStringConverter}}">
+             Text="{Binding GenerationParameters.Gnarl, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="9"
            HorizontalAlignment="Left">
-      BhLin:
+      River:
     </Label>
     <TextBox Grid.Column="1"
              Grid.Row="9"
              HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.BhLin, Converter={StaticResource uInt8ToStringConverter}}">
+             Text="{Binding GenerationParameters.River, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="10"
            HorizontalAlignment="Left">
-      Sand (BhFlt):
+      Source:
     </Label>
     <TextBox Grid.Column="1"
              Grid.Row="10"
              HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.BhFlt, Converter={StaticResource uInt8ToStringConverter}}">
+             Text="{Binding GenerationParameters.Source, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="11"
            HorizontalAlignment="Left">
-      RkSte:
+      SnLin:
     </Label>
     <TextBox Grid.Column="1"
              Grid.Row="11"
+             HorizontalAlignment="Stretch"
+             Text="{Binding GenerationParameters.SnLin, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="12"
+           HorizontalAlignment="Left">
+      SnFlt:
+    </Label>
+    <TextBox Grid.Column="1"
+             Grid.Row="12"
+             HorizontalAlignment="Stretch"
+             Text="{Binding GenerationParameters.SnFlt, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="13"
+           HorizontalAlignment="Left">
+      BhLin:
+    </Label>
+    <TextBox Grid.Column="1"
+             Grid.Row="13"
+             HorizontalAlignment="Stretch"
+             Text="{Binding GenerationParameters.BhLin, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="14"
+           HorizontalAlignment="Left">
+      Sand (BhFlt):
+    </Label>
+    <TextBox Grid.Column="1"
+             Grid.Row="14"
+             HorizontalAlignment="Stretch"
+             Text="{Binding GenerationParameters.BhFlt, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="15"
+           HorizontalAlignment="Left">
+      RkSte:
+    </Label>
+    <TextBox Grid.Column="1"
+             Grid.Row="15"
              HorizontalAlignment="Stretch"
              Text="{Binding GenerationParameters.RkSte, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Button x:Name="btnGenerate" 
             Grid.Column="0"
-            Grid.Row="12"
+            Grid.Row="16"
             HorizontalAlignment="Center"
             Grid.ColumnSpan="2"
             Command="{Binding GenerateTerrainCommand}"
             IsEnabled="{Binding GenerateTerrainButtonEnable}">
       Generate Terrain
     </Button>
-            
   </Grid>
 </UserControl>

@@ -99,4 +99,16 @@ public class MapService : IMapService
     {
         return MapRepository.Map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();
     }
+
+    public bool UpdateManaTotal(uint manaTotal)
+    {
+        MapRepository.Map.ManaTotal = manaTotal;
+        return true;
+    }
+
+    public bool UpdateManaTarget(byte manaTarget)
+    {
+        MapRepository.Map.ManaTarget = manaTarget;
+        return true;
+    }
 }

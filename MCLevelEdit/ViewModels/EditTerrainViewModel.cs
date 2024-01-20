@@ -1,5 +1,6 @@
 ﻿using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Threading.Tasks;
@@ -11,7 +12,29 @@ namespace MCLevelEdit.ViewModels
     {
         protected readonly IMapService _mapService;
         protected readonly EventAggregator<object> _eventAggregator;
+        private uint _manaTotal;
+        private byte _manaTarget;
         private TerrainGenerationParamsViewModel _generationParameters;
+
+        public uint ManaTotal
+        {
+            get => _manaTotal;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _manaTotal, value);
+                _mapService.UpdateManaTotal(_manaTotal);
+            }
+        }
+
+        public byte ManaTarget
+        {
+            get => _manaTarget;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _manaTarget, value);
+                _mapService.UpdateManaTarget(_manaTarget);
+            }
+        }
 
         public TerrainGenerationParamsViewModel GenerationParameters
         {
@@ -26,10 +49,12 @@ namespace MCLevelEdit.ViewModels
         {
             _eventAggregator = eventAggregator;
             _mapService = mapService;
-            GenerationParameters = _mapService.GetMap()?.Terrain.GenerationParameters.ToTerrainGenerationParamsViewModel();
-            _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
 
-            GenerateTerrainButtonEnable = true;
+            RefreshTerrainData();
+            RefreshWorldData();
+
+            _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
+            _eventAggregator.RegisterEvent("RefreshWorld", RefreshWorldHandler);
 
             GenerateTerrainCommand = ReactiveCommand.Create(async () =>
             {
@@ -47,8 +72,26 @@ namespace MCLevelEdit.ViewModels
 
         public void RefreshDataHandler(object sender, PubSubEventArgs<object> args)
         {
-            GenerationParameters = _mapService.GetMap()?.Terrain.GenerationParameters.ToTerrainGenerationParamsViewModel();
+            RefreshTerrainData();
         }
 
+        public void RefreshTerrainData()
+        {
+            var map = _mapService.GetMap();
+            GenerationParameters = map.Terrain.GenerationParameters.ToTerrainGenerationParamsViewModel();
+            GenerateTerrainButtonEnable = true;
+        }
+
+        public void RefreshWorldHandler(object sender, PubSubEventArgs<object> args)
+        {
+            RefreshWorldData();
+        }
+
+        public void RefreshWorldData()
+        {
+            var map = _mapService.GetMap();
+            ManaTotal = map.ManaTotal;
+            ManaTarget = map.ManaTarget;
+        }
     }
 }

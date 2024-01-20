@@ -16,4 +16,6 @@ public interface IMapService
     bool AddEntity(Entity entity);
     bool UpdateEntity(Entity entity);
     bool DeleteEntity(Entity entity);
+    bool UpdateManaTotal(uint manaTotal);
+    bool UpdateManaTarget(byte manaTarget);
 }
