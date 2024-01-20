@@ -9,6 +9,7 @@ public class FileAdapter : IFilePort
     public Task<Map> LoadMap(string fileName)
     {
         var levfile = File.ReadAllBytes(fileName);
+        Map map = new Map();
         var counter = 0;
         var Wnumber = 1;
 
@@ -17,9 +18,8 @@ public class FileAdapter : IFilePort
             throw new Exception("Compressed level detected! You must uncompress this file first");
         }
 
-        var manaTarget = levfile[38800];
+        map.ManaTotal = BitConverter.ToUInt32(levfile, 38800);
         var numWizards = levfile[38802];
-        var manaTotal = BitConverter.ToInt32(levfile, 0);
 
         GenerationParameters terrainGenerationParameters = new GenerationParameters()
         {
@@ -45,17 +45,12 @@ public class FileAdapter : IFilePort
             GenerationParameters = terrainGenerationParameters
         };
 
-        Map map = new Map()
-        {
-            Terrain = terrain
-        };
+        map.Terrain = terrain;
 
         do
         {
             counter++;
-            // Get Thing entries
             TypeId entityTypeId = (TypeId)BitConverter.ToUInt16(levfile, fpos);
-            //string ThingType = IdentifyThing(classValue);
             ushort modelId = BitConverter.ToUInt16(levfile, fpos + 2);
             ushort Xpos = BitConverter.ToUInt16(levfile, fpos + 4);
             ushort Ypos = BitConverter.ToUInt16(levfile, fpos + 6);
@@ -64,8 +59,6 @@ public class FileAdapter : IFilePort
             ushort SwiId = BitConverter.ToUInt16(levfile, fpos + 12);
             ushort Parent = BitConverter.ToUInt16(levfile, fpos + 14);
             ushort Child = BitConverter.ToUInt16(levfile, fpos + 16);
-
-            string ThingName = "";
 
             var entityType = entityTypeId.GetEntityTypeFromTypeIdAndModelId(modelId);
 
@@ -76,91 +69,61 @@ public class FileAdapter : IFilePort
                     Id = counter,
                     EntityType = entityType,
                     Position = new Position(Xpos, Ypos),
+                    DisId = DisId,
+                    SwitchSize = SwiSz,
+                    SwitchId = SwiId,
                     Parent = Parent,
                     Child = Child
                 });
             }
-
-            //if (classValue == 0)
-            //{
-            //    ThingName = "Blank";
-            //}
-            //else if (classValue == 2)
-            //{
-            //    ThingName = IdentifyScenery(Model);
-            //    if (drawMap == 1)
-            //    {
-            //        bmp.SetPixel(Xpos, Ypos, Color.Green);
-            //    }
-            //}
-            //else if (classValue == 3)
-            //{
-            //    ThingName = IdentifySpawn(Model);
-            //    if (drawMap == 1)
-            //    {
-            //        bmp.SetPixel(Xpos, Ypos, Color.Yellow);
-            //    }
-            //}
-            //else if (classValue == 5)
-            //{
-            //    ThingName = IdentifyCreature(Model);
-            //    if (drawMap == 1)
-            //    {
-            //        bmp.SetPixel(Xpos, Ypos, Color.Red);
-            //    }
-            //}
-            //else if (classValue == 7)
-            //{
-            //    ThingName = IdentifyWeather(Model);
-            //}
-            //else if (classValue == 10)
-            //{
-            //    ThingName = IdentifyEffect(Model);
-            //    if (drawMap == 1)
-            //    {
-            //        bmp.SetPixel(Xpos, Ypos, Color.Cyan);
-            //    }
-            //}
-            //else if (classValue == 11)
-            //{
-            //    ThingName = IdentifySwitch(Model);
-            //    if (drawMap == 1)
-            //    {
-            //        bmp.SetPixel(Xpos, Ypos, Color.White);
-            //    }
-            //}
-            //else if (classValue == 12)
-            //{
-            //    ThingName = IdentifySpell(Model);
-            //    if (drawMap == 1)
-            //    {
-            //        bmp.SetPixel(Xpos, Ypos, Color.Purple);
-            //    }
-            //}
-
-            // Define Thing datatable rows
-            //DataRow row = datatable.NewRow();
-
-            //row["thingno"] = ThingNo;
-            //row["class"] = classValue;
-            //row["ThingTypeHidden"] = ThingType;
-            //row["Model"] = Model;
-            //row["ThingNameHidden"] = ThingName;
-            //row["XPos"] = Xpos;
-            //row["YPos"] = Ypos;
-            //row["DisId"] = DisId;
-            //row["swisz"] = SwiSz;
-            //row["SwiId"] = SwiId;
-            //row["parent"] = Parent;
-            //row["child"] = Child;
-            //datatable.Rows.Add(row);
-
-            //ThingCount--;
-
             fpos += 18;
             entityCount--;
         } while (entityCount != 0);
 
+        fpos = 37076;
+        int clevelPos = 38804;
+
+        foreach (var wizard in map.Wizards)
+        {
+            wizard.IsActive = numWizards > 0;
+            wizard.Agression = levfile[fpos];
+            wizard.Perception = levfile[fpos + 4];
+            wizard.Reflexes = levfile[fpos + 8];
+            wizard.CastleLevel = levfile[clevelPos];
+
+            int spellStart = fpos + 12;
+
+            wizard.Spells.Fireball = levfile[spellStart] > 0;
+            wizard.Spells.Shield = levfile[spellStart + 1] > 0;
+            wizard.Spells.Accelerate = levfile[spellStart + 2] > 0;
+            wizard.Spells.Possession = levfile[spellStart + 3] > 0;
+            wizard.Spells.Health = levfile[spellStart + 4] > 0;
+            wizard.Spells.BeyondSight = levfile[spellStart + 5] > 0;
+            wizard.Spells.Earthquake = levfile[spellStart + 6] > 0;
+            wizard.Spells.Meteor = levfile[spellStart + 7] > 0;
+            wizard.Spells.Volcano = levfile[spellStart + 8] > 0;
+            wizard.Spells.Crater = levfile[spellStart + 9] > 0;
+            wizard.Spells.Teleport = levfile[spellStart + 10] > 0;
+            wizard.Spells.Duel = levfile[spellStart + 11] > 0;
+            wizard.Spells.Invisible = levfile[spellStart + 12] > 0;
+            wizard.Spells.StealMana = levfile[spellStart + 13] > 0;
+            wizard.Spells.Rebound = levfile[spellStart + 14] > 0;
+            wizard.Spells.Lightning = levfile[spellStart + 15] > 0;
+            wizard.Spells.Castle = levfile[spellStart + 16] > 0;
+            wizard.Spells.UndeadArmy = levfile[spellStart + 17] > 0;
+            wizard.Spells.LightningStorm = levfile[spellStart + 18] > 0;
+            wizard.Spells.ManaMagnet = levfile[spellStart + 19] > 0;
+            wizard.Spells.WallofFire = levfile[spellStart + 20] > 0;
+            wizard.Spells.ReverseAcceleration = levfile[spellStart + 21] > 0;
+            wizard.Spells.GlobalDeath = levfile[spellStart + 22] > 0;
+            wizard.Spells.RapidFireball = levfile[spellStart + 23] > 0;
+
+            fpos += 216;
+            clevelPos += 1;
+
+            if (numWizards > 0)
+                numWizards--;
+        }
         return Task.FromResult(map);
     }
 }
