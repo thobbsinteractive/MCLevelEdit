@@ -5,6 +5,10 @@ public class Entity
     public int Id { get; set; }
     public Position Position { get; set; }
     public EntityType EntityType { get; set; }
+
+    public ushort DisId { get; set; }
+    public ushort SwitchSize { get; set; }
+    public ushort SwitchId { get; set; }
     public ushort Parent { get; set; }
     public ushort Child { get; set; }
 

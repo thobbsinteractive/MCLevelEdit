@@ -2,8 +2,84 @@
 
 public class Map
 {
+    public uint ManaTotal { get; set; }
+    public byte ManaTarget { get; set; }
     public IList<Entity> Entities { get; set; } = new List<Entity>();
     public Terrain Terrain { get; set; } = new Terrain();
+    public Wizard[] Wizards { get; set; } = new[] {
+        new Wizard()
+        {
+            Name = "Player",
+            IsActive = true,
+            Agression = 128,
+            Perception = 128,
+            Reflexes = 128,
+            CastleLevel = 0
+        },
+        new Wizard()
+        {
+            Name = "Vodor",
+            IsActive = false,
+            Agression = 0,
+            Perception = 0,
+            Reflexes = 0,
+            CastleLevel = 0
+        },
+        new Wizard()
+        {
+            Name = "Gryshnak",
+            IsActive = false,
+            Agression = 0,
+            Perception = 0,
+            Reflexes = 0,
+            CastleLevel = 0
+        },
+        new Wizard()
+        {
+            Name = "Mahmoud",
+            IsActive = false,
+            Agression = 0,
+            Perception = 0,
+            Reflexes = 0,
+            CastleLevel = 0
+        },
+        new Wizard()
+        {
+            Name = "Syed",
+            IsActive = false,
+            Agression = 0,
+            Perception = 0,
+            Reflexes = 0,
+            CastleLevel = 0
+        },
+        new Wizard()
+        {
+            Name = "Raschid",
+            IsActive = false,
+            Agression = 0,
+            Perception = 0,
+            Reflexes = 0,
+            CastleLevel = 0
+        },
+        new Wizard()
+        {
+            Name = "Alhabbal",
+            IsActive = false,
+            Agression = 0,
+            Perception = 0,
+            Reflexes = 0,
+            CastleLevel = 0
+        },
+        new Wizard()
+        {
+            Name = "Scheherazade",
+            IsActive = false,
+            Agression = 0,
+            Perception = 0,
+            Reflexes = 0,
+            CastleLevel = 0
+        }
+    };
 
     public IList<Entity> GetEntitiesByPosition(Position postion)
     {
