@@ -17,7 +17,7 @@
              FontSize="18">
       <Grid Name="grdEntities"
             ColumnDefinitions="50,50,50,50,50,50,50,50,*"
-            RowDefinitions="50,50,*">
+            RowDefinitions="50,40">
         <ToggleButton Name="btnCursor"
                       Grid.Row="0"
                       Grid.Column="0"

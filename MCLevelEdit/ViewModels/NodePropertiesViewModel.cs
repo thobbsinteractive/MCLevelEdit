@@ -9,13 +9,13 @@ namespace MCLevelEdit.ViewModels
     {
         private bool _showEditTerrain;
         private bool _showEditEntity;
-        private EditTerrainViewModel _editTerrainViewModel;
+        private EditWorldViewModel _editWorldViewModel;
         private EditEntityViewModel _editEntityViewModel;
 
-        public EditTerrainViewModel EditTerrainViewModel
+        public EditWorldViewModel EditWorldViewModel
         {
-            get => _editTerrainViewModel;
-            set => this.RaiseAndSetIfChanged(ref _editTerrainViewModel, value);
+            get => _editWorldViewModel;
+            set => this.RaiseAndSetIfChanged(ref _editWorldViewModel, value);
         }
 
         public EditEntityViewModel EditEntityViewModel
@@ -38,7 +38,7 @@ namespace MCLevelEdit.ViewModels
 
         public NodePropertiesViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
         {
-            EditTerrainViewModel = new EditTerrainViewModel(eventAggregator, mapService);
+            EditWorldViewModel = new EditWorldViewModel(eventAggregator, mapService);
             _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
         }
 

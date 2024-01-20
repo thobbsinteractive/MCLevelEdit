@@ -22,10 +22,10 @@
     <Panel Name="pEditTerrain"
            IsEnabled="{Binding ShowEditTerrain, FallbackValue=false}"
            IsVisible="{Binding ShowEditTerrain, FallbackValue=false}">
-      <views:EditTerrainView Name="vmEditTerrain"
+      <views:EditWorldView Name="vmEditTerrain"
                              Grid.Row="0"
                              Grid.Column="0"
-                             DataContext="{Binding EditTerrainViewModel}"/>
+                             DataContext="{Binding EditWorldViewModel}"/>
     </Panel>
   </Grid>
 </UserControl>

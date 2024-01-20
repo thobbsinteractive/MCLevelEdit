@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels
 {
-    public class EditTerrainViewModel : ReactiveObject
+    public class EditWorldViewModel : ReactiveObject
     {
         protected readonly IMapService _mapService;
         protected readonly EventAggregator<object> _eventAggregator;
@@ -45,7 +45,7 @@ namespace MCLevelEdit.ViewModels
         public ICommand GenerateTerrainCommand { get; }
         public bool GenerateTerrainButtonEnable { get; set; }
 
-        public EditTerrainViewModel(EventAggregator<object> eventAggregator, IMapService mapService)
+        public EditWorldViewModel(EventAggregator<object> eventAggregator, IMapService mapService)
         {
             _eventAggregator = eventAggregator;
             _mapService = mapService;
