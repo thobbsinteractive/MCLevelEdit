@@ -1,8 +1,8 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
-using MCLevelEdit.ViewModels.Mappers;
 using MCLevelEdit.Views;
 using ReactiveUI;
 using Splat;
@@ -17,6 +17,7 @@ public class MainViewModel : ViewModelBase
 {
     public IObservable<bool> IsRefreshed { get; }
     public ICommand OpenFileCommand { get; }
+    public ICommand SaveFileCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand EditEntitiesCommand { get; }
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
@@ -59,6 +60,14 @@ public class MainViewModel : ViewModelBase
                 _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
                 _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
                 _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+            }
+        });
+
+        ExitCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
+            {
+                desktopApp.Shutdown();
             }
         });
     }

@@ -1,5 +1,4 @@
-﻿using Avalonia.Collections;
-using DynamicData;
+﻿using DynamicData;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
@@ -48,7 +47,8 @@ public class ViewModelBase : ReactiveObject
 
     protected void UpdateEntity(EntityViewModel entityView)
     {
-        _mapService.UpdateEntity(entityView.ToEntity());
-        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
+        var entity = entityView.ToEntity();
+        _mapService.UpdateEntity(entity);
+        _eventAggregator.RaiseEvent("UpdateEntity", this, new PubSubEventArgs<object>(entity));
     }
 }
