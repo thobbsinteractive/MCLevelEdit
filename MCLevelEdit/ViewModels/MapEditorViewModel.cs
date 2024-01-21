@@ -62,8 +62,41 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     public MapEditorViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
         _eventAggregator.RegisterEvent("RefreshEntities", RefreshEntitiesHandler);
+        _eventAggregator.RegisterEvent("AddEntity", AddEntityHandler);
         _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
         RefreshPreviewAsync();
+    }
+
+    private void AddEntityHandler(object sender, PubSubEventArgs<object> args)
+    {
+        var entity = (Entity)args.Item;
+        if (entity is not null)
+        {
+            lock (_lockPreview)
+            {
+                AddEntity(entity);
+            }
+        }
+    }
+
+    private void AddEntity(Entity entity)
+    {
+        if (_cvEntity is not null)
+        {
+            var rect = new Rect(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE, Globals.SQUARE_SIZE, Globals.SQUARE_SIZE);
+            var brush = new SolidColorBrush(entity.EntityType.Colour, 1);
+            var rectangle = new Rectangle()
+            {
+                Width = 8,
+                Height = 8,
+                Fill = brush,
+                ZIndex = 100
+            };
+
+            Canvas.SetLeft(rectangle, rect.X);
+            Canvas.SetTop(rectangle, rect.Y);
+            _cvEntity.Children.Add(rectangle);
+        }
     }
 
     public void RefreshDataHandler(object sender, PubSubEventArgs<object> args)
@@ -118,19 +151,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                         {
                             foreach (var entity in entities)
                             {
-                                var rect = new Rect(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE, Globals.SQUARE_SIZE, Globals.SQUARE_SIZE);
-                                var brush = new SolidColorBrush(entity.EntityType.Colour, 1);
-                                var rectangle = new Rectangle()
-                                {
-                                    Width = 8,
-                                    Height = 8,
-                                    Fill = brush,
-                                    ZIndex = 100
-                                };
-
-                                Canvas.SetLeft(rectangle, rect.X);
-                                Canvas.SetTop(rectangle, rect.Y);
-                                _cvEntity.Children.Add(rectangle);
+                                AddEntity(entity);
                             }
                         }
                     }

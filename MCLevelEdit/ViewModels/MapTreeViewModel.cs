@@ -43,6 +43,7 @@ public class MapTreeViewModel
         SelectedNodes.CollectionChanged += SelectedNodes_CollectionChanged;
 
         _eventAggregator.RegisterEvent("RefreshEntities", RefreshDataHandler);
+        _eventAggregator.RegisterEvent("AddEntity", AddEntityHandler);
         _eventAggregator.RegisterEvent("RefreshWizards", RefreshWizardsHandler);
         _eventAggregator.RegisterEvent("OnCursorClicked", SelectNodeHandler);
         RefreshData();
@@ -51,6 +52,13 @@ public class MapTreeViewModel
     private void RefreshDataHandler(object sender, PubSubEventArgs<object> args)
     {
         RefreshData();
+    }
+
+    private void AddEntityHandler(object sender, PubSubEventArgs<object> args)
+    {
+        var entity = (Entity)args.Item;
+        if (entity is not null)
+            AddEntityNode(entity);
     }
 
     private void RefreshWizardsHandler(object sender, PubSubEventArgs<object> args)
@@ -113,6 +121,41 @@ public class MapTreeViewModel
                 }
             }
         }
+    }
+
+    private void AddEntityNode(Entity entity)
+    {
+        var entityNode = new Node(GetIconFromEntity(entity.EntityType), entity.Id.ToString(), $"{entity.Id}: {entity.EntityType.Model.Name}");
+        var coordNode = GetNodeByCoord(entity.Position.X, entity.Position.Y);
+        var worldNode = GetWorldNode();
+
+        if (coordNode is null)
+        {
+            var entities = new ObservableCollection<Node>();
+            entities.Add(entityNode);
+            coordNode = new CoordNode(entity.Position.X, entity.Position.Y, "Coord", $"{string.Format("{0:D3}", entity.Position.X)},{string.Format("{0:D3}", entity.Position.Y)}", entities);
+            worldNode.SubNodes.Add(coordNode);
+        }
+        else
+        {
+            coordNode.SubNodes.Add(coordNode);
+        }
+    }
+
+    private Node GetWorldNode()
+    {
+        return Nodes?.Where(n => n.Name == "World").FirstOrDefault();
+    }
+
+    private CoordNode? GetNodeByCoord(int x, int y)
+    {
+        var world = GetWorldNode();
+        if (world != null)
+        {
+            var coordNodes = world.SubNodes.Where(n => n.GetType() is CoordNode).Select(n => (CoordNode)n).ToList();
+            return coordNodes.Where(n => n.X == x && n.Y == y).FirstOrDefault();
+        }
+        return null;
     }
 
     private void RefreshWizardsData()

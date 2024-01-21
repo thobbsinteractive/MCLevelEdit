@@ -59,23 +59,6 @@ public class EntityViewModel : ObservableObject
     public ushort Parent { get; set; }
     public ushort Child { get; set; }
 
-    public EntityViewModel Copy()
-    {
-        return new EntityViewModel()
-        {
-            Id = this.Id, 
-            Type = this.Type,
-            ModelIdx = this.ModelIdx,
-            X = this.X,
-            Y = this.Y,
-            DisId = this.DisId,
-            SwitchSize = this.SwitchSize,
-            SwitchId = this.SwitchId,
-            Parent = this.Parent,
-            Child = this.Child
-        };
-    }
-
     private void PopulateModelTypes()
     {
         ModelTypes.Clear();

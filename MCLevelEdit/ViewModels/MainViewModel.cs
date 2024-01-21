@@ -19,7 +19,6 @@ public class MainViewModel : ViewModelBase
     public ICommand OpenFileCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand EditEntitiesCommand { get; }
-    public EntitiesTableViewModel EntitiesTableViewModel {  get; }
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
     public MapTreeViewModel MapTreeViewModel { get; }
     public MapEditorViewModel MapEditorViewModel { get; }
@@ -28,8 +27,6 @@ public class MainViewModel : ViewModelBase
 
     public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
-        EntitiesTableViewModel = Locator.Current.GetService<EntitiesTableViewModel>();
-
         _mapService.CreateNewMap();
         NodePropertiesViewModel = new NodePropertiesViewModel(eventAggregator, mapService, terrainService);
         EntityToolBarViewModel = new EntityToolBarViewModel(eventAggregator, mapService, terrainService);
@@ -40,8 +37,8 @@ public class MainViewModel : ViewModelBase
 
         EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            var result = await ShowDialog.Handle(EntitiesTableViewModel);
-            LoadEntities(Entities.ToEntities());
+
+            var result = await ShowDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
         });
 
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -59,10 +56,9 @@ public class MainViewModel : ViewModelBase
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
             {
                 await mapService.LoadMapFromFileAsync(files[0].Path.AbsolutePath);
-                var map = mapService.GetMap();
-                LoadEntityViewModels(map.Entities.ToEntityViewModels());
-                _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+                _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
                 _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
+                _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
             }
         });
     }

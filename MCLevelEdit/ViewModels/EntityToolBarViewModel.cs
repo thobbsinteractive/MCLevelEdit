@@ -39,7 +39,6 @@ public class EntityToolBarViewModel : ViewModelBase
                 _addEntityViewModel.X = (byte)cursorEvent.Item1.X;
                 _addEntityViewModel.Y = (byte)cursorEvent.Item1.Y;
                 this.AddEntity(_addEntityViewModel);
-                _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
             }
         }
     }

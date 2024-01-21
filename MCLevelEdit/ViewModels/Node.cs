@@ -1,7 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
-using System;
+﻿using Avalonia.Media.Imaging;
 using System.Collections.ObjectModel;
 
 namespace MCLevelEdit.ViewModels;

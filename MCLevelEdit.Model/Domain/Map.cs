@@ -93,13 +93,14 @@ public class Map
             Entities.Add(entity);
     }
 
-    public void AddEntity(Entity entity)
+    public int AddEntity(Entity entity)
     {
         if (this.Entities.Count < Globals.MAX_ENTITIES)
         {
             entity.Id = GetNextId();
             this.Entities.Add(entity);
         }
+        return entity.Id;
     }
 
     public void DeleteEntity(Entity entity)

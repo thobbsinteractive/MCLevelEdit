@@ -77,10 +77,9 @@ public class MapService : IMapService
         return MapRepository.Map.Entities.First(e => e.Id == id);
     }
 
-    public bool AddEntity(Entity entity)
+    public int AddEntity(Entity entity)
     {
-        MapRepository.Map.AddEntity(entity);
-        return true;
+        return MapRepository.Map.AddEntity(entity);
     }
 
     public bool UpdateEntity(Entity entity)

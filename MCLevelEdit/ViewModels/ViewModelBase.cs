@@ -17,8 +17,6 @@ public class ViewModelBase : ReactiveObject
     protected readonly ITerrainService _terrainService;
     protected readonly EventAggregator<object> _eventAggregator;
 
-    public static IAvaloniaList<EntityViewModel> Entities { get; } = new AvaloniaList<EntityViewModel>();
-
     public static KeyValuePair<int, string>[] TypeIds { get; } =
         Enum.GetValues(typeof(TypeId))
         .Cast<int>()
@@ -34,31 +32,21 @@ public class ViewModelBase : ReactiveObject
 
     protected void AddEntity(EntityViewModel entityView)
     {
-        Entities.Add(entityView.Copy());
-        _mapService.AddEntity(entityView.ToEntity());
-        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
+        var entity = entityView.ToEntity();
+        int id = _mapService.AddEntity(entity);
+        entity.Id = id;
+        _eventAggregator.RaiseEvent("AddEntity", this, new PubSubEventArgs<object>(entity));
     }
 
     protected void DeleteEntity(EntityViewModel entityView)
     {
-        Entities.Remove(entityView);
         _mapService.DeleteEntity(entityView.ToEntity());
         _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
     }
 
-    protected void LoadEntityViewModels(IEnumerable<EntityViewModel> entitiesViewModels)
+    protected void UpdateEntity(EntityViewModel entityView)
     {
-        Entities.Clear();
-        Entities.AddRange(entitiesViewModels);
-        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
-    }
-
-    protected void LoadEntities(IEnumerable<Entity> entities)
-    {
-        foreach(var entity in entities)
-        {
-            _mapService.UpdateEntity(entity);
-        }
+        _mapService.UpdateEntity(entityView.ToEntity());
         _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
     }
 }
