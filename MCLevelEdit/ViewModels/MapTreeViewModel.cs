@@ -134,12 +134,9 @@ public class MapTreeViewModel
             var entities = new ObservableCollection<Node>();
             entities.Add(entityNode);
             coordNode = new CoordNode(entity.Position.X, entity.Position.Y, "Coord", $"{string.Format("{0:D3}", entity.Position.X)},{string.Format("{0:D3}", entity.Position.Y)}", entities);
-            worldNode.SubNodes.Add(coordNode);
         }
-        else
-        {
-            coordNode.SubNodes.Add(coordNode);
-        }
+        worldNode.SubNodes.Add(coordNode);
+  
     }
 
     private Node GetWorldNode()

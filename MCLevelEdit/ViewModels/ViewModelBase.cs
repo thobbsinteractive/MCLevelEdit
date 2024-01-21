@@ -30,12 +30,13 @@ public class ViewModelBase : ReactiveObject
         _terrainService = terrainService;
     }
 
-    protected void AddEntity(EntityViewModel entityView)
+    protected int AddEntity(EntityViewModel entityView)
     {
         var entity = entityView.ToEntity();
         int id = _mapService.AddEntity(entity);
         entity.Id = id;
         _eventAggregator.RaiseEvent("AddEntity", this, new PubSubEventArgs<object>(entity));
+        return id;
     }
 
     protected void DeleteEntity(EntityViewModel entityView)
