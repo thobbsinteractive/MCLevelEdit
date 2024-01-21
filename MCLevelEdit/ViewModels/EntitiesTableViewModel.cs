@@ -53,6 +53,8 @@ namespace MCLevelEdit.ViewModels
                 {
                     foreach (var entityViewModel in _selectedEntityViewModels)
                         DeleteEntity(entityViewModel);
+
+                    _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
                 }
             });
         }

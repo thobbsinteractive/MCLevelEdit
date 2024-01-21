@@ -41,8 +41,9 @@ public class ViewModelBase : ReactiveObject
 
     protected void DeleteEntity(EntityViewModel entityView)
     {
-        _mapService.DeleteEntity(entityView.ToEntity());
-        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
+        var entity = entityView.ToEntity();
+        _mapService.DeleteEntity(entity);
+        _eventAggregator.RaiseEvent("DeleteEntity", this, new PubSubEventArgs<object>(entity));
     }
 
     protected void UpdateEntity(EntityViewModel entityView)
