@@ -12,9 +12,18 @@ public class EntityViewModel : ObservableObject
 {
     private int _type;
     private int _modelIdx;
+    private byte _x;
+    private byte _y;
+    private ushort _disId;
+    private ushort _switchSize;
+    private ushort _switchId;
+    private ushort _parent;
+    private ushort _child;
 
     public IAvaloniaList<KeyValuePair<int, string>> ModelTypes { get; init; } = new AvaloniaList<KeyValuePair<int, string>>();
+
     public int Id { get; set; }
+
     public int Type
     {
         get { return _type; }
@@ -24,9 +33,10 @@ public class EntityViewModel : ObservableObject
             PopulateModelTypes();
         }
     }
+
     public int Model
     {
-        
+        get { return ModelTypes[_modelIdx].Key; }
         set
         {
             if (!ModelTypes.Any())
@@ -40,24 +50,56 @@ public class EntityViewModel : ObservableObject
                     break;
                 }
             }
-        } 
-        get { return ModelTypes[_modelIdx].Key; }
+        }
     }
+
     public int ModelIdx
     {
         get { return _modelIdx; }
-        set
-        {
-            SetProperty(ref _modelIdx, value);
-        }
+        set { SetProperty(ref _modelIdx, value); }
     }
-    public byte X { get; set; }
-    public byte Y { get; set; }
-    public ushort DisId { get; set; }
-    public ushort SwitchSize { get; set; }
-    public ushort SwitchId { get; set; }
-    public ushort Parent { get; set; }
-    public ushort Child { get; set; }
+
+    public byte X
+    {
+        get { return _x; }
+        set { SetProperty(ref _x, value); }
+    }
+
+    public byte Y
+    {
+        get { return _y; }
+        set { SetProperty(ref _y, value); }
+    }
+
+    public ushort DisId
+    {
+        get { return _disId; }
+        set { SetProperty(ref _disId, value); }
+    }
+
+    public ushort SwitchSize
+    {
+        get { return _switchSize; }
+        set { SetProperty(ref _switchSize, value); }
+    }
+
+    public ushort SwitchId
+    {
+        get { return _switchId; }
+        set { SetProperty(ref _switchId, value); }
+    }
+
+    public ushort Parent
+    {
+        get { return _parent; }
+        set { SetProperty(ref _parent, value); }
+    }
+
+    public ushort Child
+    {
+        get { return _child; }
+        set { SetProperty(ref _child, value); }
+    }
 
     private void PopulateModelTypes()
     {
