@@ -18,8 +18,8 @@ public class MapTreeViewModel
     protected readonly EventAggregator<object> _eventAggregator;
     protected readonly Dictionary<string, Bitmap> _icons;
 
-    public ObservableCollection<Node> Nodes { get; }
-    public ObservableCollection<Node> SelectedNodes { get; }
+    public ObservableCollection<Node> Nodes { get; } = new ObservableCollection<Node>();
+    public ObservableCollection<Node> SelectedNodes { get; } = new ObservableCollection<Node>();
 
     public MapTreeViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService)
     {
@@ -30,6 +30,7 @@ public class MapTreeViewModel
         _icons = new Dictionary<string, Bitmap>
         {
             { "World", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/world-32.png"))) },
+            { "Wizard", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/wizard-32.png"))) },
             { "Spawn", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/magic-carpet-32.png"))) },
             { "Scenary", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/tree-32.png"))) },
             { "Creature", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/dragon-32.png"))) },
@@ -39,11 +40,10 @@ public class MapTreeViewModel
             { "Weather", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/wind-32.png"))) }
         };
 
-        SelectedNodes = new ObservableCollection<Node>();
         SelectedNodes.CollectionChanged += SelectedNodes_CollectionChanged;
-        Nodes = new ObservableCollection<Node>();
 
         _eventAggregator.RegisterEvent("RefreshEntities", RefreshDataHandler);
+        _eventAggregator.RegisterEvent("RefreshWizards", RefreshWizardsHandler);
         _eventAggregator.RegisterEvent("OnCursorClicked", SelectNodeHandler);
         RefreshData();
     }
@@ -51,6 +51,11 @@ public class MapTreeViewModel
     private void RefreshDataHandler(object sender, PubSubEventArgs<object> args)
     {
         RefreshData();
+    }
+
+    private void RefreshWizardsHandler(object sender, PubSubEventArgs<object> args)
+    {
+        RefreshWizardsData();
     }
 
     private void SelectNodeHandler(object sender, PubSubEventArgs<object> arg)
@@ -84,11 +89,12 @@ public class MapTreeViewModel
         SelectedNodes.Clear();
         Nodes.Clear();
 
+        RefreshWizardsData();
+
         var map = _mapService.GetMap();
 
         var entitiesCoords = new ObservableCollection<Node>();
         var world = new Node(_icons["World"], $"World", "", entitiesCoords);
-
         Nodes.Add(world);
 
         for (int x = 0; x < Globals.MAX_MAP_SIZE; x++)
@@ -107,6 +113,28 @@ public class MapTreeViewModel
                 }
             }
         }
+    }
+
+    private void RefreshWizardsData()
+    {
+        var map = _mapService.GetMap();
+        var wizardsNode = Nodes.Where(n => n.Name == "Wizards").FirstOrDefault();
+        var nodeWizards = new ObservableCollection<Node>();
+
+        if (wizardsNode == null)
+        {
+            wizardsNode = new Node(_icons["Wizard"], $"Wizards", "", nodeWizards);
+            Nodes.Add(wizardsNode);
+        }
+
+        wizardsNode.SubNodes.Clear();
+
+        foreach (var wizard in map.Wizards)
+        {
+            if (wizard.IsActive)
+                wizardsNode.SubNodes.Add(new Node(null, wizard.Name, wizard.Name));
+        }
+        
     }
 
     private void SelectedNodes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

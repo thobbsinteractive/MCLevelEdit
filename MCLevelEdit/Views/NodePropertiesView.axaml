@@ -11,6 +11,14 @@
         Margin="5"
         ColumnDefinitions="*"
         RowDefinitions="*">
+    <Panel Name="pEditWizards"
+       IsEnabled="{Binding ShowEditWizards, FallbackValue=false}"
+       IsVisible="{Binding ShowEditWizards, FallbackValue=false}">
+      <views:EditWizardsView Name="vmWizardsEntity"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            DataContext="{Binding EditWizardsViewModel}"/>
+    </Panel>
     <Panel Name="pEditEntity"
            IsEnabled="{Binding ShowEditEntity, FallbackValue=false}"
            IsVisible="{Binding ShowEditEntity, FallbackValue=false}">

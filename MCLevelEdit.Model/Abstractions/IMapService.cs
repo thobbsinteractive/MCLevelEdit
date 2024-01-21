@@ -18,4 +18,6 @@ public interface IMapService
     bool DeleteEntity(Entity entity);
     bool UpdateManaTotal(uint manaTotal);
     bool UpdateManaTarget(byte manaTarget);
+    bool SetActiveWizards(byte numOfWizards);
+    bool UpdateWizard(Wizard wizard);
 }

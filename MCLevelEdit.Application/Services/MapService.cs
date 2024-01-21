@@ -60,7 +60,7 @@ public class MapService : IMapService
         await RecalculateTerrain(MapRepository.Map.Terrain.GenerationParameters);
         return true;
     }
-    
+
     public async Task<bool> RecalculateTerrain(GenerationParameters generationParameters)
     {
         MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(generationParameters);
@@ -109,6 +109,69 @@ public class MapService : IMapService
     public bool UpdateManaTarget(byte manaTarget)
     {
         MapRepository.Map.ManaTarget = manaTarget;
+        return true;
+    }
+
+    public bool SetActiveWizards(byte numWizards)
+    {
+        if (numWizards == 0)
+            numWizards = 1;
+
+        if (numWizards > 8)
+            numWizards = 8;
+
+        foreach (var wizard in MapRepository.Map.Wizards)
+        {
+            wizard.IsActive = false;
+            wizard.IsActive = numWizards > 0;
+
+            if (numWizards > 0)
+                numWizards--;
+        }
+
+        return true;
+    }
+
+    public bool UpdateWizard(Wizard wizard)
+    {
+        var wizardToUpdate = MapRepository.Map.Wizards.Where(w => w.Name.Equals(wizard.Name)).FirstOrDefault();
+
+        if (wizardToUpdate != null)
+        {
+            wizardToUpdate.Agression = wizard.Agression;
+            wizardToUpdate.Perception = wizard.Perception;
+            wizardToUpdate.Reflexes = wizard.Reflexes;
+            wizardToUpdate.CastleLevel = wizard.CastleLevel;
+
+            if (wizardToUpdate.Spells != null)
+            {
+                wizardToUpdate.Spells.Fireball = wizard.Spells.Fireball;
+                wizardToUpdate.Spells.Shield = wizard.Spells.Shield;
+                wizardToUpdate.Spells.Accelerate = wizard.Spells.Accelerate;
+                wizardToUpdate.Spells.Possession = wizard.Spells.Possession;
+                wizardToUpdate.Spells.Health = wizard.Spells.Health;
+                wizardToUpdate.Spells.BeyondSight = wizard.Spells.BeyondSight;
+                wizardToUpdate.Spells.Earthquake = wizard.Spells.Earthquake;
+                wizardToUpdate.Spells.Meteor = wizard.Spells.Meteor;
+                wizardToUpdate.Spells.Volcano = wizard.Spells.Volcano;
+                wizardToUpdate.Spells.Crater = wizard.Spells.Crater;
+                wizardToUpdate.Spells.Teleport = wizard.Spells.Teleport;
+                wizardToUpdate.Spells.Duel = wizard.Spells.Duel;
+                wizardToUpdate.Spells.Invisible = wizard.Spells.Invisible;
+                wizardToUpdate.Spells.StealMana = wizard.Spells.StealMana;
+                wizardToUpdate.Spells.Rebound = wizard.Spells.Rebound;
+                wizardToUpdate.Spells.Lightning = wizard.Spells.Lightning;
+                wizardToUpdate.Spells.Castle = wizard.Spells.Castle;
+                wizardToUpdate.Spells.UndeadArmy = wizard.Spells.UndeadArmy;
+                wizardToUpdate.Spells.LightningStorm = wizard.Spells.LightningStorm;
+                wizardToUpdate.Spells.ManaMagnet = wizard.Spells.ManaMagnet;
+                wizardToUpdate.Spells.WallofFire = wizard.Spells.WallofFire;
+                wizardToUpdate.Spells.ReverseAcceleration = wizard.Spells.ReverseAcceleration;
+                wizardToUpdate.Spells.GlobalDeath = wizard.Spells.GlobalDeath;
+                wizardToUpdate.Spells.RapidFireball = wizard.Spells.RapidFireball;
+            }
+        }
+
         return true;
     }
 }
