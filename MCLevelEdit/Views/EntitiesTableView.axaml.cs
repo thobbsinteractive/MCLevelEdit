@@ -13,6 +13,12 @@ namespace MCLevelEdit.Views
             InitializeComponent();
 
             this.dgEntities.SelectionChanged += DgEntities_SelectionChanged;
+            this.Unloaded += EntitiesTableView_Unloaded; 
+        }
+
+        private void EntitiesTableView_Unloaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            VmEntitiesTable?.OnUnload();
         }
 
         private void DgEntities_SelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -25,7 +31,7 @@ namespace MCLevelEdit.Views
                 selectedEntities.Add((EntityViewModel)item);
             }
 
-            VmEntitiesTable.OnSelectedItemsChanged(this, selectedEntities);
+            VmEntitiesTable?.OnSelectedItemsChanged(this, selectedEntities);
         }
     }
 }

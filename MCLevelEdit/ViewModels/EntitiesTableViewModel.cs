@@ -26,7 +26,6 @@ namespace MCLevelEdit.ViewModels
 
         public EntitiesTableViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
         {
-            _eventAggregator.RegisterEvent("RefreshEntities", RefreshDataHandler);
             RefreshData();
 
             AddNewEntityCommand = ReactiveCommand.Create(() =>
@@ -53,9 +52,8 @@ namespace MCLevelEdit.ViewModels
                 {
                     foreach (var entityViewModel in _selectedEntityViewModels)
                         DeleteEntity(entityViewModel);
-
-                    _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
                 }
+                RefreshData();
             });
         }
 
@@ -65,9 +63,9 @@ namespace MCLevelEdit.ViewModels
             _selectedEntityViewModels = entityViewModels;
         }
 
-        private void RefreshDataHandler(object sender, PubSubEventArgs<object> args)
+        public void OnUnload()
         {
-            RefreshData();
+            UpdateEntities();
         }
 
         public void RefreshData()
@@ -75,6 +73,19 @@ namespace MCLevelEdit.ViewModels
             Entities.Clear();
             var map = _mapService.GetMap();
             Entities.AddRange(map.Entities.ToEntityViewModels());
+        }
+
+        private void UpdateEntities()
+        {
+            foreach (var entityViewModel in Entities)
+            {
+                var entity = _mapService.GetEntity((ushort)entityViewModel.Id);
+
+                if (entity is not null)
+                    _mapService.UpdateEntity(entityViewModel.ToEntity());          
+            }
+
+            _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
         }
     }
 }
