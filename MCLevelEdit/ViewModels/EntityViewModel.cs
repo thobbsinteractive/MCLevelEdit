@@ -29,14 +29,22 @@ public class EntityViewModel : ObservableObject
         get { return _type; }
         set
         {
-            SetProperty(ref _type, value);
+            _type = value;
             PopulateModelTypes();
+            OnPropertyChanged(nameof(Type));
         }
     }
 
     public int Model
     {
-        get { return ModelTypes[_modelIdx].Key; }
+        get 
+        {
+            var modelTypesList = GetModelTypes(_type);
+
+            if (_modelIdx >= 0)
+                return modelTypesList[_modelIdx].Key;
+            return -1;
+        }
         set
         {
             if (!ModelTypes.Any())
@@ -62,7 +70,10 @@ public class EntityViewModel : ObservableObject
     public byte X
     {
         get { return _x; }
-        set { SetProperty(ref _x, value); }
+        set 
+        {
+            SetProperty(ref _x, value); 
+        }
     }
 
     public byte Y
@@ -108,7 +119,9 @@ public class EntityViewModel : ObservableObject
         if (modelTypesList.Any())
         {
             ModelTypes.AddRange(modelTypesList);
+            _modelIdx = 0;
             OnPropertyChanged(nameof(ModelTypes));
+            OnPropertyChanged(nameof(ModelIdx));
         }
     }
 

@@ -21,6 +21,7 @@ namespace MCLevelEdit.ViewModels
         public EditEntityViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService, EntityViewModel entityView) : base(eventAggregator, mapService, terrainService)
         {
             EntityView = entityView;
+            EntityView.PropertyChanged += EntityView_PropertyChanged;
         }
 
         public EditEntityViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService, TypeId typeId) : base(eventAggregator, mapService, terrainService)
@@ -38,6 +39,13 @@ namespace MCLevelEdit.ViewModels
                 Parent = 0,
                 Child = 0
             };
+            EntityView.PropertyChanged += EntityView_PropertyChanged;
+        }
+
+        private void EntityView_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != "ModelTypes" && EntityView.ModelIdx >= 0)
+                this.UpdateEntity(EntityView);
         }
     }
 }

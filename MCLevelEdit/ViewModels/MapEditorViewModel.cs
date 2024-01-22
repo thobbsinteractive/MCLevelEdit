@@ -63,11 +63,24 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     {
         _eventAggregator.RegisterEvent("RefreshEntities", RefreshEntitiesHandler);
         _eventAggregator.RegisterEvent("AddEntity", AddEntityHandler);
+        _eventAggregator.RegisterEvent("UpdateEntity", UpdateEntityHandler);
         _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
         RefreshPreviewAsync();
     }
 
     private void AddEntityHandler(object sender, PubSubEventArgs<object> args)
+    {
+        var entity = (Entity)args.Item;
+        if (entity is not null)
+        {
+            lock (_lockPreview)
+            {
+                AddEntity(entity);
+            }
+        }
+    }
+
+    private void UpdateEntityHandler(object sender, PubSubEventArgs<object> args)
     {
         var entity = (Entity)args.Item;
         if (entity is not null)

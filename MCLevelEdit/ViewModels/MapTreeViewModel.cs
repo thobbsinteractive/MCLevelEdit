@@ -44,6 +44,7 @@ public class MapTreeViewModel
 
         _eventAggregator.RegisterEvent("RefreshEntities", RefreshDataHandler);
         _eventAggregator.RegisterEvent("AddEntity", AddEntityHandler);
+        _eventAggregator.RegisterEvent("UpdateEntity", UpdateEntityHandler);
         _eventAggregator.RegisterEvent("RefreshWizards", RefreshWizardsHandler);
         _eventAggregator.RegisterEvent("OnCursorClicked", SelectNodeHandler);
         RefreshData();
@@ -59,6 +60,13 @@ public class MapTreeViewModel
         var entity = (Entity)args.Item;
         if (entity is not null)
             AddEntityNode(entity);
+    }
+
+    private void UpdateEntityHandler(object sender, PubSubEventArgs<object> args)
+    {
+        var entity = (Entity)args.Item;
+        if (entity is not null)
+            UpdateEntityNode(entity);
     }
 
     private void RefreshWizardsHandler(object sender, PubSubEventArgs<object> args)
@@ -126,7 +134,7 @@ public class MapTreeViewModel
     private void AddEntityNode(Entity entity)
     {
         var entityNode = new Node(GetIconFromEntity(entity.EntityType), entity.Id.ToString(), $"{entity.Id}: {entity.EntityType.Model.Name}");
-        var coordNode = GetNodeByCoord(entity.Position.X, entity.Position.Y);
+        var coordNode = GetCoordNodeByCoords(entity.Position.X, entity.Position.Y);
         var worldNode = GetWorldNode();
 
         if (coordNode is null)
@@ -136,7 +144,26 @@ public class MapTreeViewModel
             coordNode = new CoordNode(entity.Position.X, entity.Position.Y, "Coord", $"{string.Format("{0:D3}", entity.Position.X)},{string.Format("{0:D3}", entity.Position.Y)}", entities);
         }
         worldNode.SubNodes.Add(coordNode);
-  
+    }
+
+    private void UpdateEntityNode(Entity entity)
+    {
+        var entityNode = GetNodeById(entity.Id);
+
+        if (entityNode is not null)
+        {
+            entityNode.Icon = GetIconFromEntity(entity.EntityType);
+            entityNode.Title = $"{entity.Id}: {entity.EntityType.Model.Name}";
+
+            var coordNode = GetCoordNodeByEntityId(entity.Id);
+
+            if (coordNode is not null && (coordNode.X != entity.Position.X || coordNode.Y != entity.Position.Y))
+            {
+                coordNode.Title = $"{string.Format("{0:D3}", entity.Position.X)},{string.Format("{0:D3}", entity.Position.Y)}";
+                coordNode.X = entity.Position.X;
+                coordNode.Y = entity.Position.Y;
+            }
+        }
     }
 
     private Node GetWorldNode()
@@ -144,13 +171,44 @@ public class MapTreeViewModel
         return Nodes?.Where(n => n.Name == "World").FirstOrDefault();
     }
 
-    private CoordNode? GetNodeByCoord(int x, int y)
+    private Node? GetNodeById(int id)
+    {
+        var world = GetWorldNode();
+        if (world != null)
+        {
+            var coordNode = GetCoordNodeByEntityId(id);
+            var nodes = from subNode in coordNode.SubNodes
+                        where subNode.Name == id.ToString()
+                        select subNode;
+
+            return nodes.FirstOrDefault();
+        }
+        return null;
+    }
+
+    private CoordNode? GetCoordNodeByCoords(int x, int y)
     {
         var world = GetWorldNode();
         if (world != null)
         {
             var coordNodes = world.SubNodes.Where(n => n.GetType() is CoordNode).Select(n => (CoordNode)n).ToList();
-            return coordNodes.Where(n => n.X == x && n.Y == y).FirstOrDefault();
+            return coordNodes?.Where(n => n.X == x && n.Y == y).FirstOrDefault();
+        }
+        return null;
+    }
+
+    private CoordNode? GetCoordNodeByEntityId(int id)
+    {
+        var world = GetWorldNode();
+        if (world != null)
+        {
+            var coordNodes = world.SubNodes.Select(n => (CoordNode)n).ToList();
+            var nodes = from coordNode in coordNodes
+                        from subNode in coordNode.SubNodes
+                        where subNode.Name == id.ToString()
+                        select coordNode;
+
+            return nodes.FirstOrDefault();
         }
         return null;
     }
