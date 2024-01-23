@@ -28,6 +28,11 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     private Canvas _cvEntity;
     private Rectangle _rectSelection;
+    private Rectangle _outerRectSelection;
+    private Line _horizontalSelection1;
+    private Line _horizontalSelection2;
+    private Line _verticalSelection1;
+    private Line _verticalSelection2;
 
     public WriteableBitmap Preview 
     {
@@ -52,10 +57,26 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         if (_rectSelection is not null)
             _cvEntity.Children.Remove(_rectSelection);
 
+        if (_outerRectSelection is not null)
+            _cvEntity.Children.Remove(_outerRectSelection);
+
+        if (_horizontalSelection1 is not null)
+            _cvEntity.Children.Remove(_horizontalSelection1);
+
+        if (_horizontalSelection2 is not null)
+            _cvEntity.Children.Remove(_horizontalSelection2);
+
+        if (_verticalSelection1 is not null)
+            _cvEntity.Children.Remove(_verticalSelection1);
+
+        if (_verticalSelection2 is not null)
+            _cvEntity.Children.Remove(_verticalSelection2);
+
         if (entity is not null)
         {
             var rect = new Rect(entity.Position.X * Globals.SQUARE_SIZE - 3, entity.Position.Y * Globals.SQUARE_SIZE - 3, Globals.SQUARE_SIZE + 3, Globals.SQUARE_SIZE + 3);
             var brush = new SolidColorBrush(Color.FromRgb(255, 255, 255), 1);
+            var transBrush = new SolidColorBrush(Color.FromRgb(255, 255, 255), 0.5);
 
             _rectSelection = new Rectangle()
             {
@@ -66,9 +87,70 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 ZIndex = 200
             };
 
+            _outerRectSelection = new Rectangle()
+            {
+                Width = 36,
+                Height = 36,
+                Stroke = transBrush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            _horizontalSelection1 = new Line()
+            {
+                StartPoint = new Point(-16, 7),
+                EndPoint = new Point(0, 7),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            _horizontalSelection2 = new Line()
+            {
+                StartPoint = new Point(14, 7),
+                EndPoint = new Point(30, 7),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            _verticalSelection1 = new Line()
+            {
+                StartPoint = new Point(7, -16),
+                EndPoint = new Point(7, 0),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            _verticalSelection2 = new Line()
+            {
+                StartPoint = new Point(7, 14),
+                EndPoint = new Point(7, 30),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
             Canvas.SetLeft(_rectSelection, rect.X);
             Canvas.SetTop(_rectSelection, rect.Y);
+            Canvas.SetLeft(_outerRectSelection, rect.X - 11);
+            Canvas.SetTop(_outerRectSelection, rect.Y - 11);
+            Canvas.SetLeft(_horizontalSelection1, rect.X);
+            Canvas.SetTop(_horizontalSelection1, rect.Y);
+            Canvas.SetLeft(_horizontalSelection2, rect.X);
+            Canvas.SetTop(_horizontalSelection2, rect.Y);
+            Canvas.SetLeft(_verticalSelection1, rect.X);
+            Canvas.SetTop(_verticalSelection1, rect.Y);
+            Canvas.SetLeft(_verticalSelection2, rect.X);
+            Canvas.SetTop(_verticalSelection2, rect.Y);
+
             _cvEntity.Children.Add(_rectSelection);
+            _cvEntity.Children.Add(_outerRectSelection);
+            _cvEntity.Children.Add(_horizontalSelection1);
+            _cvEntity.Children.Add(_horizontalSelection2);
+            _cvEntity.Children.Add(_verticalSelection1);
+            _cvEntity.Children.Add(_verticalSelection2);
         }
     }
 
