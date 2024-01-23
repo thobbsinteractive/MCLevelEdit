@@ -74,12 +74,9 @@ namespace MCLevelEdit.ViewModels
                 {
                     ShowEditWizards = true;
                 }
-                else if(node.GetType() is EntityNode)
+                else if(node.GetType() == typeof(EntityNode))
                 {
                     ShowEditEntity = true;
-                }
-                else
-                {
                     ushort id = 0;
                     if (ushort.TryParse(node.Name, out id))
                     {

@@ -27,6 +27,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             PixelFormat.Rgba8888);
 
     private Canvas _cvEntity;
+    private Rectangle _rectSelection;
 
     public WriteableBitmap Preview 
     {
@@ -40,10 +41,35 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         get { return _cvEntity; }
     }
 
-    public void OnCursorClicked( Point position, bool left, bool right)
+    public void OnCursorClicked(Point position, bool left, bool right)
     {
         (Point, bool, bool) cursorEvent = (position, left, right);
         _eventAggregator.RaiseEvent("OnCursorClicked", this, new PubSubEventArgs<object>(cursorEvent));
+    }
+
+    public void OnEntitySelected(Entity? entity)
+    {
+        if (_rectSelection is not null)
+            _cvEntity.Children.Remove(_rectSelection);
+
+        if (entity is not null)
+        {
+            var rect = new Rect(entity.Position.X * Globals.SQUARE_SIZE - 3, entity.Position.Y * Globals.SQUARE_SIZE - 3, Globals.SQUARE_SIZE + 3, Globals.SQUARE_SIZE + 3);
+            var brush = new SolidColorBrush(Color.FromRgb(255, 255, 255), 1);
+
+            _rectSelection = new Rectangle()
+            {
+                Width = 14,
+                Height = 14,
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            Canvas.SetLeft(_rectSelection, rect.X);
+            Canvas.SetTop(_rectSelection, rect.Y);
+            _cvEntity.Children.Add(_rectSelection);
+        }
     }
 
     public Point CursorPosition { 
@@ -65,6 +91,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         _eventAggregator.RegisterEvent("AddEntity", AddEntityHandler);
         _eventAggregator.RegisterEvent("UpdateEntity", UpdateEntityHandler);
         _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
+        _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
         RefreshPreviewAsync();
     }
 
@@ -90,6 +117,32 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 AddEntity(entity);
             }
         }
+    }
+
+    public void NodeSelectedHandler(object sender, PubSubEventArgs<object> arg)
+    {
+        bool deselect = true;
+
+        if (arg.Item is not null)
+        {
+            var node = (Node)arg.Item;
+            if (node.GetType() == typeof(EntityNode))
+            {
+                ushort id = 0;
+                if (ushort.TryParse(node.Name, out id))
+                {
+                    var entity = _mapService.GetEntity(id);
+                    if (entity is not null)
+                    {
+                        OnEntitySelected(entity);
+                        deselect = false;
+                    }
+                }
+            }
+        }
+
+        if (deselect)
+            OnEntitySelected(null);
     }
 
     private void AddEntity(Entity entity)
