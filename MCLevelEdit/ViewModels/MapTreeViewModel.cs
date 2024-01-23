@@ -82,11 +82,11 @@ public class MapTreeViewModel
             var world = Nodes?.Where(n => n.Name == "World").FirstOrDefault();
             if(world is not null)
             {
-                var coordNode = world?.SubNodes.OfType<CoordNode>().Where(n => n.X == cursorEvent.Item1.X && n.Y == cursorEvent.Item1.Y).FirstOrDefault();
-                if (coordNode is not null && coordNode.SubNodes is not null && coordNode.SubNodes.Count > 0)
+                var entityNode = world?.SubNodes.Select(n => (EntityNode)n).Where(n => n.X == cursorEvent.Item1.X && n.Y == cursorEvent.Item1.Y).FirstOrDefault();
+                if (entityNode is not null)
                 {
                     SelectedNodes.Clear();
-                    SelectedNodes.Add(coordNode.SubNodes[0]);
+                    SelectedNodes.Add(entityNode);
                 }
             }
         }
@@ -106,7 +106,11 @@ public class MapTreeViewModel
         Nodes.Clear();
 
         RefreshWizardsData();
+        RefeshEntitiesData();
+    }
 
+    private void RefeshEntitiesData()
+    {
         var map = _mapService.GetMap();
 
         var entitiesCoords = new ObservableCollection<Node>();
@@ -120,97 +124,13 @@ public class MapTreeViewModel
                 var squareEntities = map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).OrderBy(e => e.EntityType.TypeId);
                 if (squareEntities.Any())
                 {
-                    var nodeEntities = new ObservableCollection<Node>();
                     foreach (var entity in squareEntities)
                     {
-                        nodeEntities.Add(new Node(GetIconFromEntity(entity.EntityType), entity.Id.ToString(), $"{entity.Id}: {entity.EntityType.Model.Name}"));
+                        world.SubNodes.Add(new EntityNode(entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity)));
                     }
-                    entitiesCoords.Add(new CoordNode(x, y, "Coord", $"{string.Format("{0:D3}", x)},{string.Format("{0:D3}", y)}", nodeEntities));
                 }
             }
         }
-    }
-
-    private void AddEntityNode(Entity entity)
-    {
-        var entityNode = new Node(GetIconFromEntity(entity.EntityType), entity.Id.ToString(), $"{entity.Id}: {entity.EntityType.Model.Name}");
-        var coordNode = GetCoordNodeByCoords(entity.Position.X, entity.Position.Y);
-        var worldNode = GetWorldNode();
-
-        if (coordNode is null)
-        {
-            var entities = new ObservableCollection<Node>();
-            entities.Add(entityNode);
-            coordNode = new CoordNode(entity.Position.X, entity.Position.Y, "Coord", $"{string.Format("{0:D3}", entity.Position.X)},{string.Format("{0:D3}", entity.Position.Y)}", entities);
-        }
-        worldNode.SubNodes.Add(coordNode);
-    }
-
-    private void UpdateEntityNode(Entity entity)
-    {
-        var entityNode = GetNodeById(entity.Id);
-
-        if (entityNode is not null)
-        {
-            entityNode.Icon = GetIconFromEntity(entity.EntityType);
-            entityNode.Title = $"{entity.Id}: {entity.EntityType.Model.Name}";
-
-            var coordNode = GetCoordNodeByEntityId(entity.Id);
-
-            if (coordNode is not null && (coordNode.X != entity.Position.X || coordNode.Y != entity.Position.Y))
-            {
-                coordNode.Title = $"{string.Format("{0:D3}", entity.Position.X)},{string.Format("{0:D3}", entity.Position.Y)}";
-                coordNode.X = entity.Position.X;
-                coordNode.Y = entity.Position.Y;
-            }
-        }
-    }
-
-    private Node GetWorldNode()
-    {
-        return Nodes?.Where(n => n.Name == "World").FirstOrDefault();
-    }
-
-    private Node? GetNodeById(int id)
-    {
-        var world = GetWorldNode();
-        if (world != null)
-        {
-            var coordNode = GetCoordNodeByEntityId(id);
-            var nodes = from subNode in coordNode.SubNodes
-                        where subNode.Name == id.ToString()
-                        select subNode;
-
-            return nodes.FirstOrDefault();
-        }
-        return null;
-    }
-
-    private CoordNode? GetCoordNodeByCoords(int x, int y)
-    {
-        var world = GetWorldNode();
-        if (world != null)
-        {
-            var coordNodes = world.SubNodes.Where(n => n.GetType() is CoordNode).Select(n => (CoordNode)n).ToList();
-            return coordNodes?.Where(n => n.X == x && n.Y == y).FirstOrDefault();
-        }
-        return null;
-    }
-
-    private CoordNode? GetCoordNodeByEntityId(int id)
-    {
-        var world = GetWorldNode();
-        if (world != null)
-        {
-            var coordNodes = world.SubNodes.Select(n => (CoordNode)n).ToList();
-            var nodes = from coordNode in coordNodes
-                        from subNode in coordNode.SubNodes
-                        where subNode.Name == id.ToString()
-                        select coordNode;
-
-            return nodes.FirstOrDefault();
-        }
-        return null;
     }
 
     private void RefreshWizardsData()
@@ -232,7 +152,64 @@ public class MapTreeViewModel
             if (wizard.IsActive)
                 wizardsNode.SubNodes.Add(new Node(null, wizard.Name, wizard.Name));
         }
-        
+
+    }
+
+    private void AddEntityNode(Entity entity)
+    {
+        var entityNode = new EntityNode(entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity));
+        var worldNode = GetWorldNode();
+        worldNode.SubNodes.Add(entityNode);
+    }
+
+    private void UpdateEntityNode(Entity entity)
+    {
+        var entityNode = GetEntityNodeById(entity.Id);
+
+        if (entityNode is not null)
+        {
+            entityNode.X = entity.Position.X;
+            entityNode.Y = entity.Position.Y;
+            entityNode.Icon = GetIconFromEntity(entity.EntityType);
+            entityNode.Title = GetEntityNodeTitle(entity);
+            entityNode.Subtitle = GetEntityNodeSubTitle(entity);
+        }
+    }
+
+    private Node GetWorldNode()
+    {
+        return Nodes?.Where(n => n.Name == "World").FirstOrDefault();
+    }
+
+    private EntityNode? GetEntityNodeByCoords(int x, int y)
+    {
+        var world = GetWorldNode();
+        if (world != null)
+        {
+            var entityNodes = world.SubNodes.Select(n => (EntityNode)n).ToList();
+            return entityNodes?.Where(n => n.X == x && n.Y == y).FirstOrDefault();
+        }
+        return null;
+    }
+
+    private EntityNode? GetEntityNodeById(int id)
+    {
+        var world = GetWorldNode();
+        if (world != null)
+        {
+            return world.SubNodes.Select(n => (EntityNode)n).Where(n => n.Name == id.ToString()).FirstOrDefault();
+        }
+        return null;
+    }
+
+    private string GetEntityNodeTitle(Entity entity)
+    {
+        return $"{string.Format("{0:D4}", entity.Id)}: ({string.Format("{0:D3}", entity.Position.X)},{string.Format("{0:D3}", entity.Position.Y)})";
+    }
+
+    private string GetEntityNodeSubTitle(Entity entity)
+    {
+        return $"{entity.EntityType.Model.Name}";
     }
 
     private void SelectedNodes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

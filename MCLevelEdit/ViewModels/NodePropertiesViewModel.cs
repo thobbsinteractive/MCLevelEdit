@@ -74,7 +74,7 @@ namespace MCLevelEdit.ViewModels
                 {
                     ShowEditWizards = true;
                 }
-                else if(node.GetType() is CoordNode)
+                else if(node.GetType() is EntityNode)
                 {
                     ShowEditEntity = true;
                 }

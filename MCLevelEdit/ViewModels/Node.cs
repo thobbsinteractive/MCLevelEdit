@@ -9,6 +9,7 @@ public class Node : ObservableObject
     private Bitmap _icon;
     private string _name;
     private string _title;
+    private string _subtitle;
 
     public ObservableCollection<Node>? SubNodes { get; }
 
@@ -28,6 +29,13 @@ public class Node : ObservableObject
         get => _title;
         set => this.SetProperty(ref _title, value);
     }
+    public string Subtitle
+    {
+        get => _subtitle;
+        set => this.SetProperty(ref _subtitle, value);
+    }
+
+    public bool IsSubtitleSet => _subtitle?.Length > 0;
 
     public Node(Bitmap icon, string name, string title)
     {
