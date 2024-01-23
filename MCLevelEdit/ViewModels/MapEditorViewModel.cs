@@ -27,7 +27,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             new Vector(96, 96),
             PixelFormat.Rgba8888);
 
-    private Dictionary<int, Rectangle> _entityRectangles = new Dictionary<int, Rectangle>();
+    private Dictionary<int, (Rectangle, Ellipse)> _entityShapes = new Dictionary<int, (Rectangle, Ellipse)>();
 
     private Canvas _cvEntity;
     private Rectangle _rectSelection;
@@ -199,10 +199,11 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             lock (_lockPreview)
             {
-                if (_entityRectangles.ContainsKey(entity.Id))
+                if (_entityShapes.ContainsKey(entity.Id))
                 {
-                    _cvEntity.Children.Remove(_entityRectangles[entity.Id]);
-                    _entityRectangles.Remove(entity.Id);
+                    _cvEntity.Children.Remove(_entityShapes[entity.Id].Item1);
+                    _cvEntity.Children.Remove(_entityShapes[entity.Id].Item2);
+                    _entityShapes.Remove(entity.Id);
                 }
                 AddEntity(entity);
                 OnEntitySelected(entity);
@@ -244,16 +245,29 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             var brush = new SolidColorBrush(entity.EntityType.Colour, 1);
             var rectangle = new Rectangle()
             {
-                Width = 8,
-                Height = 8,
+                Width = Globals.SQUARE_SIZE,
+                Height = Globals.SQUARE_SIZE,
                 Fill = brush,
                 ZIndex = 100
+            };
+
+            var circle = new Ellipse()
+            {
+                Width = ((entity.SwitchSize * Globals.SQUARE_SIZE) * 2) + Globals.SQUARE_SIZE,
+                Height = ((entity.SwitchSize * Globals.SQUARE_SIZE) * 2) + Globals.SQUARE_SIZE,
+                Stroke = brush,
+                StrokeThickness = 1,
+                ZIndex = 110
             };
 
             Canvas.SetLeft(rectangle, rect.X);
             Canvas.SetTop(rectangle, rect.Y);
             _cvEntity.Children.Add(rectangle);
-            _entityRectangles.Add(entity.Id, rectangle);
+
+            Canvas.SetLeft(circle, rect.X - (entity.SwitchSize * Globals.SQUARE_SIZE));
+            Canvas.SetTop(circle, rect.Y - (entity.SwitchSize * Globals.SQUARE_SIZE));
+            _cvEntity.Children.Add(circle);
+            _entityShapes.Add(entity.Id, (rectangle, circle));
         }
     }
 
@@ -298,6 +312,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                 var children = _cvEntity.Children.Where(c => c.GetType() != typeof(Image)).DefaultIfEmpty();
                 _cvEntity.Children.RemoveAll(children);
+                _entityShapes.Clear();
 
                 for (int x = 0; x < Globals.MAX_MAP_SIZE; x++)
                 {
