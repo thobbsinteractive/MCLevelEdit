@@ -12,6 +12,7 @@ using MCLevelEdit.Model.Enums;
 using ReactiveUI;
 using Splat;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,6 +26,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
             new Vector(96, 96),
             PixelFormat.Rgba8888);
+
+    private Dictionary<int, Rectangle> _entityRectangles = new Dictionary<int, Rectangle>();
 
     private Canvas _cvEntity;
     private Rectangle _rectSelection;
@@ -196,7 +199,13 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             lock (_lockPreview)
             {
+                if (_entityRectangles.ContainsKey(entity.Id))
+                {
+                    _cvEntity.Children.Remove(_entityRectangles[entity.Id]);
+                    _entityRectangles.Remove(entity.Id);
+                }
                 AddEntity(entity);
+                OnEntitySelected(entity);
             }
         }
     }
@@ -229,7 +238,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     private void AddEntity(Entity entity)
     {
-        if (_cvEntity is not null)
+        if (_cvEntity is not null && entity is not null)
         {
             var rect = new Rect(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE, Globals.SQUARE_SIZE, Globals.SQUARE_SIZE);
             var brush = new SolidColorBrush(entity.EntityType.Colour, 1);
@@ -244,6 +253,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             Canvas.SetLeft(rectangle, rect.X);
             Canvas.SetTop(rectangle, rect.Y);
             _cvEntity.Children.Add(rectangle);
+            _entityRectangles.Add(entity.Id, rectangle);
         }
     }
 
