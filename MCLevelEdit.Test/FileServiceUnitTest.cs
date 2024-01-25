@@ -9,13 +9,15 @@ namespace MCLevelEdit.Test
         {
         }
 
-        [TestCase(@"Resources\data_000e0f.DAT")]
+        [TestCase(@"Resources\data_01ea15.dat")]
         public void LoadMapFromFile(string path)
         {
             var service = new FileAdapter();
             var fullPath = Path.Combine(Directory.GetCurrentDirectory(), path);
-            var map = service.LoadMap(fullPath);
-            Assert.Pass();
+            var map = service.LoadMapAsync(fullPath).Result;
+
+            Assert.IsNotNull(map);
+            Assert.IsTrue(map.Entities?.Any());
         }
     }
 }
