@@ -34,7 +34,8 @@ public enum Switch
     Unknown5 = 27,
     Unknown6 = 28,
     Wyvern = 29,
-    CreatureAll = 30
+    CreatureAll = 30,
+    Unknown = 31
 }
 
 public class SwitchType : EntityType
