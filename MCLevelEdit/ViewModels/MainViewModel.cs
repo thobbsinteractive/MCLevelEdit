@@ -38,7 +38,6 @@ public class MainViewModel : ViewModelBase
 
         EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-
             var result = await ShowDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
         });
 
@@ -61,6 +60,35 @@ public class MainViewModel : ViewModelBase
                 _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
                 _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
             }
+        });
+
+        SaveFileCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            // Get top level from the current control. Alternatively, you can use Window reference instead.
+            var topLevel = TopLevel.GetTopLevel(MainView.I);
+
+            var map = _mapService.GetMap();
+
+            string suggestedExtension = "mc1";
+            string suggestedFileName = "NewMap";
+            IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+
+            if (!string.IsNullOrWhiteSpace(map.FilePath))
+            {
+                suggestedFileName = Path.GetFileName(map.FilePath);
+                storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
+                suggestedExtension = Path.GetExtension(map.FilePath);
+            }
+
+            // Start async operation to open the dialog.
+            var files = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Save Map File",
+                SuggestedFileName = suggestedFileName,
+                ShowOverwritePrompt = true,
+                DefaultExtension = suggestedExtension,
+                SuggestedStartLocation = storageFolder
+            });
         });
 
         ExitCommand = ReactiveCommand.CreateFromTask(async () =>

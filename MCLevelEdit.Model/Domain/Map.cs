@@ -2,6 +2,7 @@
 
 public class Map
 {
+    public string FilePath {  get; set; }
     public uint ManaTotal { get; set; }
     public byte ManaTarget { get; set; }
     public IList<Entity> Entities { get; set; } = new List<Entity>();
