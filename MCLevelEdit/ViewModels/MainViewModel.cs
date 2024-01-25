@@ -44,8 +44,9 @@ public class MainViewModel : ViewModelBase
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(MainView.I);
+            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
 
+            
             // Start async operation to open the dialog.
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
@@ -55,17 +56,20 @@ public class MainViewModel : ViewModelBase
 
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
             {
-                await mapService.LoadMapFromFileAsync(files[0].Path.AbsolutePath);
+                string filePath = files[0].Path.AbsolutePath;
+                await mapService.LoadMapFromFileAsync(filePath);
                 _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
                 _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
                 _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+
+                MainWindow.I.Title = GetTitle(filePath);
             }
         });
 
         SaveFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(MainView.I);
+            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
 
             var map = _mapService.GetMap();
 
@@ -98,5 +102,13 @@ public class MainViewModel : ViewModelBase
                 desktopApp.Shutdown();
             }
         });
+
+        MainWindow.I.Title = GetTitle("NewMap.mc1");
+    }
+
+    private string GetTitle(string filePath)
+    {
+        string title = !string.IsNullOrWhiteSpace(filePath)? Path.GetFileName(filePath) : string.Empty;
+        return $"Magic Carpet 1 Level Editor: {title}";
     }
 }

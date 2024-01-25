@@ -7,8 +7,10 @@ namespace MCLevelEdit.Views;
 
 public partial class MainWindow : ReactiveWindow<MainViewModel>
 {
+    public static MainWindow I;
     public MainWindow()
     {
+        I = this;
         InitializeComponent();
 
         this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(DoShowDialogAsync)));
