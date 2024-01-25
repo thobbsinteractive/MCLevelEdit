@@ -9,11 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Desktop", "..\M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Test", "..\MCLevelEdit.Test\MCLevelEdit.Test.csproj", "{EF0516AA-9365-467F-8429-FD548366A6CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCLevelEdit.Model", "..\MCLevelEdit.Model\MCLevelEdit.Model.csproj", "{A2E7B073-05A1-47BC-80D5-3040F1A4B14D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Model", "..\MCLevelEdit.Model\MCLevelEdit.Model.csproj", "{A2E7B073-05A1-47BC-80D5-3040F1A4B14D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCLevelEdit.Application", "..\MCLevelEdit.Application\MCLevelEdit.Application.csproj", "{33B71612-92F4-4054-A745-9955D073814A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Application", "..\MCLevelEdit.Application\MCLevelEdit.Application.csproj", "{33B71612-92F4-4054-A745-9955D073814A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCLevelEdit.Infrastructure", "..\MCLevelEdit.Infrastructure\MCLevelEdit.Infrastructure.csproj", "{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Infrastructure", "..\MCLevelEdit.Infrastructure\MCLevelEdit.Infrastructure.csproj", "{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicCarpet2Terrain", "..\MagicCarpet2Terrain\MagicCarpet2Terrain.csproj", "{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

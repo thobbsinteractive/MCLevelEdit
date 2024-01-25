@@ -1,5 +1,5 @@
 ﻿using Avalonia.Media.Imaging;
-using MCLevelEdit.Model.Domain;
+using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Model.Enums;
 
 namespace MCLevelEdit.Model.Abstractions;

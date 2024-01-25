@@ -1,4 +1,6 @@
-﻿namespace MCLevelEdit.Model.Domain;
+﻿using MagicCarpet2Terrain.Model;
+
+namespace MCLevelEdit.Model.Domain;
 
 public class Map
 {
