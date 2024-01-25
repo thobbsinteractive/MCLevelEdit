@@ -1,6 +1,5 @@
 ﻿using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
-using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Threading.Tasks;
@@ -42,6 +41,7 @@ namespace MCLevelEdit.ViewModels
             set => this.RaiseAndSetIfChanged(ref _generationParameters, value);
         }
 
+        public ICommand CalculateManaCommand { get; }
         public ICommand GenerateTerrainCommand { get; }
         public bool GenerateTerrainButtonEnable { get; set; }
 
@@ -55,6 +55,12 @@ namespace MCLevelEdit.ViewModels
 
             _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
             _eventAggregator.RegisterEvent("RefreshWorld", RefreshWorldHandler);
+
+            CalculateManaCommand = ReactiveCommand.Create(async () =>
+            {
+                ManaTotal = _mapService.CalculateMana();
+                _mapService.UpdateManaTotal(ManaTotal);
+            });
 
             GenerateTerrainCommand = ReactiveCommand.Create(async () =>
             {

@@ -21,4 +21,6 @@ public interface IMapService
     bool UpdateManaTarget(byte manaTarget);
     bool SetActiveWizards(byte numOfWizards);
     bool UpdateWizard(Wizard wizard);
+    uint CalculateMana();
+    void UpdateMana(uint manaTotal);
 }

@@ -46,14 +46,15 @@ public class EntityType
         get { return _colour; }
     }
 
-    public EntityType(TypeId typeId, Color colour, int id, string name)
+    public EntityType(TypeId typeId, Color colour, int id, string name, uint mana = 0)
     {
         _typeId = typeId;
         _colour = colour;
         _model = new ModelType()
         {
             Id = id,
-            Name = name
+            Name = name,
+            Mana = mana
         };
     }
 

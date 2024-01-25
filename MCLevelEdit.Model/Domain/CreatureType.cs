@@ -25,7 +25,24 @@ public enum Creature
 
 public class CreatureType : EntityType
 {
-    public CreatureType(Creature creature) : base(TypeId.Creature, Color.FromRgb(255, 0, 0),((int)creature), creature.ToString()) { }
+    private static Dictionary<Creature, uint> ManaCost = new Dictionary<Creature, uint>()
+    {
+        { Creature.Dragon, 4500 },
+        { Creature.Vulture, 4500 },
+        { Creature.Bee, 4500 },
+        { Creature.Worm, 4500 },
+        { Creature.Archer, 4500 },
+        { Creature.Crab, 12000 },
+        { Creature.Kraken, 4500 },
+        { Creature.TrollOrApe, 1500 },
+        { Creature.Griffin, 5000 },
+        { Creature.Skeleton, 500 },
+        { Creature.Emu, 1000 },
+        { Creature.Genie, 10000 },
+        { Creature.Wyvern, 50000 },
+    };
+
+    public CreatureType(Creature creature) : base(TypeId.Creature, Color.FromRgb(255, 0, 0),((int)creature), creature.ToString(), (ManaCost.ContainsKey(creature) ? ManaCost[creature] : 0)) { }
 
     public override ModelType[] ModelTypes
     {
@@ -35,7 +52,9 @@ public class CreatureType : EntityType
             {
                 _modelTypes = Enum.GetValues(typeof(Creature))
                     .Cast<int>()
-                    .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Creature), x) })
+                    .Select(x => new ModelType() { Id = x, 
+                        Name = Enum.GetName(typeof(Creature), x), 
+                        Mana = (ManaCost.ContainsKey((Creature)x) ? ManaCost[(Creature)x] : 0) })
                     .ToArray();
             }
 

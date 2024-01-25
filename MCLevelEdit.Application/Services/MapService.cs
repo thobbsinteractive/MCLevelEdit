@@ -179,4 +179,33 @@ public class MapService : IMapService
 
         return true;
     }
+
+    public uint CalculateMana()
+    {
+        uint total = 0;
+
+        if (MapRepository.Map?.Entities.Count() > 0)
+        {
+            foreach (var entity in MapRepository.Map.Entities)
+            {
+                if (entity.EntityType.TypeId == TypeId.Creature)
+                {
+                    total += entity.EntityType.Model.Mana;
+                }
+
+                if (entity.EntityType.TypeId == TypeId.Effect)
+                {
+                    if (((Effect)entity.EntityType.Model.Id) == Effect.ManaBall || ((Effect)entity.EntityType.Model.Id) == Effect.VillagerBuilding)
+                        total += 512;
+                }
+            }
+        }
+
+        return total;
+    }
+
+    public void UpdateMana(uint manaTotal)
+    {
+        MapRepository.Map.ManaTotal = manaTotal;
+    }
 }

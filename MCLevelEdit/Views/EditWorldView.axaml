@@ -28,11 +28,12 @@
            HorizontalAlignment="Left">
       Mana Total:
     </Label>
-    <TextBox Grid.Column="1"
-             Grid.Row="1"
-             HorizontalAlignment="Stretch"
-             Text="{Binding ManaTotal, Converter={StaticResource uInt32ToStringConverter}}">
-    </TextBox>
+    <Label Grid.Column="1"
+           Grid.Row="1"
+           Margin="5,0"
+           HorizontalAlignment="Stretch"
+           Content="{Binding ManaTotal}">
+    </Label>
     <Label Grid.Column="0"
            Grid.Row="2"
            HorizontalAlignment="Left">
@@ -48,7 +49,7 @@
         Grid.Row="3"
         HorizontalAlignment="Center"
         Grid.ColumnSpan="2"
-        Command=""
+        Command="{Binding CalculateManaCommand}"
         IsEnabled="">
       Recalculate Mana
     </Button>
