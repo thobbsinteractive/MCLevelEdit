@@ -1,6 +1,7 @@
 ﻿using Avalonia.Media.Imaging;
 using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Extensions;
+using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
@@ -12,11 +13,13 @@ public class MapService : IMapService
 {
     private readonly IFilePort _filePort;
     private readonly ITerrainService _terrainService;
+    protected readonly EventAggregator<object> _eventAggregator;
 
-    public MapService(ITerrainService terrainService, IFilePort filePort)
+    public MapService(EventAggregator<object> eventAggregator, ITerrainService terrainService, IFilePort filePort)
     {
         _filePort = filePort;
         _terrainService = terrainService;
+        _eventAggregator = eventAggregator;
     }
 
     public async Task<bool> LoadMapFromFileAsync(string filePath)
@@ -55,16 +58,16 @@ public class MapService : IMapService
         }
     }
 
-    public async Task<bool> CreateNewMap(ushort size = Globals.MAX_MAP_SIZE)
+    public Task<bool> CreateNewMap(ushort size = Globals.MAX_MAP_SIZE)
     {
         MapRepository.Map = new Map();
-        await RecalculateTerrain(MapRepository.Map.Terrain.GenerationParameters);
-        return true;
+        return RecalculateTerrain(MapRepository.Map.Terrain.GenerationParameters);
     }
 
     public async Task<bool> RecalculateTerrain(GenerationParameters generationParameters)
     {
         MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(generationParameters);
+        _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
         return true;
     }
 

@@ -177,7 +177,6 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         _eventAggregator.RegisterEvent("UpdateEntity", UpdateEntityHandler);
         _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
         _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
-        RefreshPreviewAsync();
     }
 
     private void AddEntityHandler(object sender, PubSubEventArgs<object> args)

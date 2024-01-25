@@ -15,7 +15,7 @@ namespace MCLevelEdit
             services.RegisterLazySingleton<EventAggregator<object>>(() => new EventAggregator<object>());
             services.RegisterLazySingleton<IFilePort>(() => new FileAdapter());
             services.RegisterLazySingleton<ITerrainService>(() => new TerrainService());
-            services.RegisterLazySingleton<IMapService>(() => new MapService(resolver.GetService<ITerrainService>(), resolver.GetService<IFilePort>()));
+            services.RegisterLazySingleton<IMapService>(() => new MapService(resolver.GetService<EventAggregator<object>>(), resolver.GetService<ITerrainService>(), resolver.GetService<IFilePort>()));
             services.RegisterLazySingleton(() => new MainViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<IMapService>(), resolver.GetService<ITerrainService>()));
             services.Register(() => new EntitiesTableViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<IMapService>(), resolver.GetService<ITerrainService>()));
         }
