@@ -52,7 +52,7 @@ namespace MCLevelEdit.Application.Services
 
         public Terrain CalculateTerrain(GenerationParameters genParams, byte stage = 18)
         {
-            MaxMapSize = genParams.MapMapSize;
+            MaxMapSize = genParams.MapSize;
 
             short[] mapEntityIndex_15B4E0 = new short[MaxMapSize * MaxMapSize];
             byte[] mapHeightmap_11B4E0 = new byte[MaxMapSize * MaxMapSize];

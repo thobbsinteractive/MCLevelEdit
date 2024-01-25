@@ -2,7 +2,7 @@
 {
     public class GenerationParameters
     {
-        public int MapMapSize { get; set; } = 256;
+        public int MapSize { get; set; } = 256;
         public MapType MapType { get; set; } = MapType.Day;
         public ushort Seed { get; set; }
         public ushort Offset { get; set; }

@@ -1,4 +1,4 @@
-﻿using MCLevelEdit.Model.Domain;
+﻿using MagicCarpet2Terrain.Model;
 
 namespace MCLevelEdit.ViewModels.Mappers;
 
