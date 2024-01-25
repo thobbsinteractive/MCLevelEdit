@@ -61,6 +61,8 @@ public class MapService : IMapService
     public Task<bool> CreateNewMap(ushort size = Globals.MAX_MAP_SIZE)
     {
         MapRepository.Map = new Map();
+        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
+        _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
         return RecalculateTerrain(MapRepository.Map.Terrain.GenerationParameters);
     }
 

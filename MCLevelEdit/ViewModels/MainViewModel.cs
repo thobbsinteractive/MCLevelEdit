@@ -16,6 +16,8 @@ namespace MCLevelEdit.ViewModels;
 public class MainViewModel : ViewModelBase
 {
     public IObservable<bool> IsRefreshed { get; }
+
+    public ICommand NewFileCommand { get; }
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
     public ICommand ExitCommand { get; }
@@ -39,6 +41,16 @@ public class MainViewModel : ViewModelBase
         EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             var result = await ShowDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
+        });
+
+        NewFileCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            // Get top level from the current control. Alternatively, you can use Window reference instead.
+            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
+
+            await mapService.CreateNewMap();
+
+            MainWindow.I.Title = GetTitle("NewMap.mc1");
         });
 
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
