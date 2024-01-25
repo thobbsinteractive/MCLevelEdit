@@ -20,7 +20,7 @@ public class MapService : IMapService
 
     public async Task<bool> LoadMapFromFileAsync(string filePath)
     {
-        MapRepository.Map = _filePort.LoadMap(filePath).Result;
+        MapRepository.Map = await _filePort.LoadMapAsync(filePath);
         MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(MapRepository.Map.Terrain.GenerationParameters);
         return true;
     }

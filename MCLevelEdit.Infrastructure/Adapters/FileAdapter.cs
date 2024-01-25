@@ -6,7 +6,14 @@ namespace MCLevelEdit.Infrastructure.Adapters;
 
 public class FileAdapter : IFilePort
 {
-    public Task<Map> LoadMap(string fileName)
+    public Task<Map> LoadMapAsync(string fileName)
+    {
+        return Task.Run<Map>(() => {
+            return LoadMap(fileName);
+        });
+    }
+
+    public Map LoadMap(string fileName)
     {
         var levfile = File.ReadAllBytes(fileName);
         Map map = new Map();
@@ -125,6 +132,6 @@ public class FileAdapter : IFilePort
             if (numWizards > 0)
                 numWizards--;
         }
-        return Task.FromResult(map);
+        return map;
     }
 }
