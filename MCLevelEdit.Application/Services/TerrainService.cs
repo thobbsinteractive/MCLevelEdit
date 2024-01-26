@@ -1,5 +1,6 @@
 ﻿using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using MagicCarpet2Terrain;
 using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Extensions;
 using MCLevelEdit.Model.Abstractions;

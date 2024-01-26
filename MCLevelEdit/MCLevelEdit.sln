@@ -15,7 +15,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Application", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Infrastructure", "..\MCLevelEdit.Infrastructure\MCLevelEdit.Infrastructure.csproj", "{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicCarpet2Terrain", "..\MagicCarpet2Terrain\MagicCarpet2Terrain.csproj", "{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicCarpet2Terrain", "..\MagicCarpet2Terrain\MagicCarpet2Terrain.csproj", "{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicCarpet2Terrain.Test", "..\MagicCarpet2Terrain.Test\MagicCarpet2Terrain.Test.csproj", "{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5} = {D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +56,10 @@ Global
 		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,7 @@ using MagicCarpet2Terrain.Structs;
 using System;
 using System.Threading.Tasks;
 
-namespace MCLevelEdit.Application.Services
+namespace MagicCarpet2Terrain
 {
     public class TerrainGenerator : ITerrainGenerator
     {
@@ -63,7 +63,7 @@ namespace MCLevelEdit.Application.Services
 
             ushort seed_17B4E0 = genParams.Seed;
             if (stage > 0)
-                sub_B5E70_decompress_terrain_map_level(mapEntityIndex_15B4E0, (short)genParams.Seed, genParams.Offset, genParams.Raise, genParams.Gnarl);
+                sub_B5E70_decompress_terrain_map_level(mapEntityIndex_15B4E0, genParams.Seed, genParams.Offset, genParams.Raise, genParams.Gnarl);
             if (stage > 1)
                 sub_44DB0_truncTerrainHeight(mapEntityIndex_15B4E0, mapHeightmap_11B4E0);//225db0 //trunc and create
             if (stage > 2)
@@ -129,7 +129,7 @@ namespace MCLevelEdit.Application.Services
             };
         }
 
-        private void sub_B5E70_decompress_terrain_map_level(short[] mapEntityIndex_15B4E0, short seed, ushort offset, ushort raise, ushort gnarl)
+        private void sub_B5E70_decompress_terrain_map_level(short[] mapEntityIndex_15B4E0, ushort seed, ushort offset, ushort raise, ushort gnarl)
         {
             UAxis2D sumEnt = new UAxis2D();
 
@@ -156,7 +156,7 @@ namespace MCLevelEdit.Application.Services
             }
         }
 
-        private void sub_B5EFA(short[] mapEntityIndex_15B4E0, short a1, ref UAxis2D indexx, ushort gnarl, ref short nextRand)//296EFA
+        private void sub_B5EFA(short[] mapEntityIndex_15B4E0, short a1, ref UAxis2D indexx, ushort gnarl, ref ushort nextRand)//296EFA
         {
             //  X-.-X
             //   \  |
@@ -177,7 +177,7 @@ namespace MCLevelEdit.Application.Services
             indexx.X += (byte)a1;
             indexx.Y -= (byte)a1;
             srandNumber = (ushort)(9377 * nextRand + 9439);
-            nextRand = (short)srandNumber;
+            nextRand = srandNumber;
             if (mapEntityIndex_15B4E0[indexx.Word] == 0)
                 mapEntityIndex_15B4E0[indexx.Word] = (short)(srandNumber % (ushort)(2 * gnarl + 1)
                 + srandNumber % (ushort)((a1 << 6) + 1) + (sumEnt >> 2) - 32 * a1 - gnarl);
@@ -186,7 +186,7 @@ namespace MCLevelEdit.Application.Services
         }
 
         //----- (000B5F8F) --------------------------------------------------------
-        private void sub_B5F8F(short[] mapEntityIndex_15B4E0, short a1, ref UAxis2D indexx, ushort gnarl, ref short nextRand)//296f8f
+        private void sub_B5F8F(short[] mapEntityIndex_15B4E0, short a1, ref UAxis2D indexx, ushort gnarl, ref ushort nextRand)//296f8f
         {
 
             //   X
@@ -231,7 +231,7 @@ namespace MCLevelEdit.Application.Services
             sumEnt2 += mapEntityIndex_15B4E0[indexx.Word];
             indexx.Y -= (byte)a1;
             srandNumber = (ushort)(9377 * srandNumber + 9439);
-            nextRand = (short)srandNumber;
+            nextRand = srandNumber;
             if (mapEntityIndex_15B4E0[indexx.Word] == 0)
                 mapEntityIndex_15B4E0[indexx.Word] = (short)(srandNumber % (ushort)(2 * gnarl + 1)
                 + srandNumber % (ushort)((a1 << 6) + 1) + (ushort)(sumEnt2 >> 2) - 32 * a1 - gnarl);

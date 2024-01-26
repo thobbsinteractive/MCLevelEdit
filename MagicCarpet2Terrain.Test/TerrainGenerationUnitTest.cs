@@ -1,8 +1,8 @@
-﻿using MagicCarpet2Terrain.Model;
-using MCLevelEdit.Application.Services;
-using MCLevelEdit.Model.Domain;
+﻿using MagicCarpet2Terrain;
+using MagicCarpet2Terrain.Model;
+using NUnit.Framework;
 
-namespace MCLevelEdit.Test
+namespace MagicCarpet2Terrain.Test
 {
     public class TerrainTests
     {
@@ -19,8 +19,6 @@ namespace MCLevelEdit.Test
         [TestCase(18, @"Resources\mapEntityIndex_final_15B4E0.bin", @"Resources\mapAngle_final_13B4E0.bin", @"Resources\mapHeightmap_final_11B4E0.bin", @"Resources\mapShading_final_12B4E0.bin", @"Resources\mapTerrainType_final_10B4E0.bin")]
         public void LoadMapFromFile(byte stage, string mapEntityIndexPath, string mapAnglePath, string mapHeightmapPath, string mapShadingPath, string mapTerrainTypePath)
         {
-            var service = new TerrainService();
-
             var mapEntityIndexFullPath = Path.Combine(Directory.GetCurrentDirectory(), mapEntityIndexPath);
             var mapAngleFullPath = Path.Combine(Directory.GetCurrentDirectory(), mapAnglePath);
             var mapHeightmapFullPath = Path.Combine(Directory.GetCurrentDirectory(), mapHeightmapPath);
@@ -36,8 +34,9 @@ namespace MCLevelEdit.Test
             var mapShadingBytes = File.ReadAllBytes(mapShadingFullPath);
             var mapTerrainTypeBytes = File.ReadAllBytes(mapTerrainTypeFullPath);
 
+            var sut = new TerrainGenerator();
 
-            var terrain = service.CalculateMc2Terrain(new GenerationParameters()
+            var terrain = sut.CalculateTerrain(new GenerationParameters()
             {
                 MapType = MapType.Night,
                 Seed = 49098,
@@ -52,7 +51,7 @@ namespace MCLevelEdit.Test
                 BhLin = 31,
                 BhFlt = 35,
                 RkSte = 10
-            }, stage).Result;
+            }, stage);
 
             for (int i = 0; i < 65536; i++)
             {
