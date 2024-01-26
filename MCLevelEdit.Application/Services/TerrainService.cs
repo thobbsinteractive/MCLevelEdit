@@ -123,4 +123,23 @@ public class TerrainService : ITerrainService, IEnableLogger
         TerrainGenerator terrainGenerator = new TerrainGenerator();
         return await terrainGenerator.CalculateTerrainAsync(genParams, stage);
     }
+
+    public GenerationParameters GetRandomGeneratorParamters()
+    {
+        Random rnd = new Random();
+        return new GenerationParameters()
+        {
+            Seed = (ushort)rnd.Next(ushort.MaxValue),
+            Offset = 0,
+            Raise = (ushort)rnd.Next(ushort.MaxValue),
+            Gnarl = (ushort)rnd.Next(50),
+            River = (byte)rnd.Next(byte.MaxValue),
+            Source = (byte)rnd.Next(byte.MaxValue),
+            SnLin = 200,
+            SnFlt = (byte)rnd.Next(50),
+            BhLin = (byte)rnd.Next(byte.MaxValue),
+            BhFlt = (byte)rnd.Next(20),
+            RkSte = (byte)rnd.Next(40)
+        };
+    }
 }

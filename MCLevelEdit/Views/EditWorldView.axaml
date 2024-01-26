@@ -108,7 +108,7 @@
     <TextBox Grid.Column="1"
              Grid.Row="9"
              HorizontalAlignment="Stretch"
-             Text="{Binding GenerationParameters.River, Converter={StaticResource uInt16ToStringConverter}}">
+             Text="{Binding GenerationParameters.River, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="10"

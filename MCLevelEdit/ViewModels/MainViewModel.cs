@@ -18,6 +18,7 @@ public class MainViewModel : ViewModelBase
     public IObservable<bool> IsRefreshed { get; }
 
     public ICommand NewFileCommand { get; }
+    public ICommand NewRandomFileCommand { get; }
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
     public ICommand ExitCommand { get; }
@@ -30,7 +31,7 @@ public class MainViewModel : ViewModelBase
 
     public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
-        _mapService.CreateNewMap();
+        _mapService.CreateNewMap(true);
         NodePropertiesViewModel = new NodePropertiesViewModel(eventAggregator, mapService, terrainService);
         EntityToolBarViewModel = new EntityToolBarViewModel(eventAggregator, mapService, terrainService);
         MapTreeViewModel = new MapTreeViewModel(eventAggregator, mapService, terrainService);
@@ -49,6 +50,16 @@ public class MainViewModel : ViewModelBase
             var topLevel = TopLevel.GetTopLevel(MainWindow.I);
 
             await mapService.CreateNewMap();
+
+            MainWindow.I.Title = GetTitle("NewMap.mc1");
+        });
+
+        NewRandomFileCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            // Get top level from the current control. Alternatively, you can use Window reference instead.
+            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
+
+            await mapService.CreateNewMap(true);
 
             MainWindow.I.Title = GetTitle("NewMap.mc1");
         });
