@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Effect = MCLevelEdit.Model.Domain.Effect;
 
 namespace MCLevelEdit.ViewModels;
 
@@ -27,7 +28,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             new Vector(96, 96),
             PixelFormat.Rgba8888);
 
-    private Dictionary<int, (Rectangle, Ellipse)> _entityShapes = new Dictionary<int, (Rectangle, Ellipse)>();
+    private Dictionary<int, List<Shape>> _entityShapes = new Dictionary<int, List<Shape>>();
 
     private Canvas _cvEntity;
     private Rectangle _rectSelection;
@@ -200,8 +201,10 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             {
                 if (_entityShapes.ContainsKey(entity.Id))
                 {
-                    _cvEntity.Children.Remove(_entityShapes[entity.Id].Item1);
-                    _cvEntity.Children.Remove(_entityShapes[entity.Id].Item2);
+                    foreach (var shape in _entityShapes[entity.Id])
+                    {
+                        _cvEntity.Children.Remove(shape);
+                    }
                     _entityShapes.Remove(entity.Id);
                 }
                 AddEntity(entity);
@@ -240,6 +243,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     {
         if (_cvEntity is not null && entity is not null)
         {
+            List<Shape> shapes = new List<Shape>();
+
             var rect = new Rect(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE, Globals.SQUARE_SIZE, Globals.SQUARE_SIZE);
             var brush = new SolidColorBrush(entity.EntityType.Colour, 1);
             var rectangle = new Rectangle()
@@ -250,23 +255,61 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 ZIndex = 100
             };
 
-            var circle = new Ellipse()
-            {
-                Width = ((entity.SwitchSize * Globals.SQUARE_SIZE) * 2) + Globals.SQUARE_SIZE,
-                Height = ((entity.SwitchSize * Globals.SQUARE_SIZE) * 2) + Globals.SQUARE_SIZE,
-                Stroke = brush,
-                StrokeThickness = 1,
-                ZIndex = 110
-            };
-
             Canvas.SetLeft(rectangle, rect.X);
             Canvas.SetTop(rectangle, rect.Y);
             _cvEntity.Children.Add(rectangle);
+            shapes.Add(rectangle);
 
-            Canvas.SetLeft(circle, rect.X - (entity.SwitchSize * Globals.SQUARE_SIZE));
-            Canvas.SetTop(circle, rect.Y - (entity.SwitchSize * Globals.SQUARE_SIZE));
-            _cvEntity.Children.Add(circle);
-            _entityShapes.Add(entity.Id, (rectangle, circle));
+            if (entity.SwitchSize > 0)
+            {
+                var circle = new Ellipse()
+                {
+                    Width = ((entity.SwitchSize * Globals.SQUARE_SIZE) * 2) + Globals.SQUARE_SIZE,
+                    Height = ((entity.SwitchSize * Globals.SQUARE_SIZE) * 2) + Globals.SQUARE_SIZE,
+                    Stroke = brush,
+                    StrokeThickness = 1,
+                    ZIndex = 110
+                };
+                Canvas.SetLeft(circle, rect.X - (entity.SwitchSize * Globals.SQUARE_SIZE));
+                Canvas.SetTop(circle, rect.Y - (entity.SwitchSize * Globals.SQUARE_SIZE));
+                _cvEntity.Children.Add(circle);
+                shapes.Add(circle);
+            }
+
+            if (entity.EntityType.TypeId == TypeId.Effect && entity.EntityType.Model.Id == (int)Effect.Wall)
+            {
+                brush = new SolidColorBrush(Color.FromRgb(128,128,128), 1);
+                if (entity.Child > 0)
+                {
+                    var endEntity = _mapService.GetEntity(entity.Child);
+                    var line1 = new Line()
+                    {
+                        StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
+                        EndPoint = new Point(endEntity.Position.X * Globals.SQUARE_SIZE, endEntity.Position.Y * Globals.SQUARE_SIZE),
+                        Stroke = brush,
+                        StrokeThickness = Globals.SQUARE_SIZE,
+                        ZIndex = 99
+                    };
+                    _cvEntity.Children.Add(line1);
+                    shapes.Add(line1);
+                }
+                if (entity.Parent > 0)
+                {
+                    var endEntity = _mapService.GetEntity(entity.Parent);
+                    var line2 = new Line()
+                    {
+                        StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
+                        EndPoint = new Point(endEntity.Position.X * Globals.SQUARE_SIZE, endEntity.Position.Y * Globals.SQUARE_SIZE),
+                        Stroke = brush,
+                        StrokeThickness = Globals.SQUARE_SIZE,
+                        ZIndex = 99
+                    };
+                    _cvEntity.Children.Add(line2);
+                    shapes.Add(line2);
+                }
+            }
+
+            _entityShapes.Add(entity.Id, shapes);
         }
     }
 
