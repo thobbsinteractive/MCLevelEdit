@@ -14,6 +14,7 @@ using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Effect = MCLevelEdit.Model.Domain.Effect;
 
@@ -25,7 +26,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private Point _cursorPosition = new Point(0, 0);
     private WriteableBitmap _preview = new WriteableBitmap(
             new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
-            new Vector(96, 96),
+            new Avalonia.Vector(96, 96),
             PixelFormat.Rgba8888);
 
     private Dictionary<int, List<Shape>> _entityShapes = new Dictionary<int, List<Shape>>();
@@ -282,10 +283,12 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 if (entity.Child > 0)
                 {
                     var endEntity = _mapService.GetEntity(entity.Child);
+                    var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, entity.Position, endEntity.Position);
+
                     var line1 = new Line()
                     {
                         StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                        EndPoint = new Point(endEntity.Position.X * Globals.SQUARE_SIZE, endEntity.Position.Y * Globals.SQUARE_SIZE),
+                        EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
                         Stroke = brush,
                         StrokeThickness = Globals.SQUARE_SIZE,
                         ZIndex = 99
@@ -296,10 +299,12 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 if (entity.Parent > 0)
                 {
                     var endEntity = _mapService.GetEntity(entity.Parent);
+                    var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, entity.Position, endEntity.Position);
+
                     var line2 = new Line()
                     {
                         StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                        EndPoint = new Point(endEntity.Position.X * Globals.SQUARE_SIZE, endEntity.Position.Y * Globals.SQUARE_SIZE),
+                        EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
                         Stroke = brush,
                         StrokeThickness = Globals.SQUARE_SIZE,
                         ZIndex = 99
@@ -311,6 +316,28 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
             _entityShapes.Add(entity.Id, shapes);
         }
+    }
+
+    private Position GetNearestEndPointInMapBounds(ushort mapSize, Position start, Position end)
+    {
+        var vStart = new Vector2(start.X, start.Y);
+        var vEnd = new Vector2(end.X, end.Y);
+        var shortestDistance = Vector2.Distance(vStart, vEnd);
+
+        for(int x = -1; x < 2; x++)
+        {
+            for (int y = -1; y < 2; y++)
+            {
+                var currentDistance = Vector2.Distance(vStart, new Vector2(end.X + (mapSize * x), end.Y + (mapSize * y)));
+                if (currentDistance < shortestDistance)
+                {
+                    shortestDistance = currentDistance;
+                    vEnd = new Vector2(end.X + (mapSize * x), end.Y + (mapSize * y));
+                }
+            }
+        }
+
+        return new Position((int)vEnd.X, (int)vEnd.Y);
     }
 
     public void RefreshDataHandler(object sender, PubSubEventArgs<object> args)
