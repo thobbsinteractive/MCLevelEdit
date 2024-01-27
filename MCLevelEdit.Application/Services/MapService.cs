@@ -1,4 +1,5 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia.Logging;
+using Avalonia.Media.Imaging;
 using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Extensions;
 using MCLevelEdit.Application.Model;
@@ -6,10 +7,11 @@ using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Repository;
+using Splat;
 
 namespace MCLevelEdit.Application.Services;
 
-public class MapService : IMapService
+public class MapService : IMapService, IEnableLogger
 {
     private readonly IFilePort _filePort;
     private readonly ITerrainService _terrainService;
@@ -24,8 +26,16 @@ public class MapService : IMapService
 
     public async Task<bool> LoadMapFromFileAsync(string filePath)
     {
-        MapRepository.Map = await _filePort.LoadMapAsync(filePath);
-        MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(MapRepository.Map.Terrain.GenerationParameters);
+        try
+        {
+            MapRepository.Map = await _filePort.LoadMapAsync(filePath);
+            MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(MapRepository.Map.Terrain.GenerationParameters);
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, "Error loading level {filePath}:\n{ex.Message}");
+            return false;
+        }
         return true;
     }
 
@@ -198,7 +208,7 @@ public class MapService : IMapService
 
                 if (entity.EntityType.TypeId == TypeId.Effect)
                 {
-                    if (((Effect)entity.EntityType.Model.Id) == Effect.ManaBall || ((Effect)entity.EntityType.Model.Id) == Effect.VillagerBuilding)
+                    if (((Effect)entity.EntityType.Model.Id) == Effect.ManaBall)
                         total += 512;
                 }
             }

@@ -4,6 +4,8 @@ using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Views;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 using ReactiveUI;
 using Splat;
 using System;
@@ -80,7 +82,12 @@ public class MainViewModel : ViewModelBase
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
             {
                 string filePath = files[0].Path.AbsolutePath;
-                await mapService.LoadMapFromFileAsync(filePath);
+                if (!await mapService.LoadMapFromFileAsync(filePath))
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to load the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                    await box.ShowAsync();
+                }
+
                 _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
                 _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
                 _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
