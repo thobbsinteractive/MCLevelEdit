@@ -277,9 +277,37 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 shapes.Add(circle);
             }
 
-            if (entity.EntityType.TypeId == TypeId.Effect && entity.EntityType.Model.Id == (int)Effect.Wall)
+            if (entity.EntityType.TypeId == TypeId.Switch && entity.SwitchId > 0)
+            {
+                brush = new SolidColorBrush(entity.EntityType.Colour, 0.5);
+
+                var connectedEntities = _mapService.GetEntitiesBySwitchId((ushort)entity.SwitchId);
+
+                if (connectedEntities != null && connectedEntities.Any())
+                {
+                    foreach(var connectedEntity in connectedEntities)
+                    {
+                        var line = new Line()
+                        {
+                            StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
+                            EndPoint = new Point(connectedEntity.Position.X * Globals.SQUARE_SIZE, connectedEntity.Position.Y * Globals.SQUARE_SIZE),
+                            Stroke = brush,
+                            StrokeThickness = 1,
+                            ZIndex = 98
+                        };
+                        _cvEntity.Children.Add(line);
+                        shapes.Add(line);
+                    }
+                }
+            }
+
+            if (entity.EntityType.TypeId == TypeId.Effect && (entity.EntityType.Model.Id == (int)Effect.Wall || entity.EntityType.Model.Id == (int)Effect.Path))
             {
                 brush = new SolidColorBrush(Color.FromRgb(128,128,128), 1);
+
+                if (entity.EntityType.Model.Id == (int)Effect.Path)
+                    brush = new SolidColorBrush(Color.FromRgb(90, 60, 40), 1);
+
                 if (entity.Child > 0)
                 {
                     var endEntity = _mapService.GetEntity(entity.Child);

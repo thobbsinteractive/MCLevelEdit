@@ -14,6 +14,7 @@ public interface IMapService
     Map GetMap();
     Entity? GetEntity(ushort id);
     List<Entity> GetEntitiesByCoords(int x, int y);
+    List<Entity> GetEntitiesBySwitchId(ushort switchId);
     int AddEntity(Entity entity);
     bool UpdateEntity(Entity entity);
     bool DeleteEntity(Entity entity);

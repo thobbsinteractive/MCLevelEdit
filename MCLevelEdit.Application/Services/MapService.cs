@@ -118,6 +118,16 @@ public class MapService : IMapService, IEnableLogger
         return MapRepository.Map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();
     }
 
+    public List<Entity> GetEntitiesBySwitchId(ushort switchId)
+    {
+        if (switchId > 0)
+        {
+            return MapRepository.Map.Entities.Where(e => e.SwitchId == switchId).ToList();
+        }
+        else
+            return new List<Entity>();
+    }
+
     public bool UpdateManaTotal(uint manaTotal)
     {
         MapRepository.Map.ManaTotal = manaTotal;
@@ -208,7 +218,7 @@ public class MapService : IMapService, IEnableLogger
 
                 if (entity.EntityType.TypeId == TypeId.Effect)
                 {
-                    if (((Effect)entity.EntityType.Model.Id) == Effect.ManaBall)
+                    if (((Effect)entity.EntityType.Model.Id) == Effect.ManaBall || (Effect)entity.EntityType.Model.Id == Effect.VillagerBuilding)
                         total += 512;
                 }
             }
