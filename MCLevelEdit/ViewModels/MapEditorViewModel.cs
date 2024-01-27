@@ -29,6 +29,9 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             new Avalonia.Vector(96, 96),
             PixelFormat.Rgba8888);
 
+    private Layer _selectedLayer = Layer.Game;
+    private bool _showSwitchConnections = false;
+
     private Dictionary<int, List<Shape>> _entityShapes = new Dictionary<int, List<Shape>>();
 
     private Canvas _cvEntity;
@@ -49,6 +52,25 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     {
         set { this.RaiseAndSetIfChanged(ref _cvEntity, value); }
         get { return _cvEntity; }
+    }
+
+    public Layer SelectedLayer
+    {
+        set
+        { 
+            this.RaiseAndSetIfChanged(ref _selectedLayer, value);
+            RefreshPreviewAsync();
+        }
+        get { return _selectedLayer; }
+    }
+
+    public bool ShowSwitchConnections
+    {
+        set { 
+            this.RaiseAndSetIfChanged(ref _showSwitchConnections, value);
+            RefreshEntities();
+        }
+        get { return _showSwitchConnections; }
     }
 
     public void OnCursorClicked(Point position, bool left, bool right)
@@ -277,11 +299,11 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 shapes.Add(circle);
             }
 
-            if (entity.EntityType.TypeId == TypeId.Switch && entity.SwitchId > 0)
+            if (_showSwitchConnections && entity.EntityType.TypeId == TypeId.Switch && entity.SwitchId > 0)
             {
                 brush = new SolidColorBrush(entity.EntityType.Colour, 0.5);
 
-                var connectedEntities = _mapService.GetEntitiesBySwitchId((ushort)entity.SwitchId);
+                var connectedEntities = _mapService.GetEntitiesBySwitchId(entity.SwitchId);
 
                 if (connectedEntities != null && connectedEntities.Any())
                 {
@@ -391,7 +413,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 if (map.Terrain is not null)
                 {
                     this.Log().Debug("Drawing Terrain...");
-                    await _terrainService.DrawBitmapAsync(Preview, map.Terrain, Layer.Game);
+                    await _terrainService.DrawBitmapAsync(Preview, map.Terrain, _selectedLayer);
                 }
 
                 this.Log().Debug("Preview refreshed");
