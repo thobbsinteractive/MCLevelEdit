@@ -23,4 +23,6 @@ public class Entity
             Child = this.Child
         };
     }
+
+    public bool IsPathOrWall() => this?.EntityType.TypeId == TypeId.Effect && (this?.EntityType.Model.Id == (int)Effect.Wall || this?.EntityType.Model.Id == (int)Effect.Path);
 };

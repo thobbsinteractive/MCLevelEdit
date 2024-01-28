@@ -323,7 +323,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 }
             }
 
-            if (entity.EntityType.TypeId == TypeId.Effect && (entity.EntityType.Model.Id == (int)Effect.Wall || entity.EntityType.Model.Id == (int)Effect.Path))
+            if (entity.IsPathOrWall())
             {
                 brush = new SolidColorBrush(Color.FromRgb(128,128,128), 1);
 
@@ -333,34 +333,40 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 if (entity.Child > 0)
                 {
                     var endEntity = _mapService.GetEntity(entity.Child);
-                    var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, entity.Position, endEntity.Position);
-
-                    var line1 = new Line()
+                    if (endEntity.IsPathOrWall())
                     {
-                        StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                        EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
-                        Stroke = brush,
-                        StrokeThickness = Globals.SQUARE_SIZE,
-                        ZIndex = 99
-                    };
-                    _cvEntity.Children.Add(line1);
-                    shapes.Add(line1);
+                        var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, entity.Position, endEntity.Position);
+
+                        var line1 = new Line()
+                        {
+                            StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
+                            EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
+                            Stroke = brush,
+                            StrokeThickness = Globals.SQUARE_SIZE,
+                            ZIndex = 99
+                        };
+                        _cvEntity.Children.Add(line1);
+                        shapes.Add(line1);
+                    }
                 }
                 if (entity.Parent > 0)
                 {
                     var endEntity = _mapService.GetEntity(entity.Parent);
-                    var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, entity.Position, endEntity.Position);
-
-                    var line2 = new Line()
+                    if (endEntity.IsPathOrWall())
                     {
-                        StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                        EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
-                        Stroke = brush,
-                        StrokeThickness = Globals.SQUARE_SIZE,
-                        ZIndex = 99
-                    };
-                    _cvEntity.Children.Add(line2);
-                    shapes.Add(line2);
+                        var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, entity.Position, endEntity.Position);
+
+                        var line2 = new Line()
+                        {
+                            StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
+                            EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
+                            Stroke = brush,
+                            StrokeThickness = Globals.SQUARE_SIZE,
+                            ZIndex = 99
+                        };
+                        _cvEntity.Children.Add(line2);
+                        shapes.Add(line2);
+                    }
                 }
             }
 
