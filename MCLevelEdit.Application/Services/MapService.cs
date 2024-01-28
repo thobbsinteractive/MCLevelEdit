@@ -160,6 +160,11 @@ public class MapService : IMapService, IEnableLogger
         return true;
     }
 
+    public List<Wizard> GetActiveWizards()
+    {
+        return MapRepository.Map.Wizards.Where(w => w.IsActive).ToList();
+    }
+
     public bool UpdateWizard(Wizard wizard)
     {
         var wizardToUpdate = MapRepository.Map.Wizards.Where(w => w.Name.Equals(wizard.Name)).FirstOrDefault();
@@ -176,8 +181,8 @@ public class MapService : IMapService, IEnableLogger
                 wizardToUpdate.Spells.Fireball = wizard.Spells.Fireball;
                 wizardToUpdate.Spells.Shield = wizard.Spells.Shield;
                 wizardToUpdate.Spells.Accelerate = wizard.Spells.Accelerate;
-                wizardToUpdate.Spells.Possession = wizard.Spells.Possession;
-                wizardToUpdate.Spells.Health = wizard.Spells.Health;
+                wizardToUpdate.Spells.Possess = wizard.Spells.Possess;
+                wizardToUpdate.Spells.Heal = wizard.Spells.Heal;
                 wizardToUpdate.Spells.BeyondSight = wizard.Spells.BeyondSight;
                 wizardToUpdate.Spells.Earthquake = wizard.Spells.Earthquake;
                 wizardToUpdate.Spells.Meteor = wizard.Spells.Meteor;
@@ -188,7 +193,7 @@ public class MapService : IMapService, IEnableLogger
                 wizardToUpdate.Spells.Invisible = wizard.Spells.Invisible;
                 wizardToUpdate.Spells.StealMana = wizard.Spells.StealMana;
                 wizardToUpdate.Spells.Rebound = wizard.Spells.Rebound;
-                wizardToUpdate.Spells.Lightning = wizard.Spells.Lightning;
+                wizardToUpdate.Spells.LightningBolt = wizard.Spells.LightningBolt;
                 wizardToUpdate.Spells.Castle = wizard.Spells.Castle;
                 wizardToUpdate.Spells.UndeadArmy = wizard.Spells.UndeadArmy;
                 wizardToUpdate.Spells.LightningStorm = wizard.Spells.LightningStorm;

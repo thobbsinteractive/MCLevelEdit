@@ -2,28 +2,28 @@
 
 public class Spells
 {
-    public bool Fireball { get; set; }
-    public bool Shield { get; set; }
-    public bool Accelerate { get; set; }
-    public bool Possession { get; set; }
-    public bool Health { get; set; }
-    public bool BeyondSight { get; set; }
-    public bool Earthquake { get; set; }
-    public bool Meteor { get; set; }
-    public bool Volcano { get; set; }
-    public bool Crater { get; set; }
-    public bool Teleport { get; set; }
-    public bool Duel { get; set; }
-    public bool Invisible { get; set; }
-    public bool StealMana { get; set; }
-    public bool Rebound { get; set; }
-    public bool Lightning { get; set; }
-    public bool Castle { get; set; }
-    public bool UndeadArmy { get; set; }
-    public bool LightningStorm { get; set; }
-    public bool ManaMagnet { get; set; }
-    public bool WallofFire { get; set; }
-    public bool ReverseAcceleration { get; set; }
-    public bool GlobalDeath { get; set; }
-    public bool RapidFireball { get; set; }
+    public Abilities Fireball { get; set; } = new Abilities();
+    public Abilities Possess { get; set; } = new Abilities();
+    public Abilities Accelerate { get; set; } = new Abilities();
+    public Abilities Castle { get; set; } = new Abilities();
+    public Abilities Heal { get; set; } = new Abilities();
+    public Abilities Rebound { get; set; } = new Abilities();
+    public Abilities Shield { get; set; } = new Abilities();
+    public Abilities Invisible { get; set; } = new Abilities();
+    public Abilities Earthquake { get; set; } = new Abilities();
+    public Abilities Crater { get; set; } = new Abilities();
+    public Abilities Meteor { get; set; } = new Abilities();
+    public Abilities Volcano { get; set; } = new Abilities();
+    public Abilities LightningBolt { get; set; } = new Abilities();
+    public Abilities LightningStorm { get; set; } = new Abilities();
+    public Abilities UndeadArmy { get; set; } = new Abilities();
+    public Abilities ManaMagnet { get; set; } = new Abilities();
+    public Abilities StealMana { get; set; } = new Abilities();
+    public Abilities BeyondSight { get; set; } = new Abilities();
+    public Abilities Duel { get; set; } = new Abilities();
+    public Abilities Teleport { get; set; } = new Abilities();
+    public Abilities WallofFire { get; set; } = new Abilities();
+    public Abilities ReverseAcceleration { get; set; } = new Abilities();
+    public Abilities GlobalDeath { get; set; } = new Abilities();
+    public Abilities RapidFireball { get; set; } = new Abilities();
 }
