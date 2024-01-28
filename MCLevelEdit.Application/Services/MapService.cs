@@ -93,7 +93,7 @@ public class MapService : IMapService, IEnableLogger
 
     public Entity? GetEntity(ushort id)
     {
-        return MapRepository.Map.Entities.First(e => e.Id == id);
+        return MapRepository.Map.Entities.FirstOrDefault(e => e.Id == id);
     }
 
     public int AddEntity(Entity entity)

@@ -333,7 +333,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 if (entity.Child > 0)
                 {
                     var endEntity = _mapService.GetEntity(entity.Child);
-                    if (endEntity.IsPathOrWall())
+                    if (endEntity != null && endEntity.IsPathOrWall())
                     {
                         var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, entity.Position, endEntity.Position);
 
@@ -352,7 +352,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 if (entity.Parent > 0)
                 {
                     var endEntity = _mapService.GetEntity(entity.Parent);
-                    if (endEntity.IsPathOrWall())
+                    if (endEntity != null && endEntity.IsPathOrWall())
                     {
                         var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, entity.Position, endEntity.Position);
 
