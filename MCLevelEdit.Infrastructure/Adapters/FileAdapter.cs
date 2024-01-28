@@ -103,53 +103,170 @@ public class FileAdapter : IFilePort
 
             int spellStart = fpos + 12;
             int aiStatStart = spellStart + 100;
-            wizard.Spells.Fireball = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            wizard.Spells.Fireball = new Abilities() {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0
+            };
             spellStart += 1;
-            wizard.Spells.Heal = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Heal = new Abilities() { 
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Accelerate = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Accelerate = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Possess = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Possess = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Shield = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Shield = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.BeyondSight = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.BeyondSight = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Earthquake = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Earthquake = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Meteor = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Meteor = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Volcano = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Volcano = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Crater = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Crater = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Teleport = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Teleport = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Duel = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Duel = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Invisible = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Invisible = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.StealMana = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.StealMana = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Rebound = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Rebound = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.LightningBolt = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.LightningBolt = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.Castle = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.Castle = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.UndeadArmy = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.UndeadArmy = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.LightningStorm = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.LightningStorm = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.ManaMagnet = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.ManaMagnet = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.WallofFire = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.WallofFire = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.ReverseAcceleration = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.ReverseAcceleration = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.GlobalDeath = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.GlobalDeath = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
             spellStart += 1;
-            wizard.Spells.RapidFireball = new Abilities() { StartsWith = levfile[spellStart] == 1 };
+            aiStatStart += 1;
+            wizard.Spells.RapidFireball = new Abilities()
+            {
+                StartsWith = levfile[spellStart] == 1,
+                CannotHave = levfile[aiStatStart] == 0,
+            };
 
             fpos += 216;
             clevelPos += 1;
