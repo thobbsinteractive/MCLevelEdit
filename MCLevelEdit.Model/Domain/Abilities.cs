@@ -15,5 +15,22 @@
             WillLearnIfYouDo = value1 == 0 && value2 == 1;
             CarriesCannotUse = value1 == 1 && value2 == 0;
         }
+
+        public byte[] GetBytes()
+        {
+            if (StartsWith)
+                return new byte[] { 1 , 1 };
+
+            if (CannotHave)
+                return new byte[] { 0, 0 };
+
+            if (WillLearnIfYouDo)
+                return new byte[] { 0, 1 };
+
+            if (CarriesCannotUse)
+                return new byte[] { 1, 0 };
+
+            return new byte[] { 0, 1 };
+        }
     }
 }

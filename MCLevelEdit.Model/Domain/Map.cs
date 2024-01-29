@@ -120,6 +120,11 @@ public class Map
             this.Entities[index] = entity;
     }
 
+    public Entity? GetEntity(int id)
+    {
+        return this.Entities?.Where(e => e.Id == id).FirstOrDefault();
+    }
+
     private int GetIndexOf(Entity entity)
     {
         for (int i = 0; i < this.Entities.Count; i++)
