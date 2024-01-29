@@ -10,6 +10,7 @@ namespace MCLevelEdit.Test
         }
 
         [TestCase(@"Resources\data_01ea15.dat")]
+        [TestCase(@"Resources\data_1c0000.dat")]
         public void LoadMapFromFile(string path)
         {
             var service = new FileAdapter();
@@ -21,6 +22,7 @@ namespace MCLevelEdit.Test
         }
 
         [TestCase(@"Resources\data_01ea15.dat")]
+        [TestCase(@"Resources\data_1c0000.dat")]
         public void SaveMapToFile(string path)
         {
             var service = new FileAdapter();

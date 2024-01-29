@@ -6,7 +6,7 @@
         public MapType MapType { get; set; } = MapType.Day;
         public ushort Seed { get; set; }
         public ushort Offset { get; set; }
-        public ushort Raise { get; set; }
+        public uint Raise { get; set; }
         public ushort Gnarl { get; set; }
         public ushort River { get; set; }
         public ushort LRiver { get; set; }

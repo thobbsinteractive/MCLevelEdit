@@ -33,7 +33,7 @@ public class FileAdapter : IFilePort
 
         WriteUShortToArray(map.Terrain.GenerationParameters.Seed, levfile, 4);
         WriteUShortToArray(map.Terrain.GenerationParameters.Offset, levfile, 8);
-        WriteUShortToArray(map.Terrain.GenerationParameters.Raise, levfile, 12);
+        WriteUInt32ToArray(map.Terrain.GenerationParameters.Raise, levfile, 12);
         WriteUShortToArray(map.Terrain.GenerationParameters.Gnarl, levfile, 16);
         WriteUShortToArray(map.Terrain.GenerationParameters.River, levfile, 20);
         WriteUShortToArray(map.Terrain.GenerationParameters.Source, levfile, 24);
@@ -241,7 +241,7 @@ public class FileAdapter : IFilePort
         {
             Seed = BitConverter.ToUInt16(levfile, 4),
             Offset = BitConverter.ToUInt16(levfile, 8),
-            Raise = (ushort)BitConverter.ToUInt32(levfile, 12),
+            Raise = BitConverter.ToUInt32(levfile, 12),
             Gnarl = BitConverter.ToUInt16(levfile, 16),
             River = BitConverter.ToUInt16(levfile, 20),
             Source = (byte)BitConverter.ToUInt16(levfile, 24),

@@ -63,7 +63,7 @@ namespace MagicCarpet2Terrain
 
             ushort seed_17B4E0 = genParams.Seed;
             if (stage > 0)
-                sub_B5E70_decompress_terrain_map_level(mapEntityIndex_15B4E0, genParams.Seed, genParams.Offset, genParams.Raise, genParams.Gnarl);
+                sub_B5E70_decompress_terrain_map_level(mapEntityIndex_15B4E0, genParams.Seed, genParams.Offset, (ushort)genParams.Raise, genParams.Gnarl);
             if (stage > 1)
                 sub_44DB0_truncTerrainHeight(mapEntityIndex_15B4E0, mapHeightmap_11B4E0);//225db0 //trunc and create
             if (stage > 2)

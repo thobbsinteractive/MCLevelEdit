@@ -8,7 +8,7 @@ namespace MCLevelEdit.ViewModels
         private MapType _mapType = MapType.Day;
         private ushort _seed = 0;
         private ushort _offset = 0;
-        private ushort _raise = 0;
+        private uint _raise = 0;
         private ushort _gnarl = 0;
         private ushort _river = 0;
         private ushort _lriver = 0;
@@ -37,7 +37,7 @@ namespace MCLevelEdit.ViewModels
             set { SetProperty(ref _offset, value); }
         }
 
-        public ushort Raise
+        public uint Raise
         {
             get { return _raise; }
             set { SetProperty(ref _raise, value); }
