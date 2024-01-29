@@ -33,7 +33,7 @@ namespace MCLevelEdit.Test
             Assert.IsNotNull(map);
             Assert.IsTrue(map.Entities?.Any());
 
-            bool result = service.Save(map, testPath);
+            bool result = service.SaveMap(map, testPath);
             var levfileAfter = File.ReadAllBytes(testPath);
 
             Assert.IsTrue(result);

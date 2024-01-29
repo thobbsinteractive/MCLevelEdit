@@ -9,14 +9,14 @@ public class FileAdapter : IFilePort
 {
     public const int FILE_SIZE = 38812;
 
-    public Task<Map> LoadMapAsync(string fileName)
+    public Task<bool> SaveMapAsync(Map map, string fileName)
     {
-        return Task.Run<Map>(() => {
-            return LoadMap(fileName);
+        return Task.Run<bool>(() => {
+            return SaveMap(map, fileName);
         });
     }
 
-    public bool Save(Map map, string fileName)
+    public bool SaveMap(Map map, string fileName)
     {
         var levfile = new byte[FILE_SIZE];
         var counter = 0;
@@ -213,6 +213,12 @@ public class FileAdapter : IFilePort
         return true;
     }
 
+    public Task<Map> LoadMapAsync(string fileName)
+    {
+        return Task.Run<Map>(() => {
+            return LoadMap(fileName);
+        });
+    }
 
     public Map LoadMap(string fileName)
     {
