@@ -117,18 +117,12 @@ public class MapTreeViewModel
         var world = new Node(_icons["World"], $"World", "", entitiesCoords);
         Nodes.Add(world);
 
-        for (int x = 0; x < Globals.MAX_MAP_SIZE; x++)
+        var squareEntities = map.Entities.OrderBy(e => e.Id);
+        if (squareEntities.Any())
         {
-            for (int y = 0; y < Globals.MAX_MAP_SIZE; y++)
+            foreach (var entity in squareEntities)
             {
-                var squareEntities = map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).OrderBy(e => e.EntityType.TypeId);
-                if (squareEntities.Any())
-                {
-                    foreach (var entity in squareEntities)
-                    {
-                        world.SubNodes.Add(new EntityNode(entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity)));
-                    }
-                }
+                world.SubNodes.Add(new EntityNode(entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity)));
             }
         }
     }
