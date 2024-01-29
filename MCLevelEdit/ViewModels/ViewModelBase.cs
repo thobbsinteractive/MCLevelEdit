@@ -32,6 +32,9 @@ public class ViewModelBase : ReactiveObject
     protected int AddEntity(EntityViewModel entityView)
     {
         var entity = entityView.ToEntity();
+        if (entity.EntityType.TypeId == TypeId.Spell)
+            entity.SwitchId = 1;
+        
         int id = _mapService.AddEntity(entity);
         entity.Id = id;
         _eventAggregator.RaiseEvent("AddEntity", this, new PubSubEventArgs<object>(entity));

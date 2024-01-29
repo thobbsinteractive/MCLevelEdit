@@ -53,7 +53,7 @@ public class MainViewModel : ViewModelBase
 
             await mapService.CreateNewMap();
 
-            MainWindow.I.Title = GetTitle("NewMap.dat");
+            MainWindow.I.Title = GetTitle("LEV00000.DAT");
         });
 
         NewRandomFileCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -63,7 +63,7 @@ public class MainViewModel : ViewModelBase
 
             await mapService.CreateNewMap(true);
 
-            MainWindow.I.Title = GetTitle("NewMap.dat");
+            MainWindow.I.Title = GetTitle("LEV00000.DAT");
         });
 
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -103,8 +103,8 @@ public class MainViewModel : ViewModelBase
 
             var map = _mapService.GetMap();
 
-            string suggestedExtension = "dat";
-            string suggestedFileName = "NewMap";
+            string suggestedExtension = "DAT";
+            string suggestedFileName = "LEV00000";
             IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
 
             if (!string.IsNullOrWhiteSpace(map.FilePath))
@@ -144,7 +144,7 @@ public class MainViewModel : ViewModelBase
             }
         });
 
-        MainWindow.I.Title = GetTitle("NewMap.dat");
+        MainWindow.I.Title = GetTitle("LEV00000.DAT");
     }
 
     private string GetTitle(string filePath)
