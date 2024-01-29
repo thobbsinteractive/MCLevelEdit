@@ -9,6 +9,7 @@ public interface IMapService
     void DrawEntity(Entity entity, WriteableBitmap bitmap);
     Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE);
     Task<bool> LoadMapFromFileAsync(string filePath);
+    Task<bool> SaveMapToFileAsync(string filePath);
     Task<bool> RecalculateTerrain(GenerationParameters generationParameters);
     Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, IList<Entity> entities);
     Map GetMap();

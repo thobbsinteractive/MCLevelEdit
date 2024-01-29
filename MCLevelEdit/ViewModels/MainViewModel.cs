@@ -115,7 +115,7 @@ public class MainViewModel : ViewModelBase
             }
 
             // Start async operation to open the dialog.
-            var files = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
                 Title = "Save Map File",
                 SuggestedFileName = suggestedFileName,
@@ -123,6 +123,17 @@ public class MainViewModel : ViewModelBase
                 DefaultExtension = suggestedExtension,
                 SuggestedStartLocation = storageFolder
             });
+
+            if (file != null)
+            {
+                string filePath = file.Path.AbsolutePath;
+                if (!await mapService.SaveMapToFileAsync(filePath))
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                    await box.ShowAsync();
+                }
+                MainWindow.I.Title = GetTitle(filePath);
+            }  
         });
 
         ExitCommand = ReactiveCommand.CreateFromTask(async () =>

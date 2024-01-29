@@ -33,10 +33,23 @@ public class MapService : IMapService, IEnableLogger
         }
         catch (Exception ex)
         {
-            this.Log().Error(ex, "Error loading level {filePath}:\n{ex.Message}");
+            this.Log().Error(ex, $"Error loading level {filePath}:\n{ex.Message}");
             return false;
         }
         return true;
+    }
+
+    public async Task<bool> SaveMapToFileAsync(string filePath)
+    {
+        try
+        {
+            return await _filePort.SaveMapAsync(MapRepository.Map, filePath);
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error saving level {filePath}:\n{ex.Message}");
+            return false;
+        }
     }
 
     public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, IList<Entity> entities)
