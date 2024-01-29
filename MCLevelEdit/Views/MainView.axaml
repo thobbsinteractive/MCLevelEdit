@@ -14,8 +14,11 @@
         <MenuItem Header="_New Random" Command="{Binding NewRandomFileCommand}"/>
         <MenuItem Header="_Open" Command="{Binding OpenFileCommand}"/>
         <MenuItem Header="_Save" Command="{Binding SaveFileCommand}"/>
+        <MenuItem Header="_Export Height Map" Command="{Binding ExportHeightMapCommand}"/>
         <Separator/>
         <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+      </MenuItem>
+      <MenuItem Header="_Game">
       </MenuItem>
     </Menu>
     <Grid Name="grdMain"

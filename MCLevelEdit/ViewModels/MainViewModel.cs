@@ -1,8 +1,12 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -23,6 +27,7 @@ public class MainViewModel : ViewModelBase
     public ICommand NewRandomFileCommand { get; }
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
+    public ICommand ExportHeightMapCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand EditEntitiesCommand { get; }
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
@@ -134,6 +139,57 @@ public class MainViewModel : ViewModelBase
                 }
                 MainWindow.I.Title = GetTitle(filePath);
             }  
+        });
+
+        ExportHeightMapCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
+
+            var map = _mapService.GetMap();
+
+            string suggestedExtension = "bmp";
+            string suggestedFileName = "LEV00000";
+            IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+
+            if (!string.IsNullOrWhiteSpace(map.FilePath))
+            {
+                suggestedFileName = Path.GetFileName(map.FilePath);
+                storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
+                suggestedExtension = Path.GetExtension(map.FilePath);
+            }
+
+            // Start async operation to open the dialog.
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Export Height Map",
+                SuggestedFileName = suggestedFileName,
+                ShowOverwritePrompt = true,
+                DefaultExtension = suggestedExtension,
+                SuggestedStartLocation = storageFolder
+            });
+
+            if (file != null)
+            {
+                string filePath = file.Path.AbsolutePath;
+                try
+                {
+                    WriteableBitmap preview = new WriteableBitmap(
+                        new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
+                        new Vector(96, 96),
+                        PixelFormat.Rgba8888);
+
+                    var bmp = await terrainService.DrawBitmapAsync(preview, map.Terrain, Model.Enums.Layer.Height);
+
+                    bmp.Save(filePath);
+                }
+                catch (Exception ex)
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the height map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                    await box.ShowAsync();
+                }
+
+                MainWindow.I.Title = GetTitle(filePath);
+            }
         });
 
         ExitCommand = ReactiveCommand.CreateFromTask(async () =>
