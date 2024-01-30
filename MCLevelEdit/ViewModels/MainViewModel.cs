@@ -15,6 +15,7 @@ using Splat;
 using System;
 using System.IO;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels;
@@ -28,8 +29,10 @@ public class MainViewModel : ViewModelBase
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
     public ICommand ExportHeightMapCommand { get; }
+    public ICommand ExportTerrainRenderCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand EditEntitiesCommand { get; }
+
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
     public MapTreeViewModel MapTreeViewModel { get; }
     public MapEditorViewModel MapEditorViewModel { get; }
@@ -53,154 +56,166 @@ public class MainViewModel : ViewModelBase
 
         NewFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
-
             await mapService.CreateNewMap();
-
             MainWindow.I.Title = GetTitle("LEV00000.DAT");
         });
 
         NewRandomFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
-
             await mapService.CreateNewMap(true);
-
             MainWindow.I.Title = GetTitle("LEV00000.DAT");
         });
 
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
-
-            
-            // Start async operation to open the dialog.
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-            {
-                Title = "Open Map File",
-                AllowMultiple = false
-            });
-
-            if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
-            {
-                string filePath = files[0].Path.AbsolutePath;
-                if (!await mapService.LoadMapFromFileAsync(filePath))
-                {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to load the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
-                    await box.ShowAsync();
-                }
-
-                _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
-                _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
-                _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
-
-                MainWindow.I.Title = GetTitle(filePath);
-            }
+            await OpenFile();
         });
 
         SaveFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
-
-            var map = _mapService.GetMap();
-
-            string suggestedExtension = "DAT";
-            string suggestedFileName = "LEV00000";
-            IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
-
-            if (!string.IsNullOrWhiteSpace(map.FilePath))
-            {
-                suggestedFileName = Path.GetFileName(map.FilePath);
-                storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
-                suggestedExtension = Path.GetExtension(map.FilePath);
-            }
-
-            // Start async operation to open the dialog.
-            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-            {
-                Title = "Save Map File",
-                SuggestedFileName = suggestedFileName,
-                ShowOverwritePrompt = true,
-                DefaultExtension = suggestedExtension,
-                SuggestedStartLocation = storageFolder
-            });
-
-            if (file != null)
-            {
-                string filePath = file.Path.AbsolutePath;
-                if (!await mapService.SaveMapToFileAsync(filePath))
-                {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
-                    await box.ShowAsync();
-                }
-                MainWindow.I.Title = GetTitle(filePath);
-            }  
+            await SaveFile();
         });
 
         ExportHeightMapCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            var topLevel = TopLevel.GetTopLevel(MainWindow.I);
-
-            var map = _mapService.GetMap();
-
-            string suggestedExtension = "bmp";
-            string suggestedFileName = "LEV00000";
-            IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
-
-            if (!string.IsNullOrWhiteSpace(map.FilePath))
-            {
-                suggestedFileName = Path.GetFileName(map.FilePath);
-                storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
-                suggestedExtension = Path.GetExtension(map.FilePath);
-            }
-
-            // Start async operation to open the dialog.
-            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-            {
-                Title = "Export Height Map",
-                SuggestedFileName = suggestedFileName,
-                ShowOverwritePrompt = true,
-                DefaultExtension = suggestedExtension,
-                SuggestedStartLocation = storageFolder
-            });
-
-            if (file != null)
-            {
-                string filePath = file.Path.AbsolutePath;
-                try
-                {
-                    WriteableBitmap preview = new WriteableBitmap(
-                        new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
-                        new Vector(96, 96),
-                        PixelFormat.Rgba8888);
-
-                    var bmp = await terrainService.DrawBitmapAsync(preview, map.Terrain, Model.Enums.Layer.Height);
-
-                    bmp.Save(filePath);
-                }
-                catch (Exception ex)
-                {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the height map file {filePath}!", ButtonEnum.Ok, Icon.Error);
-                    await box.ShowAsync();
-                }
-
-                MainWindow.I.Title = GetTitle(filePath);
-            }
+            await ExportImageMap(Model.Enums.Layer.Height);
         });
 
-        ExitCommand = ReactiveCommand.CreateFromTask(async () =>
+        ExportTerrainRenderCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            await ExportImageMap(Model.Enums.Layer.Game);
+        });
+
+        ExitCommand = ReactiveCommand.CreateFromTask(() =>
         {
             if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
             {
                 desktopApp.Shutdown();
             }
+            return Task.CompletedTask;
         });
 
         MainWindow.I.Title = GetTitle("LEV00000.DAT");
+    }
+
+    private async Task ExportImageMap(Model.Enums.Layer layer)
+    {
+        var topLevel = TopLevel.GetTopLevel(MainWindow.I);
+
+        var map = _mapService.GetMap();
+
+        string suggestedExtension = "bmp";
+        string suggestedFileName = "LEV00000";
+        IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+
+        if (!string.IsNullOrWhiteSpace(map.FilePath))
+        {
+            suggestedFileName = Path.GetFileName(map.FilePath);
+            storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
+            suggestedExtension = Path.GetExtension(map.FilePath);
+        }
+
+        // Start async operation to open the dialog.
+        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Export Height Map",
+            SuggestedFileName = suggestedFileName,
+            ShowOverwritePrompt = true,
+            DefaultExtension = suggestedExtension,
+            SuggestedStartLocation = storageFolder
+        });
+
+        if (file != null)
+        {
+            string filePath = file.Path.AbsolutePath;
+            try
+            {
+                WriteableBitmap preview = new WriteableBitmap(
+                    new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
+                    new Vector(96, 96),
+                    PixelFormat.Rgba8888);
+
+                var bmp = await _terrainService.DrawBitmapAsync(preview, map.Terrain, layer);
+
+                bmp.Save(filePath);
+            }
+            catch (Exception ex)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the height map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                await box.ShowAsync();
+            }
+
+            MainWindow.I.Title = GetTitle(filePath);
+        }
+    }
+
+    private async Task SaveFile()
+    {
+        // Get top level from the current control. Alternatively, you can use Window reference instead.
+        var topLevel = TopLevel.GetTopLevel(MainWindow.I);
+
+        var map = _mapService.GetMap();
+
+        string suggestedExtension = "DAT";
+        string suggestedFileName = "LEV00000";
+        IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+
+        if (!string.IsNullOrWhiteSpace(map.FilePath))
+        {
+            suggestedFileName = Path.GetFileName(map.FilePath);
+            storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
+            suggestedExtension = Path.GetExtension(map.FilePath);
+        }
+
+        // Start async operation to open the dialog.
+        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Map File",
+            SuggestedFileName = suggestedFileName,
+            ShowOverwritePrompt = true,
+            DefaultExtension = suggestedExtension,
+            SuggestedStartLocation = storageFolder
+        });
+
+        if (file != null)
+        {
+            string filePath = file.Path.AbsolutePath;
+            if (!await _mapService.SaveMapToFileAsync(filePath))
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                await box.ShowAsync();
+            }
+            MainWindow.I.Title = GetTitle(filePath);
+        }
+    }
+
+    private async Task OpenFile()
+    {
+        // Get top level from the current control. Alternatively, you can use Window reference instead.
+        var topLevel = TopLevel.GetTopLevel(MainWindow.I);
+
+        // Start async operation to open the dialog.
+        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Open Map File",
+            AllowMultiple = false
+        });
+
+        if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
+        {
+            string filePath = files[0].Path.AbsolutePath;
+            if (!await _mapService.LoadMapFromFileAsync(filePath))
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to load the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                await box.ShowAsync();
+            }
+
+            _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
+            _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
+            _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+
+            MainWindow.I.Title = GetTitle(filePath);
+        }
     }
 
     private string GetTitle(string filePath)

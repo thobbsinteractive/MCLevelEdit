@@ -12,9 +12,12 @@
       <MenuItem Header="_File">
         <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}"/>
         <MenuItem Header="_New Random" Command="{Binding NewRandomFileCommand}"/>
+        <Separator/>
         <MenuItem Header="_Open" Command="{Binding OpenFileCommand}"/>
         <MenuItem Header="_Save" Command="{Binding SaveFileCommand}"/>
+        <Separator/>
         <MenuItem Header="_Export Height Map" Command="{Binding ExportHeightMapCommand}"/>
+        <MenuItem Header="_Export Terrain Render" Command="{Binding ExportTerrainRenderCommand}"/>
         <Separator/>
         <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
       </MenuItem>
