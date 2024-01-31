@@ -32,12 +32,14 @@ public class MainViewModel : ViewModelBase
     public ICommand ExportTerrainRenderCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand EditEntitiesCommand { get; }
+    public ICommand EditGameSettingsCommand { get; }
 
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
     public MapTreeViewModel MapTreeViewModel { get; }
     public MapEditorViewModel MapEditorViewModel { get; }
     public NodePropertiesViewModel NodePropertiesViewModel { get; }
-    public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowDialog { get; }
+    public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowEntitiesDialog { get; }
+    public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
 
     public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
@@ -47,11 +49,17 @@ public class MainViewModel : ViewModelBase
         MapTreeViewModel = new MapTreeViewModel(eventAggregator, mapService, terrainService);
         MapEditorViewModel = new MapEditorViewModel(eventAggregator, mapService, terrainService);
 
-        ShowDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
+        ShowGameSettingsDialog = new Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?>();
+        ShowEntitiesDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
 
         EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            var result = await ShowDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
+            var result = await ShowEntitiesDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
+        });
+
+        EditGameSettingsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var result = await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
         });
 
         NewFileCommand = ReactiveCommand.CreateFromTask(async () =>

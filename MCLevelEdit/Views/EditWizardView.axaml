@@ -9,7 +9,7 @@
              x:DataType="vm:EditWizardViewModel">
   <Grid Margin="5"
         ColumnDefinitions="1*,1*"
-        RowDefinitions="40,30,30,30,30,30,30,30,30,30,*">
+        RowDefinitions="40,30,30,30,30,40,*">
     <Grid.Resources>
       <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
     </Grid.Resources>

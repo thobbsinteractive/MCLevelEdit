@@ -22,6 +22,7 @@
         <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
       </MenuItem>
       <MenuItem Header="_Game">
+        <MenuItem Header="_Game Settings" Command="{Binding EditGameSettingsCommand}"/>
       </MenuItem>
     </Menu>
     <Grid Name="grdMain"

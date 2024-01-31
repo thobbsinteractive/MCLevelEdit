@@ -13,7 +13,8 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         I = this;
         InitializeComponent();
 
-        this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(DoShowDialogAsync)));
+        this.WhenActivated(action => action(ViewModel!.ShowEntitiesDialog.RegisterHandler(DoShowDialogAsync)));
+        this.WhenActivated(action => action(ViewModel!.ShowGameSettingsDialog.RegisterHandler(DoShowGameDialogAsync)));
     }
 
     private async Task DoShowDialogAsync(InteractionContext<EntitiesTableViewModel,
@@ -23,6 +24,16 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         dialog.DataContext = interaction.Input;
 
         var result = await dialog.ShowDialog<EntitiesTableViewModel?>(this);
+        interaction.SetOutput(result);
+    }
+
+    private async Task DoShowGameDialogAsync(InteractionContext<EditGameSettingsViewModel,
+                                EditGameSettingsViewModel?> interaction)
+    {
+        var dialog = new GameSettingsWindow();
+        dialog.DataContext = interaction.Input;
+
+        var result = await dialog.ShowDialog<EditGameSettingsViewModel?>(this);
         interaction.SetOutput(result);
     }
 }
