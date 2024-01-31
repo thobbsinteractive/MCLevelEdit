@@ -1,6 +1,8 @@
-﻿namespace MCLevelEdit.Infrastructure.Adapters;
+﻿using MCLevelEdit.Infrastructure.Interfaces;
 
-public class MagicCarpetPackageAdapter
+namespace MCLevelEdit.Infrastructure.Adapters;
+
+public class MagicCarpetPackageAdapter : IPackagePort
 {
     public const int MAX_LEVELS = 70;
     public const int HEADER_SIZE_BYTES = 8;
