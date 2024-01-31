@@ -43,6 +43,16 @@ public class MapService : IMapService, IEnableLogger
     {
         try
         {
+            if (MapRepository.Map.ManaTotal == 0)
+            {
+                MapRepository.Map.ManaTotal = CalculateMana();
+            }
+
+            if (MapRepository.Map.ManaTarget == 0)
+            {
+                MapRepository.Map.ManaTarget = 35;
+            }
+
             return await _filePort.SaveMapAsync(MapRepository.Map, filePath);
         }
         catch (Exception ex)
