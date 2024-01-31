@@ -1,5 +1,6 @@
 ﻿using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using MagicCarpet2Terrain;
 using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Extensions;
@@ -17,6 +18,24 @@ public class TerrainService : ITerrainService, IEnableLogger
     public Color SAND_COLOUR = new Color(255, 186, 150, 101);
     public Color STONE_COLOUR = new Color(255, 186, 150, 101);
     public Color GRASS_COLOUR = new Color(255, 117, 105, 40);
+    public Color[] Pallet;
+
+    public TerrainService()
+    {
+        Pallet = new Color[256];
+
+        var writeableBitmap = WriteableBitmap.Decode(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/day-palette.bmp")));
+
+        using (var fb = writeableBitmap.Lock())
+        {
+            for (int x = 0; x < 256; x++)
+            {
+                var bytes = fb.GetPixel(x, 0);
+
+                Pallet[x] = new Color(bytes[3], bytes[2], bytes[1], bytes[0]);
+            }
+        }
+    }
 
     public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Terrain terrain, Layer layer)
     {
@@ -79,26 +98,10 @@ public class TerrainService : ITerrainService, IEnableLogger
                                     case 113:
                                         baseColour = new Color(255, 196, 172, 168);
                                         break;
-
-                                        //case 0:
-                                        //    baseColour = new Color();
-                                        //    break;
-                                        //case 2:
-                                        //    baseColour = COAST_COLOUR;
-                                        //    break;
-                                        //case 3:
-                                        //    baseColour = SAND_COLOUR;
-                                        //    break;
-                                        //case 4:
-                                        //    baseColour = STONE_COLOUR;
-                                        //    break;
-                                        //case 5:
-                                        //    baseColour = GRASS_COLOUR;
-                                        //    break;
-                                        //case 6:
-                                        //    baseColour = SAND_COLOUR;
-                                        //    break;
+                                    
+                                
                                 }
+                                //baseColour = Pallet[terrain.MapTerrainType_10B4E0[index]];
 
                                 fb.SetPixel(x , y, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
                                             (byte)Math.Max(baseColour.G - terrain.MapShading_12B4E0[index], byte.MinValue),
