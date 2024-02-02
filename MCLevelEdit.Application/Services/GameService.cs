@@ -14,20 +14,19 @@ namespace MCLevelEdit.Application.Services
             _packagePort = packagePort;
         }
 
-        public Task<bool> PackageLevelAsync(string[] levelFilePaths, string gameLevelsPath, string gameCloudLevelsPath)
+        public Task<bool> PackageLevelAsync(string[] levelFilePaths, string[] gameLevelsPaths)
         {
             return Task.Run(async () =>
             {
                 bool success = false;
-                if (Directory.Exists(gameLevelsPath))
+                foreach (string levelFilePath in levelFilePaths)
                 {
-                    success = await _packagePort.PackageFilesAsync(levelFilePaths, gameLevelsPath);
-                    if (!success)
-                        return false;
-                }
-                if (Directory.Exists(gameCloudLevelsPath))
-                {
-                    success = await _packagePort.PackageFilesAsync(levelFilePaths, gameCloudLevelsPath);
+                    if (Directory.Exists(levelFilePath))
+                    {
+                        success = await _packagePort.PackageFilesAsync(levelFilePaths, levelFilePath);
+                        if (!success)
+                            return false;
+                    }
                 }
                 return success;
             });

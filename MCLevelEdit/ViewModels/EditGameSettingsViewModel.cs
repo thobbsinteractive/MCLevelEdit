@@ -90,7 +90,7 @@ namespace MCLevelEdit.ViewModels
                     DeleteExistingFiles(GameLevelsPath);
                     DeleteExistingFiles(GameCloudLevelsPath);
 
-                    if (await _gameService.PackageLevelAsync(LevelPaths, GameLevelsPath, GameCloudLevelsPath))
+                    if (await _gameService.PackageLevelAsync(LevelPaths, new string[] { GameLevelsPath, GameCloudLevelsPath}))
                     {
                         SetFilesToReadonly(GameLevelsPath);
                         SetFilesToReadonly(GameCloudLevelsPath);
