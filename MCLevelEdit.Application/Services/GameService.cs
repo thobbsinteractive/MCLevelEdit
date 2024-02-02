@@ -19,11 +19,11 @@ namespace MCLevelEdit.Application.Services
             return Task.Run(async () =>
             {
                 bool success = false;
-                foreach (string levelFilePath in levelFilePaths)
+                foreach (string gameLevelPath in gameLevelsPaths)
                 {
-                    if (Directory.Exists(levelFilePath))
+                    if (Directory.Exists(gameLevelPath))
                     {
-                        success = await _packagePort.PackageFilesAsync(levelFilePaths, levelFilePath);
+                        success = await _packagePort.PackageFilesAsync(levelFilePaths, gameLevelPath);
                         if (!success)
                             return false;
                     }
