@@ -20,6 +20,118 @@ public class TerrainService : ITerrainService, IEnableLogger
     public Color GRASS_COLOUR = new Color(255, 117, 105, 40);
     public Color[] Pallet;
 
+    public Dictionary<int, int> terrainTypeToPalletMapping = new Dictionary<int, int>()
+    {
+        {0  ,   3    },
+        {1  ,   40   },
+        {2  ,   168  },
+        {3  ,   76   },
+        {4  ,   139  },
+        {5  ,   33   },
+        {6  ,   16   },
+        {10 ,   172  },
+        {11 ,   170  },
+        {18 ,   129  },
+        {19 ,   149  },
+        {20 ,   150  },
+        {24 ,   171  },
+        {26 ,   170  },
+        {27 ,   109  },
+        {32 ,   110  },
+        {33 ,   171  },
+        {34 ,   49   },
+        {35 ,   79   },
+        {36 ,   108  },
+        {37 ,   49   },
+        {38 ,   109  },
+        {39 ,   40   },
+        {40 ,   181  },
+        {42 ,   44   },
+        {43 ,   78   },
+        {44 ,   118  },
+        {45 ,   49   },
+        {46 ,   137  },
+        {47 ,   109  },
+        {48 ,   65   },
+        {50 ,   130  },
+        {51 ,   252  },
+        {52 ,   169  },
+        {53 ,   150  },
+        {55 ,   36   },
+        {56 ,   168  },
+        {57 ,   168  },
+        {58 ,   54   },
+        {59 ,   54   },
+        {60 ,   76   },
+        {61 ,   74   },
+        {62 ,   74   },
+        {63 ,   135  },
+        {64 ,   36   },
+        {65 ,   136  },
+        {66 ,   54   },
+        {67 ,   33   },
+        {69 ,   110  },
+        {70 ,   141  },
+        {71 ,   150  },
+        {72 ,   54   },
+        {73 ,   252  },
+        {74 ,   135  },
+        {75 ,   150  },
+        {76 ,   170  },
+        {77 ,   22   },
+        {79 ,   82   },
+        {80 ,   82   },
+        {81 ,   170  },
+        {82 ,   16   },
+        {83 ,   170  },
+        {85 ,   150  },
+        {86 ,   36   },
+        {87 ,   150  },
+        {88 ,   143  },
+        {89 ,   33   },
+        {90 ,   54   },
+        {91 ,   135  },
+        {92 ,   131  },
+        {93 ,   32   },
+        {94 ,   54   },
+        {95 ,   54   },
+        {96 ,   144  },
+        {97 ,   170  },
+        {98 ,   172  },
+        {99 ,   142  },
+        {100,   109  },
+        {101,   22   },
+        {102,   54   },
+        {103,   169  },
+        {104,   49   },
+        {105,   82   },
+        {106,   18   },
+        {107,   97   },
+        {109,   109  },
+        {110,   172  },
+        {111,   97   },
+        {114,   22   },
+        {115,   149  },
+        {116,   110  },
+        {117,   131  },
+        {118,   54   },
+        {119,   22   },
+        {120,   32   },
+        {121,   132  },
+        {122,   33   },
+        {125,   33   },
+        {132,   144  },
+        {133,   82   },
+        {134,   16   },
+        {135,   77   },
+        {142,   54   },
+        {143,   81   },
+        {144,   169  },
+        {145,   32   },
+        {146,   170  },
+        {147,   22   }
+    };
+
     public TerrainService()
     {
         Pallet = new Color[256];
@@ -54,55 +166,11 @@ public class TerrainService : ITerrainService, IEnableLogger
                             Color baseColour = WATER_COLOUR;
                             if (terrain.MapTerrainType_10B4E0 != null)
                             {
-                                switch (terrain.MapTerrainType_10B4E0[index])
+                                if (terrainTypeToPalletMapping.ContainsKey((int)terrain.MapTerrainType_10B4E0[index]))
                                 {
-                                    case 82:
-                                        baseColour = new Color(255, 168, 152, 148);
-                                        break;
-                                    case 83:
-                                        baseColour = new Color(255, 188, 160, 156);
-                                        break;
-                                    case 6:
-                                        baseColour = new Color(255, 164, 116, 92);
-                                        break;
-                                    case 80:
-                                        baseColour = new Color(255, 128, 136, 140);
-                                        break;
-                                    case 79:
-                                        baseColour = new Color(255, 104, 128, 132);
-                                        break;
-                                    case 76:
-                                        baseColour = new Color(255, 40, 104, 116);
-                                        break;
-                                    case 78:
-                                        baseColour = new Color(255, 84, 120, 128);
-                                        break;
-                                    case 81:
-                                        baseColour = new Color(255, 148, 144, 144);
-                                        break;
-                                    case 77:
-                                        baseColour = new Color(255, 64, 112, 124);
-                                        break;
-                                    case 108:
-                                        baseColour = new Color(255, 88, 84, 92);
-                                        break;
-                                    case 111:
-                                        baseColour = new Color(255, 16, 76, 88);
-                                        break;
-                                    case 110:
-                                        baseColour = new Color(255, 48, 52, 60);
-                                        break;
-                                    case 1:
-                                        baseColour = new Color(255, 140, 96, 68);
-                                        break;
-                                    case 113:
-                                        baseColour = new Color(255, 196, 172, 168);
-                                        break;
-                                    
-                                
+                                    baseColour = Pallet[terrainTypeToPalletMapping[(int)terrain.MapTerrainType_10B4E0[index]]];
                                 }
-                                //baseColour = Pallet[terrain.MapTerrainType_10B4E0[index]];
-
+                                
                                 fb.SetPixel(x , y, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
                                             (byte)Math.Max(baseColour.G - terrain.MapShading_12B4E0[index], byte.MinValue),
                                             (byte)Math.Max(baseColour.B - terrain.MapShading_12B4E0[index], byte.MinValue)));
