@@ -53,6 +53,8 @@ public class MapService : IMapService, IEnableLogger
                 MapRepository.Map.ManaTarget = 35;
             }
 
+            MapRepository.Map.ValidateEntities();
+
             return await _filePort.SaveMapAsync(MapRepository.Map, filePath);
         }
         catch (Exception ex)

@@ -1,4 +1,5 @@
 ﻿using MagicCarpet2Terrain.Model;
+using MCLevelEdit.Model.Domain.Validation;
 
 namespace MCLevelEdit.Model.Domain;
 
@@ -7,6 +8,7 @@ public class Map
     public string FilePath {  get; set; }
     public uint ManaTotal { get; set; }
     public byte ManaTarget { get; set; }
+    public IList<ValidationResult> ValidationResults { get; set; } = new List<ValidationResult>();
     public IList<Entity> Entities { get; set; } = new List<Entity>();
     public Terrain Terrain { get; set; } = new Terrain();
     public Wizard[] Wizards { get; set; } = new[] {
@@ -123,6 +125,15 @@ public class Map
     public Entity? GetEntity(int id)
     {
         return this.Entities?.Where(e => e.Id == id).FirstOrDefault();
+    }
+
+    public IList<ValidationResult> ValidateEntities()
+    {
+        ValidationResults = new List<ValidationResult>();
+
+        ValidationResults.Add(Rules.HasPlayerSpawn(this.Entities));
+        
+        return ValidationResults;
     }
 
     private int GetIndexOf(Entity entity)
