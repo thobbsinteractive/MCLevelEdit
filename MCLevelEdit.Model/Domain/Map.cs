@@ -131,7 +131,12 @@ public class Map
     {
         ValidationResults = new List<ValidationResult>();
 
-        ValidationResults.Add(Rules.HasPlayerSpawn(this.Entities));
+        ValidationResults.Add(MapRules.HasPlayerSpawn(this.Entities));
+
+        foreach(Entity entity in this.Entities)
+        {
+            ValidationResults.Add(EntityRules.HasSwitch(entity, Entities));
+        }
         
         return ValidationResults;
     }
