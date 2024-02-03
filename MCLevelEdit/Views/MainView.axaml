@@ -28,7 +28,7 @@
     <Grid Name="grdMain"
           DockPanel.Dock="Bottom"
           ColumnDefinitions="*"
-          RowDefinitions="*,50">
+          RowDefinitions="*,60">
       <Grid Grid.Row="0"
             Grid.Column="0"
             ColumnDefinitions="256,*,300"
@@ -52,13 +52,14 @@
                                   Grid.Column="2"
                                   DataContext="{Binding NodePropertiesViewModel}"/>
       </Grid>
-      <StackPanel Grid.Row="1"
-                  Grid.Column="0"
-                  Margin="10"
-                  Height="38"
-                  Orientation="Horizontal"
-                  HorizontalAlignment="Left">
+      <Grid Grid.Row="1"
+            Grid.Column="0"
+            Margin="10"
+            RowDefinitions="40"
+            ColumnDefinitions="150,*,150,150">
         <Button Name="btnFailures"
+                Grid.Column="2"
+                Height="38"
                 Command="{Binding DisplayFailCommand}">
           <StackPanel Orientation="Horizontal">
             <Image Source="/Assets/error-32.png"/>
@@ -66,6 +67,8 @@
           </StackPanel>
         </Button>
         <Button Name="btnWarnings"
+                Grid.Column="3"
+                Height="38"
                 Command="{Binding DisplayWarningsCommand}">
           <StackPanel Orientation="Horizontal">
             <Image Source="/Assets/warning-32.png"/>
@@ -73,6 +76,7 @@
           </StackPanel>
         </Button>
         <Button Name="btnEdit"
+                Grid.Column="0"
                 VerticalContentAlignment="Center"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Center"
@@ -80,7 +84,7 @@
                 Command="{Binding EditEntitiesCommand}">
           Edit Entities
         </Button>
-      </StackPanel>
+      </Grid>
     </Grid>
   </DockPanel>
 </UserControl>
