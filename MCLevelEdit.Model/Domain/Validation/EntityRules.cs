@@ -23,7 +23,7 @@ namespace MCLevelEdit.Model.Domain.Validation
                     }
                     else
                     {
-                        return new ValidationResult(entity.Id, Result.Warning, nameof(HasSwitch));
+                        return new ValidationResult(entity.Id, Result.Pass, nameof(HasSwitch));
                     }
                 }
                 else

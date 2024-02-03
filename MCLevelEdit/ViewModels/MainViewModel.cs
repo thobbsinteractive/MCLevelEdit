@@ -24,15 +24,15 @@ namespace MCLevelEdit.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    private int _errorCount = 0;
+    private int _failCount = 0;
     private int _warningCount = 0;
 
-    public int ErrorCount
+    public int FailCount
     {
-        get => _errorCount;
+        get => _failCount;
         set
         {
-            this.RaiseAndSetIfChanged(ref _errorCount, value);
+            this.RaiseAndSetIfChanged(ref _failCount, value);
         }
     }
 
@@ -54,7 +54,7 @@ public class MainViewModel : ViewModelBase
     public ICommand ExitCommand { get; }
     public ICommand EditEntitiesCommand { get; }
     public ICommand EditGameSettingsCommand { get; }
-    public ICommand DisplayErrorsCommand { get; }
+    public ICommand DisplayFailCommand { get; }
     public ICommand DisplayWarningsCommand { get; }
 
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
@@ -128,7 +128,7 @@ public class MainViewModel : ViewModelBase
             return Task.CompletedTask;
         });
 
-        DisplayErrorsCommand = ReactiveCommand.CreateFromTask(async () =>
+        DisplayFailCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             var vm = new ValidationResultsTableViewModel(_eventAggregator, _mapService);
             vm.Filter = Result.Fail;
@@ -275,13 +275,13 @@ public class MainViewModel : ViewModelBase
 
     private void RefreshData()
     {
-        ErrorCount = 0;
+        FailCount = 0;
         WarningCount = 0;
         var results = _mapService.GetValidationResults();
 
         if (results != null)
         {
-            ErrorCount = results.Where(r => r.Result == Result.Fail).Count();
+            FailCount = results.Where(r => r.Result == Result.Fail).Count();
             WarningCount = results.Where(r => r.Result == Result.Warning).Count();
         }
     }

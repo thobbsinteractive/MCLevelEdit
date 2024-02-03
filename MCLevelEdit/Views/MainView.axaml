@@ -58,11 +58,11 @@
                   Height="38"
                   Orientation="Horizontal"
                   HorizontalAlignment="Left">
-        <Button Name="btnErrors"
-                Command="{Binding DisplayErrorsCommand}">
+        <Button Name="btnFailures"
+                Command="{Binding DisplayFailCommand}">
           <StackPanel Orientation="Horizontal">
             <Image Source="/Assets/error-32.png"/>
-            <Label Content="{Binding ErrorCount, StringFormat=' {0} Error(s)'}" />
+            <Label Content="{Binding FailCount, StringFormat=' {0} Failure(s)'}" />
           </StackPanel>
         </Button>
         <Button Name="btnWarnings"

@@ -20,13 +20,13 @@ public class ValidationResultsTableViewModel : ReactiveObject
         set
         {
             this.RaiseAndSetIfChanged(ref _filter, value);
+            RefreshData();
         }
     }
 
     public ValidationResultsTableViewModel(EventAggregator<object> eventAggregator, IMapService mapService)
     {
         _mapService = mapService;
-        RefreshData();
     }
 
     private void RefreshData()
