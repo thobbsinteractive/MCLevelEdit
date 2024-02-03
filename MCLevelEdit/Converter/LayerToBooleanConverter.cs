@@ -18,7 +18,6 @@ public class LayerToBooleanConverter : IValueConverter
         {
             case "Game":
                 return MCLevelEdit.Model.Enums.Layer.Game;
-                break;
             case "Height":
                 return MCLevelEdit.Model.Enums.Layer.Height;
         }

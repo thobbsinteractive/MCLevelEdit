@@ -1,11 +1,11 @@
-﻿using Avalonia.Logging;
-using Avalonia.Media.Imaging;
+﻿using Avalonia.Media.Imaging;
 using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Extensions;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Model.Enums;
 using MCLevelEdit.Model.Repository;
 using Splat;
 

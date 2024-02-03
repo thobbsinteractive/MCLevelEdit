@@ -1,11 +1,5 @@
-﻿namespace MCLevelEdit.Model.Domain
-{
-    public enum Result
-    {
-        None,
-        Pass,
-        Warning,
-        Fail
-    }
-    public record ValidationResult(int EntityId, Result Result, string Message);
-}
+﻿using MCLevelEdit.Model.Enums;
+
+namespace MCLevelEdit.Model.Domain;
+
+public record ValidationResult(int EntityId, Result Result, string Message);

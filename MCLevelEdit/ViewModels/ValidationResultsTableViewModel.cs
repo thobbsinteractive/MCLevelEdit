@@ -1,7 +1,7 @@
 ﻿using Avalonia.Collections;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
-using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Model.Enums;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Linq;

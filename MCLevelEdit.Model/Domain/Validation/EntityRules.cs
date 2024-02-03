@@ -1,4 +1,6 @@
-﻿namespace MCLevelEdit.Model.Domain.Validation
+﻿using MCLevelEdit.Model.Enums;
+
+namespace MCLevelEdit.Model.Domain.Validation
 {
     public static class EntityRules
     {
