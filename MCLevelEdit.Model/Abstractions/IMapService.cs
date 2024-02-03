@@ -26,4 +26,5 @@ public interface IMapService
     bool UpdateWizard(Wizard wizard);
     uint CalculateMana();
     void UpdateMana(uint manaTotal);
+    IList<ValidationResult> GetValidationResults(Result filter = Result.None);
 }

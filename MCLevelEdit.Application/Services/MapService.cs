@@ -30,6 +30,7 @@ public class MapService : IMapService, IEnableLogger
         {
             MapRepository.Map = await _filePort.LoadMapAsync(filePath);
             MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(MapRepository.Map.Terrain.GenerationParameters);
+            MapRepository.Map.ValidateEntities();
         }
         catch (Exception ex)
         {
@@ -52,7 +53,6 @@ public class MapService : IMapService, IEnableLogger
             {
                 MapRepository.Map.ManaTarget = 35;
             }
-
             MapRepository.Map.ValidateEntities();
 
             return await _filePort.SaveMapAsync(MapRepository.Map, filePath);
@@ -260,5 +260,13 @@ public class MapService : IMapService, IEnableLogger
     public void UpdateMana(uint manaTotal)
     {
         MapRepository.Map.ManaTotal = manaTotal;
+    }
+
+    public IList<ValidationResult> GetValidationResults(Result filter = Result.None)
+    {
+        if (filter == Result.None)
+            return MapRepository.Map.ValidationResults;
+        else
+            return MapRepository.Map.ValidationResults.Where(r => r.Result == filter).ToList();
     }
 }

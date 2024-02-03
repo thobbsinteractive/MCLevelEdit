@@ -14,6 +14,7 @@ using ReactiveUI;
 using Splat;
 using System;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -22,7 +23,26 @@ namespace MCLevelEdit.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    public IObservable<bool> IsRefreshed { get; }
+    private int _errorCount = 0;
+    private int _warningCount = 0;
+
+    public int ErrorCount
+    {
+        get => _errorCount;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _errorCount, value);
+        }
+    }
+
+    public int WarningCount
+    {
+        get => _warningCount;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _warningCount, value);
+        }
+    }
 
     public ICommand NewFileCommand { get; }
     public ICommand NewRandomFileCommand { get; }
@@ -33,6 +53,8 @@ public class MainViewModel : ViewModelBase
     public ICommand ExitCommand { get; }
     public ICommand EditEntitiesCommand { get; }
     public ICommand EditGameSettingsCommand { get; }
+    public ICommand DisplayErrorsCommand { get; }
+    public ICommand DisplayWarningsCommand { get; }
 
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
     public MapTreeViewModel MapTreeViewModel { get; }
@@ -40,6 +62,7 @@ public class MainViewModel : ViewModelBase
     public NodePropertiesViewModel NodePropertiesViewModel { get; }
     public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowEntitiesDialog { get; }
     public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
+    public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
 
     public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
@@ -51,6 +74,7 @@ public class MainViewModel : ViewModelBase
 
         ShowGameSettingsDialog = new Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?>();
         ShowEntitiesDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
+        ShowValidationResultsDialog = new Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?>();
 
         EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -101,6 +125,20 @@ public class MainViewModel : ViewModelBase
                 desktopApp.Shutdown();
             }
             return Task.CompletedTask;
+        });
+
+        DisplayErrorsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var vm = new ValidationResultsTableViewModel(_eventAggregator, _mapService);
+            vm.Filter = Result.Fail;
+            await ShowValidationResultsDialog.Handle(vm);
+        });
+
+        DisplayWarningsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var vm = new ValidationResultsTableViewModel(_eventAggregator, _mapService);
+            vm.Filter = Result.Warning;
+            await ShowValidationResultsDialog.Handle(vm);
         });
 
         MainWindow.I.Title = GetTitle("LEV00000.DAT");
@@ -195,6 +233,7 @@ public class MainViewModel : ViewModelBase
             }
             MainWindow.I.Title = GetTitle(filePath);
         }
+        RefreshData();
     }
 
     private async Task OpenFile()
@@ -224,11 +263,25 @@ public class MainViewModel : ViewModelBase
 
             MainWindow.I.Title = GetTitle(filePath);
         }
+        RefreshData();
     }
 
     private string GetTitle(string filePath)
     {
         string title = !string.IsNullOrWhiteSpace(filePath)? Path.GetFileName(filePath) : string.Empty;
         return $"Magic Carpet 1 Level Editor: {title}";
+    }
+
+    private void RefreshData()
+    {
+        ErrorCount = 0;
+        WarningCount = 0;
+        var results = _mapService.GetValidationResults();
+
+        if (results != null)
+        {
+            ErrorCount = results.Where(r => r.Result == Result.Fail).Count();
+            WarningCount = results.Where(r => r.Result == Result.Warning).Count();
+        }
     }
 }

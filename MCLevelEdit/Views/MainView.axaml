@@ -52,15 +52,35 @@
                                   Grid.Column="2"
                                   DataContext="{Binding NodePropertiesViewModel}"/>
       </Grid>
-      <Button x:Name="btnEdit"
-              Grid.Row="1"
-              Grid.Column="0"
-              Margin="10"
-              HorizontalAlignment="Stretch"
-              HorizontalContentAlignment="Center"
-              Command="{Binding EditEntitiesCommand}">
-        Edit Entities
-      </Button>
+      <StackPanel Grid.Row="1"
+                  Grid.Column="0"
+                  Margin="10"
+                  Height="38"
+                  Orientation="Horizontal"
+                  HorizontalAlignment="Left">
+        <Button Name="btnErrors"
+                Command="{Binding DisplayErrorsCommand}">
+          <StackPanel Orientation="Horizontal">
+            <Image Source="/Assets/error-32.png"/>
+            <Label Content="{Binding ErrorCount, StringFormat=' {0} Error(s)'}" />
+          </StackPanel>
+        </Button>
+        <Button Name="btnWarnings"
+                Command="{Binding DisplayWarningsCommand}">
+          <StackPanel Orientation="Horizontal">
+            <Image Source="/Assets/warning-32.png"/>
+            <Label Content="{Binding WarningCount, StringFormat=' {0} Warning(s)'}" />
+          </StackPanel>
+        </Button>
+        <Button Name="btnEdit"
+                VerticalContentAlignment="Center"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Height="38"
+                Command="{Binding EditEntitiesCommand}">
+          Edit Entities
+        </Button>
+      </StackPanel>
     </Grid>
   </DockPanel>
 </UserControl>

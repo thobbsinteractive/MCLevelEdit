@@ -15,6 +15,8 @@
   
   <ItemGroup>
     <None Remove="Assets\day-palette.bmp" />
+    <None Remove="Assets\error-32.png" />
+    <None Remove="Assets\warning-32.png" />
   </ItemGroup>
 
   <ItemGroup>
