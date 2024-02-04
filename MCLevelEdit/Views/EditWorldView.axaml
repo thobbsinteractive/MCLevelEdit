@@ -39,8 +39,9 @@
            HorizontalAlignment="Left">
       Mana Target (%):
     </Label>
-    <TextBox Grid.Column="2"
+    <TextBox Grid.Column="1"
              Grid.Row="2"
+             Grid.ColumnSpan="2"
              HorizontalAlignment="Stretch"
              Text="{Binding ManaTarget, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>

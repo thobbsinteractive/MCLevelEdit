@@ -398,7 +398,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void RefreshDataHandler(object sender, PubSubEventArgs<object> args)
     {
-        RefreshPreviewAsync();
+         RefreshPreviewAsync();
     }
 
     public void RefreshEntitiesHandler(object sender, PubSubEventArgs<object> args)
@@ -406,7 +406,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         RefreshEntities();
     }
 
-    protected async Task RefreshPreviewAsync()
+    protected void RefreshPreviewAsync()
     {
         lock (_lockPreview)
         {
