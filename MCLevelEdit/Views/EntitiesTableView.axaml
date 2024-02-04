@@ -83,12 +83,36 @@
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
-        <DataGridTextColumn Header="DisId"
-            Width="1*"/>
-        <DataGridTextColumn Header="SwSz"
-            Width="1*"/>
-        <DataGridTextColumn Header="SwId"
-            Width="1*"/>
+        <DataGridTemplateColumn Header="DisId"
+            Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtDisId"
+                       Text="{Binding DisId, Converter={StaticResource uInt16ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="SwSz"
+          Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtSwSz"
+                       Text="{Binding SwitchSize, Converter={StaticResource uInt16ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="SwId"
+          Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtSwId"
+                       Text="{Binding SwitchId, Converter={StaticResource uInt16ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
         <DataGridTemplateColumn Header="Parent"
             Width="1*">
           <DataGridTemplateColumn.CellTemplate>
