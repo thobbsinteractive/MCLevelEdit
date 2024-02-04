@@ -154,40 +154,44 @@ public class TerrainService : ITerrainService, IEnableLogger
     {
         return Task.Run(() =>
         {
-            using (var fb = bitmap.Lock())
-            {
-                for (int y = 0; y < Globals.MAX_MAP_SIZE; y++)
-                {
-                    for (int x = 0; x < Globals.MAX_MAP_SIZE; x++)
-                    {
-                        int index = (y * Globals.MAX_MAP_SIZE) + x;
+            return DrawBitmap(bitmap, terrain, layer);
+        });
+    }
 
-                        if (layer == Layer.Game)
+    public WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Terrain terrain, Layer layer)
+    {
+        using (var fb = bitmap.Lock())
+        {
+            for (int y = 0; y < Globals.MAX_MAP_SIZE; y++)
+            {
+                for (int x = 0; x < Globals.MAX_MAP_SIZE; x++)
+                {
+                    int index = (y * Globals.MAX_MAP_SIZE) + x;
+
+                    if (layer == Layer.Game)
+                    {
+                        Color baseColour = WATER_COLOUR;
+                        if (terrain.MapTerrainType_10B4E0 != null)
                         {
-                            Color baseColour = WATER_COLOUR;
-                            if (terrain.MapTerrainType_10B4E0 != null)
+                            if (terrainTypeToPalletMapping.ContainsKey((int)terrain.MapTerrainType_10B4E0[index]))
                             {
-                                if (terrainTypeToPalletMapping.ContainsKey((int)terrain.MapTerrainType_10B4E0[index]))
-                                {
-                                    baseColour = Pallet[terrainTypeToPalletMapping[(int)terrain.MapTerrainType_10B4E0[index]]];
-                                }
-                                
-                                fb.SetPixel(x , y, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
-                                            (byte)Math.Max(baseColour.G - terrain.MapShading_12B4E0[index], byte.MinValue),
-                                            (byte)Math.Max(baseColour.B - terrain.MapShading_12B4E0[index], byte.MinValue)));
+                                baseColour = Pallet[terrainTypeToPalletMapping[(int)terrain.MapTerrainType_10B4E0[index]]];
                             }
+
+                            fb.SetPixel(x, y, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
+                                        (byte)Math.Max(baseColour.G - terrain.MapShading_12B4E0[index], byte.MinValue),
+                                        (byte)Math.Max(baseColour.B - terrain.MapShading_12B4E0[index], byte.MinValue)));
                         }
-                        if (layer == Layer.Height)
-                        {
-                            fb.SetPixel(x , y, new Color(255, terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index]));
-                        }
+                    }
+                    if (layer == Layer.Height)
+                    {
+                        fb.SetPixel(x, y, new Color(255, terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index]));
                     }
                 }
             }
+        }
             //BitmapUtils.SaveBitmap(bitmap);
-
-            return bitmap;
-        });
+        return bitmap;
     }
 
     public async Task<Terrain> CalculateMc2Terrain(GenerationParameters genParams, byte stage = 18)
