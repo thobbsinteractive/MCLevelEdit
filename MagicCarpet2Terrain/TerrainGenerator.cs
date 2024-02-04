@@ -1,4 +1,4 @@
-﻿using MagicCarpet2Terrain.Interfaces;
+﻿using MagicCarpet2Terrain.Abstractions;
 using MagicCarpet2Terrain.Model;
 using MagicCarpet2Terrain.Structs;
 using System;

@@ -1,7 +1,7 @@
 ﻿using MagicCarpet2Terrain.Model;
 using System.Threading.Tasks;
 
-namespace MagicCarpet2Terrain.Interfaces
+namespace MagicCarpet2Terrain.Abstractions
 {
     public interface ITerrainGenerator
     {

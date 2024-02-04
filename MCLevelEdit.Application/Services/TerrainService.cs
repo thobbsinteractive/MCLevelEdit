@@ -2,6 +2,7 @@
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using MagicCarpet2Terrain;
+using MagicCarpet2Terrain.Abstractions;
 using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Extensions;
 using MCLevelEdit.Model.Abstractions;
@@ -191,7 +192,7 @@ public class TerrainService : ITerrainService, IEnableLogger
 
     public async Task<Terrain> CalculateMc2Terrain(GenerationParameters genParams, byte stage = 18)
     {
-        TerrainGenerator terrainGenerator = new TerrainGenerator();
+        ITerrainGenerator terrainGenerator = new TerrainGenerator();
         return await terrainGenerator.CalculateTerrainAsync(genParams, stage);
     }
 

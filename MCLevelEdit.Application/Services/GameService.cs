@@ -1,4 +1,5 @@
-﻿using MCLevelEdit.Infrastructure.Interfaces;
+﻿using MagicCarpetLevelPackager;
+using MagicCarpetLevelPackager.Abstractions;
 using MCLevelEdit.Model.Abstractions;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,9 +10,9 @@ namespace MCLevelEdit.Application.Services
     {
         private readonly IPackagePort _packagePort;
 
-        public GameService(IPackagePort packagePort) 
+        public GameService() 
         {
-            _packagePort = packagePort;
+            _packagePort = new MagicCarpetPackageAdapter();
         }
 
         public Task<bool> PackageLevelAsync(string[] levelFilePaths, string[] gameLevelsPaths)

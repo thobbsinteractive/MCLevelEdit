@@ -1,6 +1,6 @@
-﻿using MCLevelEdit.Infrastructure.Adapters;
+﻿using NUnit.Framework;
 
-namespace MCLevelEdit.Test
+namespace MagicCarpetLevelPackager.Test
 {
     public class PackageAdapterUnitTest
     {

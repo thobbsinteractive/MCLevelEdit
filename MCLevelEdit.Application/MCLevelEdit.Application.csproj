@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MagicCarpetLevelPackager\MagicCarpetLevelPackager.csproj" />
     <ProjectReference Include="..\MCLevelEdit.Infrastructure\MCLevelEdit.Infrastructure.csproj" />
     <ProjectReference Include="..\MCLevelEdit.Model\MCLevelEdit.Model.csproj" />
   </ItemGroup>
