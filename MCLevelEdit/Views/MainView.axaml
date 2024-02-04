@@ -15,6 +15,7 @@
         <Separator/>
         <MenuItem Header="_Open" Command="{Binding OpenFileCommand}"/>
         <MenuItem Header="_Save" Command="{Binding SaveFileCommand}"/>
+        <MenuItem Header="Save _As" Command="{Binding SaveFileAsCommand}"/>
         <Separator/>
         <MenuItem Header="_Export Height Map" Command="{Binding ExportHeightMapCommand}"/>
         <MenuItem Header="_Export Terrain Render" Command="{Binding ExportTerrainRenderCommand}"/>

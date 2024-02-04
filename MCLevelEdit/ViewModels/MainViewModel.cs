@@ -5,6 +5,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
+using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Enums;
@@ -26,6 +27,8 @@ public class MainViewModel : ViewModelBase
 {
     private int _failCount = 0;
     private int _warningCount = 0;
+
+    protected readonly ISettingsPort _settingsPort;
 
     public int FailCount
     {
@@ -49,6 +52,7 @@ public class MainViewModel : ViewModelBase
     public ICommand NewRandomFileCommand { get; }
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
+    public ICommand SaveFileAsCommand { get; }
     public ICommand ExportHeightMapCommand { get; }
     public ICommand ExportTerrainRenderCommand { get; }
     public ICommand ExitCommand { get; }
@@ -65,8 +69,9 @@ public class MainViewModel : ViewModelBase
     public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
 
-    public MainViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
+    public MainViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
+        _settingsPort = settingsPort;
         _mapService.CreateNewMap(true);
         NodePropertiesViewModel = new NodePropertiesViewModel(eventAggregator, mapService, terrainService);
         EntityToolBarViewModel = new EntityToolBarViewModel(eventAggregator, mapService, terrainService);
@@ -106,7 +111,12 @@ public class MainViewModel : ViewModelBase
 
         SaveFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await SaveFile();
+            await SaveFile(false);
+        });
+
+        SaveFileAsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            await SaveFile(true);
         });
 
         ExportHeightMapCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -196,44 +206,56 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private async Task SaveFile()
+    private async Task SaveFile(bool saveAs)
     {
+        var filePath = _settingsPort.CurrentLevelFilePath;
+        if (!File.Exists(filePath) && !saveAs)
+        {
+            saveAs = true;
+        }
+
         // Get top level from the current control. Alternatively, you can use Window reference instead.
         var topLevel = TopLevel.GetTopLevel(MainWindow.I);
 
         var map = _mapService.GetMap();
 
-        string suggestedExtension = "DAT";
-        string suggestedFileName = "LEV00000";
-        IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
-
-        if (!string.IsNullOrWhiteSpace(map.FilePath))
+        if (saveAs)
         {
-            suggestedFileName = Path.GetFileName(map.FilePath);
-            storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
-            suggestedExtension = Path.GetExtension(map.FilePath);
-        }
+            string suggestedExtension = "DAT";
+            string suggestedFileName = "LEV00000";
+            IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
 
-        // Start async operation to open the dialog.
-        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = "Save Map File",
-            SuggestedFileName = suggestedFileName,
-            ShowOverwritePrompt = true,
-            DefaultExtension = suggestedExtension,
-            SuggestedStartLocation = storageFolder
-        });
-
-        if (file != null)
-        {
-            string filePath = file.Path.AbsolutePath;
-            if (!await _mapService.SaveMapToFileAsync(filePath))
+            if (!string.IsNullOrWhiteSpace(map.FilePath))
             {
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
-                await box.ShowAsync();
+                suggestedFileName = Path.GetFileName(map.FilePath);
+                storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
+                suggestedExtension = Path.GetExtension(map.FilePath);
             }
-            MainWindow.I.Title = GetTitle(filePath);
+
+            // Start async operation to open the dialog.
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Save Map File As...",
+                SuggestedFileName = suggestedFileName,
+                ShowOverwritePrompt = true,
+                DefaultExtension = suggestedExtension,
+                SuggestedStartLocation = storageFolder
+            });
+
+            if (file != null)
+            {
+                filePath = file.Path.AbsolutePath;
+            }
         }
+        
+        if (!string.IsNullOrWhiteSpace(filePath) && !await _mapService.SaveMapToFileAsync(filePath))
+        {
+            var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+            await box.ShowAsync();
+        }
+        MainWindow.I.Title = GetTitle(filePath);
+        _settingsPort.CurrentLevelFilePath = filePath;
+
         RefreshData();
     }
 
@@ -263,6 +285,7 @@ public class MainViewModel : ViewModelBase
             _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
 
             MainWindow.I.Title = GetTitle(filePath);
+            _settingsPort.CurrentLevelFilePath = filePath;
         }
         RefreshData();
     }

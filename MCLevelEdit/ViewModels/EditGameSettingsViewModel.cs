@@ -1,7 +1,9 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
+using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -16,10 +18,11 @@ namespace MCLevelEdit.ViewModels
     public class EditGameSettingsViewModel : ReactiveObject
     {
         protected readonly EventAggregator<object> _eventAggregator;
+        protected readonly ISettingsPort _settingsPort;
         protected readonly IGameService _gameService;
 
         private string[] _levelPaths;
-        private string _gamePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\Launch Magic Carpet Plus.lnk";
+        private string _gameExePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\Launch Magic Carpet Plus.lnk";
         private string _gameLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\";
         private string _gameCloudLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\cloud_saves\CARPET.CD\LEVELS\";
 
@@ -31,6 +34,8 @@ namespace MCLevelEdit.ViewModels
         public ICommand SelectLevelsFolderCommand { get; }
         public ICommand SelectCloudLevelsFolderCommand { get; }
 
+        public ICommand SaveCommand { get; }
+
         public string LevelPathsString => _levelPaths is not null ? string.Join(",", _levelPaths) : string.Empty;
         public bool CanRun => _levelPaths?.Length > 0;
 
@@ -40,10 +45,10 @@ namespace MCLevelEdit.ViewModels
             set => this.RaiseAndSetIfChanged(ref _levelPaths, value);
         }
 
-        public string GamePath
+        public string GameExePath
         {
-            get => _gamePath;
-            set => this.RaiseAndSetIfChanged(ref _gamePath, value);
+            get => _gameExePath;
+            set => this.RaiseAndSetIfChanged(ref _gameExePath, value);
         }
 
         public string GameLevelsPath
@@ -58,10 +63,36 @@ namespace MCLevelEdit.ViewModels
             set => this.RaiseAndSetIfChanged(ref _gameCloudLevelsPath, value);
         }
 
-        public EditGameSettingsViewModel(EventAggregator<object> eventAggregator, IGameService gameService)
+        public EditGameSettingsViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IGameService gameService)
         {
             _eventAggregator = eventAggregator;
+            _settingsPort = settingsPort;
             _gameService = gameService;
+
+            var settings = _settingsPort.LoadSettings();
+
+            LevelPaths = new string[] { _settingsPort.CurrentLevelFilePath };
+
+            if (settings != null)
+            {
+                var gameExePath = settings.GameExeLocation;
+
+                if (!string.IsNullOrEmpty(gameExePath))
+                {
+                    GameExePath = gameExePath;
+                }
+
+                var gameLevelFolders = settings.GameLevelFolders;
+
+                if (gameLevelFolders.Any())
+                {
+                    if (gameLevelFolders.Length > 0)
+                        GameLevelsPath = gameLevelFolders[0];
+
+                    if (gameLevelFolders.Length > 1)
+                        GameCloudLevelsPath = gameLevelFolders[1];
+                }
+            }
 
             SelectLevelsCommand = ReactiveCommand.CreateFromTask(async () =>
             {
@@ -94,7 +125,9 @@ namespace MCLevelEdit.ViewModels
                     {
                         SetFilesToReadonly(GameLevelsPath);
                         SetFilesToReadonly(GameCloudLevelsPath);
-                        _gameService.RunGame(GamePath);
+
+                        if (SaveLevelPaths())
+                            _gameService.RunGame(GameExePath);
                     }
                     else
                     {
@@ -107,6 +140,11 @@ namespace MCLevelEdit.ViewModels
             CheckLevelCommand = ReactiveCommand.CreateFromTask(async() =>
             {
                 await CheckForGameLaunch();
+            });
+
+            SaveCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                return SaveLevelPaths();
             });
         }
 
@@ -192,7 +230,7 @@ namespace MCLevelEdit.ViewModels
 
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
             {
-                GamePath = Path.GetDirectoryName(files[0].Path.AbsolutePath);
+                GameExePath = Path.GetDirectoryName(files[0].Path.AbsolutePath);
                 AutoPopulateFolders(GameLevelsPath);
             }
         }
@@ -213,6 +251,8 @@ namespace MCLevelEdit.ViewModels
             {
                 GameLevelsPath = folder[0].Path.AbsolutePath;
             }
+
+
         }
 
         private async Task SelectCloudLevelsFolder()
@@ -235,7 +275,7 @@ namespace MCLevelEdit.ViewModels
 
         private void AutoPopulateFolders(string gameFolder)
         {
-            GamePath = GetFilePath(gameFolder, "Launch Magic Carpet Plus");
+            GameExePath = GetFilePath(gameFolder, "Launch Magic Carpet Plus");
             var gameLevelsFolder = Path.Combine(gameFolder, @"CARPET.CD\LEVELS");
             if (GetFilePath(gameLevelsFolder, "LEVELS.DAT")?.Length > 0 && GetFilePath(gameLevelsFolder, "LEVELS.TAB")?.Length > 0)
             {
@@ -271,19 +311,33 @@ namespace MCLevelEdit.ViewModels
 
         private async Task<bool> CheckForGameLaunch()
         {
-            if (GetFilePath(GamePath, Path.GetFileName(GamePath))?.Length > 0)
+            if (_levelPaths?.Length > 0 && File.Exists(LevelPaths[0]))
             {
-                if (GetFolderPath(GameLevelsPath, "LEVELS")?.Length > 0)
+                if (GetFilePath(GameExePath, Path.GetFileName(GameExePath))?.Length > 0)
                 {
-                    if (GetFolderPath(GameCloudLevelsPath, "LEVELS")?.Length > 0)
+                    if (GetFolderPath(GameLevelsPath, "LEVELS")?.Length > 0)
                     {
-                        return true;
+                        if (GetFolderPath(GameCloudLevelsPath, "LEVELS")?.Length > 0)
+                        {
+                            return true;
+                        }
                     }
                 }
             }
             var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Incorrect paths. Please re-check!", ButtonEnum.Ok, Icon.Error);
             await box.ShowAsync();
             return false;
+        }
+
+        private bool SaveLevelPaths()
+        {
+            var settings = new Settings()
+            {
+                GameExeLocation = this.GameExePath,
+                GameLevelFolders = new string[] { this.GameLevelsPath, this.GameCloudLevelsPath }
+            };
+
+            return _settingsPort.SaveSettings(settings);
         }
     }
 }

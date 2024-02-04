@@ -46,7 +46,7 @@
              Grid.Column="1"
              Grid.Row="2"
              VerticalAlignment="Center"
-             Text="{Binding GamePath}"/>
+             Text="{Binding GameExePath}"/>
     <Button Name="btnSelectExeLocation"
             Grid.Column="2"
             Grid.Row="2"
@@ -86,6 +86,13 @@
             HorizontalAlignment="Center"
             Content="Select"
             Command="{Binding SelectCloudLevelsFolderCommand}"/>
+    <Button Name="btnSave"
+        Grid.Column="0"
+        Grid.Row="6"
+        VerticalAlignment="Center"
+        HorizontalAlignment="Left"
+        Content="Save Settings"
+        Command="{Binding SaveCommand}"/>
     <Button Name="btnRun"
             Grid.Column="2"
             Grid.Row="6"
