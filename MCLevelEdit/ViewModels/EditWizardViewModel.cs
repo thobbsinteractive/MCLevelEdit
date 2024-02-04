@@ -1,6 +1,6 @@
 ﻿using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
-using MCLevelEdit.Model.Domain;
+using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Linq;
 
@@ -11,7 +11,7 @@ public class EditWizardViewModel : ReactiveObject
     protected readonly IMapService _mapService;
     protected readonly EventAggregator<object> _eventAggregator;
 
-    private readonly Wizard _wizard;
+    private readonly WizardViewModel _wizard;
 
     public byte Agression
     {
@@ -62,11 +62,11 @@ public class EditWizardViewModel : ReactiveObject
         _eventAggregator = eventAggregator;
         _mapService = mapService;
         var map = _mapService.GetMap();
-        _wizard = map.Wizards.Where(w => w.Name.Equals(wizardName)).First();
+        _wizard = map.Wizards.Where(w => w.Name.Equals(wizardName)).Select(w => w.ToWizardViewModel()).First();
     }
 
     public void Update()
     {
-        _mapService.UpdateWizard(_wizard);
+        _mapService.UpdateWizard(_wizard.ToWizard());
     }
 }
