@@ -1,4 +1,5 @@
-﻿using MCLevelEdit.Application.Model;
+﻿using MagicCarpet2Terrain.Model;
+using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
@@ -43,6 +44,30 @@ namespace MCLevelEdit.ViewModels
 
         public ICommand CalculateManaCommand { get; }
         public ICommand GenerateTerrainCommand { get; }
+
+        public ICommand IncreaseSeedCommand { get; }
+        public ICommand DecreaseSeedCommand { get; }
+        public ICommand IncreaseOffsetCommand { get; }
+        public ICommand DecreaseOffsetCommand { get; }
+        public ICommand IncreaseRaiseCommand { get; }
+        public ICommand DecreaseRaiseCommand { get; }
+        public ICommand IncreaseGnarlCommand { get; }
+        public ICommand DecreaseGnarlCommand { get; }
+        public ICommand IncreaseRiverCommand { get; }
+        public ICommand DecreaseRiverCommand { get; }
+        public ICommand IncreaseSourceCommand { get; }
+        public ICommand DecreaseSourceCommand { get; }
+        public ICommand IncreaseSnLinCommand { get; }
+        public ICommand DecreaseSnLinCommand { get; }
+        public ICommand IncreaseSnFltCommand { get; }
+        public ICommand DecreaseSnFltCommand { get; }
+        public ICommand IncreaseBhLinCommand { get; }
+        public ICommand DecreaseBhLinCommand { get; }
+        public ICommand IncreaseSandCommand { get; }
+        public ICommand DecreaseSandCommand { get; }
+        public ICommand IncreaseRkSteCommand { get; }
+        public ICommand DecreaseRkSteCommand { get; }
+
         public bool GenerateTerrainButtonEnable { get; set; }
 
         public EditWorldViewModel(EventAggregator<object> eventAggregator, IMapService mapService)
@@ -64,6 +89,127 @@ namespace MCLevelEdit.ViewModels
 
             GenerateTerrainCommand = ReactiveCommand.Create(async () =>
             {
+                await GenerateHeightMap();
+            });
+
+            IncreaseSeedCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Seed++;
+                await GenerateHeightMap();
+            });
+            DecreaseSeedCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Seed--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseOffsetCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Offset++;
+                await GenerateHeightMap();
+            });
+            DecreaseOffsetCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Offset--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseRaiseCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Raise++;
+                await GenerateHeightMap();
+            });
+            DecreaseRaiseCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Raise--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseGnarlCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Gnarl++;
+                await GenerateHeightMap();
+            });
+            DecreaseGnarlCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Gnarl--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseRiverCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.River++;
+                await GenerateHeightMap();
+            });
+            DecreaseRiverCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.River--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseSourceCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Source++;
+                await GenerateHeightMap();
+            });
+            DecreaseSourceCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.Source--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseSnLinCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.SnLin++;
+                await GenerateHeightMap();
+            });
+            DecreaseSnLinCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.SnLin--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseSnFltCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.SnFlt++;
+                await GenerateHeightMap();
+            });
+            DecreaseSnFltCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.SnFlt--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseBhLinCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.BhLin++;
+                await GenerateHeightMap();
+            });
+            DecreaseBhLinCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.BhLin--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseSandCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.BhFlt++;
+                await GenerateHeightMap();
+            });
+            DecreaseSandCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.BhFlt--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseRkSteCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.RkSte++;
+                await GenerateHeightMap();
+            });
+            DecreaseRkSteCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.RkSte--;
                 await GenerateHeightMap();
             });
         }
