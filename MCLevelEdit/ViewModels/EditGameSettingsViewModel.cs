@@ -1,6 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
+using MCLevelEdit.Application.Services;
+using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
@@ -116,20 +118,9 @@ namespace MCLevelEdit.ViewModels
 
             RunLevelCommand = ReactiveCommand.CreateFromTask(async() =>
             {
-                if (await CheckForGameLaunch())
+                if (await CheckForGameLaunch() && SaveLevelPaths())
                 {
-                    DeleteExistingFiles(GameLevelsPath);
-                    DeleteExistingFiles(GameCloudLevelsPath);
-
-                    if (await _gameService.PackageLevelAsync(LevelPaths, new string[] { GameLevelsPath, GameCloudLevelsPath}))
-                    {
-                        SetFilesToReadonly(GameLevelsPath);
-                        SetFilesToReadonly(GameCloudLevelsPath);
-
-                        if (SaveLevelPaths())
-                            _gameService.RunGame(GameExePath);
-                    }
-                    else
+                    if (!await _gameService.RunLevelFromSettings(LevelPaths))
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error packing level!", ButtonEnum.Ok, Icon.Error);
                         await box.ShowAsync();
@@ -154,47 +145,6 @@ namespace MCLevelEdit.ViewModels
         
             this.RaisePropertyChanged(nameof(LevelPathsString));
             this.RaisePropertyChanged(nameof(CanRun));
-        }
-
-        private void DeleteExistingFiles(string folderPath)
-        {
-            string levelsdat = GetFilePath(folderPath, "LEVELS.DAT");
-            if (levelsdat != null)
-            {
-                FileInfo fInfo = new FileInfo(levelsdat);
-                if (fInfo.IsReadOnly)
-                {
-                    fInfo.IsReadOnly = false;
-                }
-                File.Delete(levelsdat);
-            }
-            string levelstab = GetFilePath(folderPath, "LEVELS.TAB");
-            if (levelstab != null)
-            {
-                FileInfo fInfo = new FileInfo(levelstab);
-                if (fInfo.IsReadOnly)
-                {
-                    fInfo.IsReadOnly = false;
-                }
-                File.Delete(levelstab);
-            }
-        }
-
-        private void SetFilesToReadonly(string folderPath)
-        {
-            string levelsdat = GetFilePath(folderPath, "LEVELS.DAT");
-            if (levelsdat != null)
-            {
-                FileInfo fInfo = new FileInfo(levelsdat);
-                fInfo.IsReadOnly = true;
-   
-            }
-            string levelstab = GetFilePath(folderPath, "LEVELS.TAB");
-            if (levelstab != null)
-            {
-                FileInfo fInfo = new FileInfo(levelstab);
-                fInfo.IsReadOnly = true;
-            }
         }
 
         private async Task SelectLevelFiles()

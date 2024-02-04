@@ -5,6 +5,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
+using MCLevelEdit.Application.Services;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
@@ -31,6 +32,7 @@ public class MainViewModel : ViewModelBase
     private int _warningCount = 0;
 
     protected readonly ISettingsPort _settingsPort;
+    protected readonly IGameService _gameService;
 
     public int FailCount
     {
@@ -58,6 +60,7 @@ public class MainViewModel : ViewModelBase
     public ICommand ExportHeightMapCommand { get; }
     public ICommand ExportTerrainRenderCommand { get; }
     public ICommand ExitCommand { get; }
+    public ICommand RunCommand { get; }
     public ICommand EditEntitiesCommand { get; }
     public ICommand EditGameSettingsCommand { get; }
     public ICommand DisplayFailCommand { get; }
@@ -71,9 +74,11 @@ public class MainViewModel : ViewModelBase
     public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
 
-    public MainViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
+    public MainViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IMapService mapService, ITerrainService terrainService, IGameService gameService) : base(eventAggregator, mapService, terrainService)
     {
         _settingsPort = settingsPort;
+        _gameService = gameService;
+
         _mapService.CreateNewMap(true);
         NodePropertiesViewModel = new NodePropertiesViewModel(eventAggregator, mapService, terrainService);
         EntityToolBarViewModel = new EntityToolBarViewModel(eventAggregator, mapService, terrainService);
@@ -131,6 +136,22 @@ public class MainViewModel : ViewModelBase
             await ExportImageMap(Model.Enums.Layer.Game);
         });
 
+        RunCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            if (await SaveFile(false) && !string.IsNullOrWhiteSpace(_settingsPort.CurrentLevelFilePath) && File.Exists(_settingsPort.CurrentLevelFilePath))
+            {
+                var settings = _settingsPort.LoadSettings();
+                if (settings == null || string.IsNullOrWhiteSpace(settings.GameExeLocation))
+                {
+                    await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
+                }
+                else
+                {
+                    await _gameService.RunLevelFromSettings(new string[] { _settingsPort.CurrentLevelFilePath });
+                }
+            }
+        });
+
         ExitCommand = ReactiveCommand.CreateFromTask(() =>
         {
             if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
@@ -164,7 +185,7 @@ public class MainViewModel : ViewModelBase
         var map = _mapService.GetMap();
 
         string suggestedExtension = "bmp";
-        string suggestedFileName = !string.IsNullOrEmpty(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
+        string suggestedFileName = !string.IsNullOrWhiteSpace(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
         IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Pictures);
 
         if (!string.IsNullOrWhiteSpace(map.FilePath))
@@ -208,7 +229,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private async Task SaveFile(bool saveAs)
+    private async Task<bool> SaveFile(bool saveAs)
     {
         var filePath = _settingsPort.CurrentLevelFilePath;
         if (!File.Exists(filePath) && !saveAs)
@@ -224,7 +245,7 @@ public class MainViewModel : ViewModelBase
         if (saveAs)
         {
             string suggestedExtension = "DAT";
-            string suggestedFileName = !string.IsNullOrEmpty(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
+            string suggestedFileName = !string.IsNullOrWhiteSpace(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
             IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DOCS_DIRECTORY));
             
             if (storageFolder != null && !Directory.Exists(storageFolder.Path.AbsolutePath))
@@ -254,17 +275,19 @@ public class MainViewModel : ViewModelBase
                 filePath = file.Path.AbsolutePath;
             }
         }
-        
+
         if (!string.IsNullOrWhiteSpace(filePath) && !await _mapService.SaveMapToFileAsync(filePath))
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
             await box.ShowAsync();
+            return false;
         }
         MainWindow.I.Title = GetTitle(filePath);
         _settingsPort.CurrentLevelFilePath = filePath;
         map.FilePath = filePath;
 
         RefreshData();
+        return true;
     }
 
     private async Task OpenFile()

@@ -76,11 +76,20 @@
             <Label Content="{Binding WarningCount, StringFormat=' {0} Warning(s)'}" />
           </StackPanel>
         </Button>
-        <Button Name="btnEdit"
+        <Button Name="btnRun"
                 Grid.Column="0"
                 VerticalContentAlignment="Center"
-                HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Center"
+                Height="38"
+                MinWidth="150"
+                Command="{Binding RunCommand}">
+            Run
+        </Button>
+        <Button Name="btnEdit"
+                Grid.Column="1"
+                VerticalContentAlignment="Center"
+                HorizontalContentAlignment="Center"
+                MinWidth="150"
                 Height="38"
                 Command="{Binding EditEntitiesCommand}">
           Edit Entities
