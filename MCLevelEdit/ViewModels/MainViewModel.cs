@@ -25,6 +25,8 @@ namespace MCLevelEdit.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
+    private const string DOCS_DIRECTORY = "MCLevelEdit";
+
     private int _failCount = 0;
     private int _warningCount = 0;
 
@@ -95,13 +97,13 @@ public class MainViewModel : ViewModelBase
         NewFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             await mapService.CreateNewMap();
-            MainWindow.I.Title = GetTitle("LEV00000.DAT");
+            MainWindow.I.Title = GetTitle("NewLevel.DAT");
         });
 
         NewRandomFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             await mapService.CreateNewMap(true);
-            MainWindow.I.Title = GetTitle("LEV00000.DAT");
+            MainWindow.I.Title = GetTitle("NewLevel.DAT");
         });
 
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -152,7 +154,7 @@ public class MainViewModel : ViewModelBase
             await ShowValidationResultsDialog.Handle(vm);
         });
 
-        MainWindow.I.Title = GetTitle("LEV00000.DAT");
+        MainWindow.I.Title = GetTitle("NewLevel.DAT");
     }
 
     private async Task ExportImageMap(Model.Enums.Layer layer)
@@ -162,8 +164,8 @@ public class MainViewModel : ViewModelBase
         var map = _mapService.GetMap();
 
         string suggestedExtension = "bmp";
-        string suggestedFileName = "LEV00000";
-        IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+        string suggestedFileName = !string.IsNullOrEmpty(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
+        IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Pictures);
 
         if (!string.IsNullOrWhiteSpace(map.FilePath))
         {
@@ -222,8 +224,13 @@ public class MainViewModel : ViewModelBase
         if (saveAs)
         {
             string suggestedExtension = "DAT";
-            string suggestedFileName = "LEV00000";
-            IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+            string suggestedFileName = !string.IsNullOrEmpty(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
+            IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DOCS_DIRECTORY));
+            
+            if (storageFolder != null && !Directory.Exists(storageFolder.Path.AbsolutePath))
+            {
+                Directory.CreateDirectory(storageFolder.Path.AbsolutePath);
+            }
 
             if (!string.IsNullOrWhiteSpace(map.FilePath))
             {
@@ -255,6 +262,7 @@ public class MainViewModel : ViewModelBase
         }
         MainWindow.I.Title = GetTitle(filePath);
         _settingsPort.CurrentLevelFilePath = filePath;
+        map.FilePath = filePath;
 
         RefreshData();
     }
