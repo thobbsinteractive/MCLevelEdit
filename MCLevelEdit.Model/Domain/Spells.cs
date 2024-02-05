@@ -2,28 +2,28 @@
 
 public class Spells
 {
-    public Abilities Fireball { get; set; } = new Abilities();
-    public Abilities Possess { get; set; } = new Abilities();
-    public Abilities Accelerate { get; set; } = new Abilities();
-    public Abilities Castle { get; set; } = new Abilities();
-    public Abilities Heal { get; set; } = new Abilities();
-    public Abilities Rebound { get; set; } = new Abilities();
-    public Abilities Shield { get; set; } = new Abilities();
-    public Abilities Invisible { get; set; } = new Abilities();
-    public Abilities Earthquake { get; set; } = new Abilities();
-    public Abilities Crater { get; set; } = new Abilities();
-    public Abilities Meteor { get; set; } = new Abilities();
-    public Abilities Volcano { get; set; } = new Abilities();
-    public Abilities LightningBolt { get; set; } = new Abilities();
-    public Abilities LightningStorm { get; set; } = new Abilities();
-    public Abilities UndeadArmy { get; set; } = new Abilities();
-    public Abilities ManaMagnet { get; set; } = new Abilities();
-    public Abilities StealMana { get; set; } = new Abilities();
-    public Abilities BeyondSight { get; set; } = new Abilities();
-    public Abilities Duel { get; set; } = new Abilities();
-    public Abilities Teleport { get; set; } = new Abilities();
-    public Abilities WallofFire { get; set; } = new Abilities();
-    public Abilities ReverseAcceleration { get; set; } = new Abilities();
-    public Abilities GlobalDeath { get; set; } = new Abilities();
-    public Abilities RapidFireball { get; set; } = new Abilities();
+    public (byte, byte) Fireball { get; set; } = new(0, 1);
+    public (byte, byte) Possess { get; set; } = new(0, 1);
+    public (byte, byte) Accelerate { get; set; } = new(0, 1);
+    public (byte, byte) Castle { get; set; } = new(0, 1);
+    public (byte, byte) Heal { get; set; } = new(0, 1);
+    public (byte, byte) Rebound { get; set; } = new(0, 1);
+    public (byte, byte) Shield { get; set; } = new(0, 1);
+    public (byte, byte) Invisible { get; set; } = new(0, 1);
+    public (byte, byte) Earthquake { get; set; } = new(0, 1);
+    public (byte, byte) Crater { get; set; } = new(0, 1);
+    public (byte, byte) Meteor { get; set; } = new(0, 1);
+    public (byte, byte) Volcano { get; set; } = new(0, 1);
+    public (byte, byte) LightningBolt { get; set; } = new(0, 1);
+    public (byte, byte) LightningStorm { get; set; } = new(0, 1);
+    public (byte, byte) UndeadArmy { get; set; } = new(0, 1);
+    public (byte, byte) ManaMagnet { get; set; } = new(0, 1);
+    public (byte, byte) StealMana { get; set; } = new(0, 1);
+    public (byte, byte) BeyondSight { get; set; } = new(0, 1);
+    public (byte, byte) Duel { get; set; } = new(0, 1);
+    public (byte, byte) Teleport { get; set; } = new(0, 1);
+    public (byte, byte) WallofFire { get; set; } = new(0, 1);
+    public (byte, byte) ReverseAcceleration { get; set; } = new(0, 1);
+    public (byte, byte) GlobalDeath { get; set; } = new(0, 1);
+    public (byte, byte) RapidFireball { get; set; } = new(0, 1);
 }
