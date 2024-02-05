@@ -34,6 +34,13 @@ public class ViewModelBase : ReactiveObject
         var entity = entityView.ToEntity();
         if (entity.EntityType.TypeId == TypeId.Spell)
             entity.SwitchId = 1;
+
+        if (entity.EntityType.TypeId == TypeId.Effect && entity.EntityType.Model.Id == (int)Effect.VillagerBuilding)
+        {
+            entity.DisId = 65535;
+            entity.SwitchId = 65535;
+            entity.Parent = 1;
+        }
         
         int id = _mapService.AddEntity(entity);
         entity.Id = id;
