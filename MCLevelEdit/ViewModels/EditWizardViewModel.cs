@@ -57,6 +57,11 @@ public class EditWizardViewModel : ReactiveObject
         }
     }
 
+    public SpellsViewModel Spells
+    {
+        get => _wizard.Spells;
+    }
+
     public EditWizardViewModel(EventAggregator<object> eventAggregator, IMapService mapService, string wizardName)
     {
         _eventAggregator = eventAggregator;

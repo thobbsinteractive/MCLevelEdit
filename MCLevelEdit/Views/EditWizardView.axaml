@@ -5,6 +5,7 @@
              mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="600"
              xmlns:c="clr-namespace:MCLevelEdit.Converter"
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:view="clr-namespace:MCLevelEdit.Views"
              x:Class="MCLevelEdit.Views.EditWizardView"
              x:DataType="vm:EditWizardViewModel">
   <Grid Margin="5"
@@ -67,5 +68,11 @@
            VerticalAlignment="Center">
       Wizard Spells
     </Label>
+    <view:EditSpells Name="esSpells"
+                     Grid.Row="6"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     HorizontalAlignment="Center"
+                     DataContext="{Binding Spells}"/>
   </Grid>
 </UserControl>
