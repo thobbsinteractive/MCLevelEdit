@@ -17,6 +17,13 @@
                 BorderThickness="1"
                 CornerRadius="5"
                 Padding="3">
+          <Border.ContextMenu>
+            <ContextMenu>
+              <MenuItem Header="Delete"
+                        IsVisible="{Binding CanDelete}"
+                        Command="{Binding DeleteEntityCommand}"/>
+            </ContextMenu>
+          </Border.ContextMenu>
           <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
               <Image Source="{Binding Icon}" />

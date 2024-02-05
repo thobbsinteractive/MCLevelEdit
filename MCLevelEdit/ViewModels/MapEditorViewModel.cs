@@ -199,6 +199,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         _eventAggregator.RegisterEvent("RefreshEntities", RefreshEntitiesHandler);
         _eventAggregator.RegisterEvent("AddEntity", AddEntityHandler);
         _eventAggregator.RegisterEvent("UpdateEntity", UpdateEntityHandler);
+        _eventAggregator.RegisterEvent("DeleteEntity", DeleteEntityHandler);
         _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
         _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
     }
@@ -232,6 +233,26 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 }
                 AddEntity(entity);
                 OnEntitySelected(entity);
+            }
+        }
+    }
+
+    private void DeleteEntityHandler(object sender, PubSubEventArgs<object> args)
+    {
+        var entity = (Entity)args.Item;
+        if (entity is not null)
+        {
+            lock (_lockPreview)
+            {
+                if (_entityShapes.ContainsKey(entity.Id))
+                {
+                    foreach (var shape in _entityShapes[entity.Id])
+                    {
+                        _cvEntity.Children.Remove(shape);
+                    }
+                    _entityShapes.Remove(entity.Id);
+                }
+                OnEntitySelected(null);
             }
         }
     }

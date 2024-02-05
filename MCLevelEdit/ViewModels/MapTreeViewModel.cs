@@ -45,6 +45,7 @@ public class MapTreeViewModel
         _eventAggregator.RegisterEvent("RefreshEntities", RefreshDataHandler);
         _eventAggregator.RegisterEvent("AddEntity", AddEntityHandler);
         _eventAggregator.RegisterEvent("UpdateEntity", UpdateEntityHandler);
+        _eventAggregator.RegisterEvent("DeleteEntity", DeleteEntityHandler);
         _eventAggregator.RegisterEvent("RefreshWizards", RefreshWizardsHandler);
         _eventAggregator.RegisterEvent("OnCursorClicked", SelectNodeHandler);
         RefreshData();
@@ -67,6 +68,16 @@ public class MapTreeViewModel
         var entity = (Entity)args.Item;
         if (entity is not null)
             UpdateEntityNode(entity);
+    }
+
+    private void DeleteEntityHandler(object sender, PubSubEventArgs<object> args)
+    {
+        var entity = (Entity)args.Item;
+        if (entity is not null)
+        {
+            SelectedNodes.Clear();
+            RefreshEntitiesData();
+        }
     }
 
     private void RefreshWizardsHandler(object sender, PubSubEventArgs<object> args)
@@ -106,23 +117,29 @@ public class MapTreeViewModel
         Nodes.Clear();
 
         RefreshWizardsData();
-        RefeshEntitiesData();
+        RefreshEntitiesData();
     }
 
-    private void RefeshEntitiesData()
+    private void RefreshEntitiesData()
     {
         var map = _mapService.GetMap();
-
+        var worldNode = Nodes.Where(n => n.Name == "World").FirstOrDefault();
         var entitiesCoords = new ObservableCollection<Node>();
-        var world = new Node(_icons["World"], $"World", "", entitiesCoords);
-        Nodes.Add(world);
+
+        if (worldNode == null)
+        {
+            worldNode = new Node(_icons["World"], $"World", "", entitiesCoords);
+            Nodes.Add(worldNode);
+        }
+
+        worldNode.SubNodes.Clear();
 
         var squareEntities = map.Entities.OrderBy(e => e.Id);
         if (squareEntities.Any())
         {
             foreach (var entity in squareEntities)
             {
-                world.SubNodes.Add(new EntityNode(entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity)));
+                worldNode.SubNodes.Add(new EntityNode(this, entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity)));
             }
         }
     }
@@ -149,9 +166,19 @@ public class MapTreeViewModel
 
     }
 
+    public void DeleteEntityNode(int id)
+    {
+        var entity = _mapService.GetEntity((ushort)id);
+        if (entity != null)
+        {
+            _mapService.DeleteEntity(entity);
+            _eventAggregator.RaiseEvent("DeleteEntity", this, new PubSubEventArgs<object>(entity));
+        }
+    }
+
     private void AddEntityNode(Entity entity)
     {
-        var entityNode = new EntityNode(entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity));
+        var entityNode = new EntityNode(this, entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity));
         var worldNode = GetWorldNode();
         worldNode.SubNodes.Add(entityNode);
     }

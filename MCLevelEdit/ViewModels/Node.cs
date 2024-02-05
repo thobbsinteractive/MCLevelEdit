@@ -1,6 +1,7 @@
 ﻿using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels;
 
@@ -10,6 +11,9 @@ public class Node : ObservableObject
     private string _name;
     private string _title;
     private string _subtitle;
+    private bool _canDelete;
+
+    public ICommand DeleteEntityCommand { get; protected set; }
 
     public ObservableCollection<Node>? SubNodes { get; }
 
@@ -33,6 +37,11 @@ public class Node : ObservableObject
     {
         get => _subtitle;
         set => this.SetProperty(ref _subtitle, value);
+    }
+    public bool CanDelete
+    {
+        get => _canDelete;
+        set => this.SetProperty(ref _canDelete, value);
     }
 
     public bool IsSubtitleSet => _subtitle?.Length > 0;
