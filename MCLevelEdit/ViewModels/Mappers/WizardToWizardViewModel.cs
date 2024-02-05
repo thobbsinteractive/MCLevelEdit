@@ -13,7 +13,8 @@ public static class WizardToWizardViewModel
             Agression = wizard.Agression,
             Perception = wizard.Perception,
             Reflexes = wizard.Reflexes,
-            CastleLevel = wizard.CastleLevel
+            CastleLevel = wizard.CastleLevel,
+            Spells = wizard.Spells.ToSpellsViewModel()
         };
     }
 }

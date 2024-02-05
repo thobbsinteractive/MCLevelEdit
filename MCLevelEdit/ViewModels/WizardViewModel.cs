@@ -21,5 +21,8 @@ namespace MCLevelEdit.ViewModels
 
         [ObservableProperty]
         private byte _castleLevel;
+
+        [ObservableProperty]
+        private SpellsViewModel _spells = new SpellsViewModel();
     }
 }
