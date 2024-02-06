@@ -24,6 +24,13 @@
                  IsChecked="{Binding GameIsClassic}"
                  GroupName="grpGameType"
                  Content="Original"/>
+    <Button Name="btnSetDefaults"
+            Grid.Column="2"
+            Grid.Row="0"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Content="Set Defaults"
+            Command="{Binding SetDefaultsCommand}"/>
     <Label Grid.Column="0"
            Grid.Row="1"
            Content="Level File:"

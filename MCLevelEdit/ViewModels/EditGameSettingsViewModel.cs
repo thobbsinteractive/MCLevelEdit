@@ -24,12 +24,20 @@ namespace MCLevelEdit.ViewModels
         private string[] _levelPaths;
         private bool _gameIsClassic = false;
 
-        private string _gameExePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\Launch Magic Carpet Plus.lnk";
-        private string _gameLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\";
-        private string _gameCloudLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\cloud_saves\CARPET.CD\LEVELS\";
+        private string _defaultClassicExePath = @"C:\CARPET\CARPET.EXE";
+        private string _defaultClassicLevelsPath = @"C:\CARPET\LEVELS\";
+
+        private string _defaultGoGExePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\Launch Magic Carpet Plus.lnk";
+        private string _defaultGoGLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\";
+        private string _defaultGoGCloudLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\cloud_saves\CARPET.CD\LEVELS\";
+
+        private string _gameExePath;
+        private string _gameLevelsPath;
+        private string _gameCloudLevelsPath;
 
         public ICommand RunLevelCommand { get; }
         public ICommand CheckLevelCommand { get; }
+        public ICommand SetDefaultsCommand { get; }
 
         public ICommand SelectLevelsCommand { get; }
         public ICommand SelectGameFolderCommand { get; }
@@ -103,6 +111,10 @@ namespace MCLevelEdit.ViewModels
                         GameCloudLevelsPath = gameLevelFolders[1];
                 }
             }
+            else
+            {
+                SetDefaultPaths();
+            }
 
             SelectLevelsCommand = ReactiveCommand.CreateFromTask(async () =>
             {
@@ -145,6 +157,11 @@ namespace MCLevelEdit.ViewModels
             {
                 return SaveLevelPaths();
             });
+
+            SetDefaultsCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                SetDefaultPaths();
+            });
         }
 
         public void SetLevelPaths(string[] levelPaths)
@@ -153,6 +170,21 @@ namespace MCLevelEdit.ViewModels
         
             this.RaisePropertyChanged(nameof(LevelPathsString));
             this.RaisePropertyChanged(nameof(CanRun));
+        }
+
+        private void SetDefaultPaths()
+        {
+            if (this.GameIsClassic)
+            {
+                GameExePath = _defaultClassicExePath;
+                GameLevelsPath = _defaultClassicLevelsPath;
+            }
+            else
+            {
+                GameExePath = _defaultGoGExePath;
+                GameLevelsPath = _defaultGoGLevelsPath;
+                GameCloudLevelsPath = _defaultGoGCloudLevelsPath;
+            }
         }
 
         private async Task SelectLevelFiles()
