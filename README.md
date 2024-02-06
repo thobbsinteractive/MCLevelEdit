@@ -9,6 +9,7 @@ Without Moburma's research and his original repo https://github.com/Moburma/MCLe
 https://github.com/thobbsinteractive/MCLevelEdit/releases/latest
 
 ## Usage
+* Extract the Zip file to the folder of your choice. Run the MCLevelEdit.Desktop.exe.
 * Most of the editor is fairly easy to use. The editor should load with randomly generated Terrain.
 * To play levels, simply configure the Game Settings via its menu and click then [Run].
 * Keep in mind that a large number of the game's levels work by only giving the player the spell inventory they have found at that point, and ignore what is set in the level file. When you use the [Run] button, your level will be the first one in the game and the player will always start with NO spells, regardless what is set in the level file. So include the spells on the ground at map start.
@@ -40,8 +41,8 @@ White - Switch (hidden switches)<br/>
 - [ ] Hopefully I will get to reverse engineering the MC1 terrain generation as there are slight differences
 - [ ] Implement Hidden Worlds
 
-## Steps: to build and run this code
-### Windows:
+# Steps: to build and run this code #
+## Windows:
 - 1: Install the latest version of Visual Studio 2022 Community. Download and install .Net 7 SDK
 - 2: Pull the development branch
 - 3: Open "MCLevelEdit.sln"
@@ -49,14 +50,11 @@ White - Switch (hidden switches)<br/>
 - 5: Build/run the code
 - 6: Purchase a copy of Magic Carpet 1 from GOG here: https://www.gog.com/game/magic_carpet
 
-### Linux:
+## Linux:
 - 1 Avalonia should compile and run on Linux, but I have not tested it.
 
-## License ##
-### Terrain generation code is Copyright 1995 Bullfrog Productions ###
-
-### Additonal Code is Licensed under the following MIT Licence: ###
-Copyright 2024 Tim Hobbs
+# Code is Licensed under the following MIT Licence:
+Copyright 2024 Tim Hobbs, Level Packager and Loading and Saving code is converted from Moburma's [repo](https://github.com/Moburma/MCLevelEdit)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
