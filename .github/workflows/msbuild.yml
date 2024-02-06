@@ -34,7 +34,22 @@ jobs:
     - name: Build ${{matrix.BUILD_CONFIGURATION}} ${{matrix.BUILD_PLATFORM}}
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: msbuild /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit/MCLevelEdit.sln
-      
+    
+    - name: Run MagicCarpet2Terrain Unit Test
+      if: ${{ matrix.BUILD_CONFIGURATION == 'Debug' }}
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nunit-console.exe /xml:MagicCarpet2Terrain.xml ${{env.SOLUTION_FILE_PATH}}/MagicCarpet2Terrain.Test/bin/${{matrix.BUILD_CONFIGURATION}}/net7.0/MagicCarpet2Terrain.Test.dll
+
+    - name: Run MagicCarpetLevelPackager Unit Test
+      if: ${{ matrix.BUILD_CONFIGURATION == 'Debug' }}
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nunit-console.exe /xml:MagicCarpetLevelPackager.xml ${{env.SOLUTION_FILE_PATH}}/MagicCarpetLevelPackager.Test/bin/${{matrix.BUILD_CONFIGURATION}}/net7.0/MagicCarpetLevelPackager.Test.dll
+            
+    - name: Run MCLevelEdit Unit Test
+      if: ${{ matrix.BUILD_CONFIGURATION == 'Debug' }}
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nunit-console.exe /xml:MCLevelEdit.xml ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit.Test/bin/${{matrix.BUILD_CONFIGURATION}}/net7.0/MCLevelEdit.Test.dll
+
     - name: Archive
       if: ${{ github.REF_NAME == 'master' && matrix.BUILD_CONFIGURATION == 'Debug' && matrix.BUILD_PLATFORM == 'Any CPU' }}    
       uses: actions/upload-artifact@v3
