@@ -36,5 +36,37 @@ namespace MCLevelEdit.Model.Domain.Validation
                 return new ValidationResult(0, Result.Fail, $"Entity or Entities was null!");
             }
         }
+
+        public static ValidationResult BuildingHasSwidAndDisIdAndParent(Entity entity)
+        {
+
+            if (entity is not null)
+            {
+                if (entity.EntityType.TypeId == TypeId.Effect && entity.EntityType.Model.Id == (int)Effect.VillagerBuilding)
+                {
+                    if (entity.DisId != ushort.MaxValue)
+                    {
+                        return new ValidationResult(entity.Id, Result.Warning, $"Building should have DisId {ushort.MaxValue} set!");
+                    }
+                    if (entity.SwitchId != ushort.MaxValue)
+                    {
+                        return new ValidationResult(entity.Id, Result.Warning, $"Building should have SwitchId {ushort.MaxValue} set!");
+                    }
+                    if (entity.Parent == 0)
+                    {
+                        return new ValidationResult(entity.Id, Result.Warning, $"Building Parent {entity.Parent} should be greater than zero!");
+                    }
+                    return new ValidationResult(entity.Id, Result.Pass, nameof(BuildingHasSwidAndDisIdAndParent));
+                }
+                else
+                {
+                    return new ValidationResult(entity.Id, Result.Pass, nameof(BuildingHasSwidAndDisIdAndParent));
+                }
+            }
+            else
+            {
+                return new ValidationResult(0, Result.Fail, $"Entity was null!");
+            }
+        }
     }
 }

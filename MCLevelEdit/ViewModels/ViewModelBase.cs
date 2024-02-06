@@ -37,8 +37,8 @@ public class ViewModelBase : ReactiveObject
 
         if (entity.EntityType.TypeId == TypeId.Effect && entity.EntityType.Model.Id == (int)Effect.VillagerBuilding)
         {
-            entity.DisId = 65535;
-            entity.SwitchId = 65535;
+            entity.DisId = ushort.MaxValue;
+            entity.SwitchId = ushort.MaxValue;
             entity.Parent = 1;
         }
         

@@ -25,63 +25,63 @@ public class Map
         {
             Name = "Vodor",
             IsActive = false,
-            Agression = 0,
-            Perception = 0,
-            Reflexes = 0,
+            Agression = 128,
+            Perception = 128,
+            Reflexes = 128,
             CastleLevel = 0
         },
         new Wizard()
         {
             Name = "Gryshnak",
             IsActive = false,
-            Agression = 0,
-            Perception = 0,
-            Reflexes = 0,
+            Agression = 128,
+            Perception = 128,
+            Reflexes = 128,
             CastleLevel = 0
         },
         new Wizard()
         {
             Name = "Mahmoud",
             IsActive = false,
-            Agression = 0,
-            Perception = 0,
-            Reflexes = 0,
+            Agression = 128,
+            Perception = 128,
+            Reflexes = 128,
             CastleLevel = 0
         },
         new Wizard()
         {
             Name = "Syed",
             IsActive = false,
-            Agression = 0,
-            Perception = 0,
-            Reflexes = 0,
+            Agression = 128,
+            Perception = 128,
+            Reflexes = 128,
             CastleLevel = 0
         },
         new Wizard()
         {
             Name = "Raschid",
             IsActive = false,
-            Agression = 0,
-            Perception = 0,
-            Reflexes = 0,
+            Agression = 128,
+            Perception = 128,
+            Reflexes = 128,
             CastleLevel = 0
         },
         new Wizard()
         {
             Name = "Alhabbal",
             IsActive = false,
-            Agression = 0,
-            Perception = 0,
-            Reflexes = 0,
+            Agression = 128,
+            Perception = 128,
+            Reflexes = 128,
             CastleLevel = 0
         },
         new Wizard()
         {
             Name = "Scheherazade",
             IsActive = false,
-            Agression = 0,
-            Perception = 0,
-            Reflexes = 0,
+            Agression = 128,
+            Perception = 128,
+            Reflexes = 128,
             CastleLevel = 0
         }
     };
@@ -136,6 +136,7 @@ public class Map
         foreach(Entity entity in this.Entities)
         {
             ValidationResults.Add(EntityRules.HasSwitch(entity, Entities));
+            ValidationResults.Add(EntityRules.BuildingHasSwidAndDisIdAndParent(entity));
         }
         
         return ValidationResults;
