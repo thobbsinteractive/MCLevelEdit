@@ -11,7 +11,7 @@ https://github.com/thobbsinteractive/MCLevelEdit/releases/latest
 ## Usage
 * Extract the Zip file to the folder of your choice. Run the MCLevelEdit.Desktop.exe.
 * Most of the editor is fairly easy to use. The editor should load with randomly generated Terrain.
-* To play levels, simply configure the Game Settings via its menu and click then [Run].
+* To play levels, simply configure the Game Settings via its menu and click then [Run]. Select Magic Carpet on the main menu click the Globe to run your level!
 * Keep in mind that a large number of the game's levels work by only giving the player the spell inventory they have found at that point, and ignore what is set in the level file. When you use the [Run] button, your level will be the first one in the game and the player will always start with NO spells, regardless what is set in the level file. So include the spells on the ground at map start.
 
 ## Edit Magic Carpet 1 Levels
