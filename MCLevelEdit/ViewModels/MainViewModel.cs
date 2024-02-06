@@ -188,13 +188,6 @@ public class MainViewModel : ViewModelBase
         string suggestedFileName = !string.IsNullOrWhiteSpace(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
         IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Pictures);
 
-        if (!string.IsNullOrWhiteSpace(map.FilePath))
-        {
-            suggestedFileName = Path.GetFileName(map.FilePath);
-            storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
-            suggestedExtension = Path.GetExtension(map.FilePath);
-        }
-
         // Start async operation to open the dialog.
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
