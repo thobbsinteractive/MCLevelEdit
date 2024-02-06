@@ -92,5 +92,43 @@ namespace MCLevelEdit.Application.Services
             }
             return false;
         }
+
+        public async Task<bool> BackupLevelFiles(string[] gameLevelsPaths)
+        { 
+            if (gameLevelsPaths is not null && gameLevelsPaths.Any())
+            {
+                try
+                {
+                    foreach (var gameLevelsPath in gameLevelsPaths)
+                    {
+                        FileUtils.CopyBackupFiles(gameLevelsPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error backing up files: " + ex.Message);
+                }
+            }
+            return false;
+        }
+
+        public async Task<bool> RestoringLevelFiles(string[] gameLevelsPaths)
+        {
+            if (gameLevelsPaths is not null && gameLevelsPaths.Any())
+            {
+                try
+                {
+                    foreach (var gameLevelsPath in gameLevelsPaths)
+                    {
+                        FileUtils.RestoreBackupFiles(gameLevelsPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error restoring up files: " + ex.Message);
+                }
+            }
+            return false;
+        }
     }
 }
