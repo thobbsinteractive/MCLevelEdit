@@ -18,7 +18,6 @@ jobs:
     strategy:
       matrix:
         BUILD_CONFIGURATION: [Debug, Release]
-        BUILD_PLATFORM: [Any CPU]
 
     steps:
     - uses: actions/checkout@v2
@@ -34,7 +33,7 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: nuget restore ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit/MCLevelEdit.sln
 
-    - name: Build ${{matrix.BUILD_CONFIGURATION}} ${{matrix.BUILD_PLATFORM}}
+    - name: Build ${{matrix.BUILD_CONFIGURATION}}
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: dotnet build /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit/MCLevelEdit.sln
     
@@ -54,7 +53,7 @@ jobs:
       run: dotnet test --logger "trx;LogFileName=MCLevelEdit.trx" /p:Configuration=${{matrix.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit.Test/MCLevelEdit.Test.csproj
 
     - name: Archive
-      if: ${{ github.REF_NAME == 'development' && matrix.BUILD_CONFIGURATION == 'Debug' && matrix.BUILD_PLATFORM == 'Any CPU' }}    
+      if: ${{ github.REF_NAME == 'master' && matrix.BUILD_CONFIGURATION == 'Release' }}    
       uses: actions/upload-artifact@v3
       with:
         name: MCLevelEdit
