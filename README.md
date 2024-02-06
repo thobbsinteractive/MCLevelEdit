@@ -1,33 +1,23 @@
 # MCLevelEdit
-A simplistic Level Editor for the Bullfrog Productions game Magic Carpet. It's written in PowerShell 5, but will eventually get re-written into C#.
+A C# Level Editor for the Bullfrog Productions game Magic Carpet. 30 years late, but better late than never. It is written in Avalonia and C#. Currently this only works for the original Magic Carpet (but ironically uses the MC2 terrain generation algorithem). In the future versions, Hidden worlds should be possible.
 
-Currently it only works for the original Magic Carpet, but likely works fine for levels from the Hidden Worlds expansion too. It does not work with Magic Carpet 2 levels (yet).
-
-At the moment this is more of a proof of concept release, it is useful mainly for reverse engineering and editing the existing levels. It will eventually support making your own levels from scratch, better support for which should come soon.
+Without Moburma's research and his original repo https://github.com/Moburma/MCLevelEdit this could not have been written.
 
 ![Example Screenshot](MCLevelEdit1.png)
 
-## New in Version 0.3
-
-* Mana estimation to help work out reasonable mana targets for levels. Press the button to force a recalculation of this when you add more Things.
-* MapGen Attributes. You can change the fundamentals of how a level looks with these. Note any changes you make will NOT be reflected within the map image, you will need to make changes by trial and error, sadly.
-* Wizard AI Attributes. These are not understood, but determine how skilled a wizard is in-game. Tick the box to toggle seeing these in the Wizard stats window.
-* New Map button. This actually loads a file called template.dat with nothing in it. Use this to make new maps based on templates for e.g. common Wizard stats.
+## Download the latest Beta Here! ##
+https://github.com/thobbsinteractive/MCLevelEdit/releases/latest
 
 ## Usage
+* Most of the editor is fairly easy to use. The editor should load with randomly generated Terrain.
+* To play levels, simply configure the Game Settings via its menu and click then [Run].
+* Keep in mind that a large number of the game's levels work by only giving the player the spell inventory they have found at that point, and ignore what is set in the level file. When you use the [Run] button, your level will be the first one in the game and the player will always start with NO spells, regardless what is set in the level file. So include the spells on the ground at map start.
 
-* You will need the original loose level files. These are NOT included with Magic Carpet Plus, but can be found on the original Magic Carpet CD in the LEVELS directory. Either that, or you can extact them yourself with my [MCDatTab](https://github.com/Moburma/MCDatExtractor) tool.
+## Edit Magic Carpet 1 Levels
+* If you want to load and edit the MC1 Levels, you will need the original loose level files. These are NOT included with Magic Carpet Plus, but can be found on the original Magic Carpet CD in the LEVELS directory. Either that, or you can extact them yourself with Moburma's [MCDatTab](https://github.com/Moburma/MCDatExtractor) tool (I plan on adding decompression and extraction of levels to the PagkageAdapter at some point).
 * You will need to decompress the levels to edit them. They are RNC compressed and there are many tools available to achieve this, [this](https://github.com/lab313ru/rnc_propack_source) tool is recommended
-* Once the above is complete, run the script via PowerShell: MCLevelEdit.PS1
-* Choose Load to load one of the extracted and uncompressed level files above
-* Edit levels as you see fit
-* When finished press the save button to save a level file. Note this takes a relatively long time (approx 30 seconds) to save, so be patient! You will see a prompt when complete
-* To play levels, you can optionally RNC pack them first, and then add them with the other level files to the LEVELS.DAT/TAB file. To do this, see my other script [here](https://github.com/Moburma/MCDatTab)
-* Keep in mind that a large number of the game's levels work by only giving the player the spell inventory they have found at that point, and ignore what is set in the level file. If you set your level as the first one in the game, for example, the player will always start with NO spells, regardless what is set in the level file. To work around this, either save as a later "spell vampire" level, include the spells on the ground at map start, or use the Alpha executable found on the original game CD (non-Magic Carpet Plus) for testing
 
 For information on game entities and attributes, see [here](https://tcrf.net/Notes:Magic_Carpet_(DOS)) and [here](https://github.com/michaelhoward/MagicCarpetFileFormat/blob/master/magic%20carpet%20file%20format.txt).
-
-Things placed in a level will appear in the map overview at the top left of the window. The currently highlighted object in the main dataview will appear orange (can be hard to see), so use that to know which object is where. Things like large buildings, craters, and walls just appear as small dots, so what is seen here is not the same as in-game.
 
 Map Key:<br/>
 Red - Creature (enemies but also villagers)<br/>
@@ -37,15 +27,39 @@ Purple - Spells<br/>
 Cyan - Effect (things like explosions but also extra map elements like canyons and walls)<br/>
 White - Switch (hidden switches)<br/>
 
-## Limitations/Known issues
+# ROADMAP:
 
-* The map image support is very crude and only a few levels have map images pre-created. The rest will appear as black squares
-* Removed items still appear on the map image
-* No editing of mana total and target yet
+## MILLSTONE 1
+- [ ] Currently the Mana Calculation is wrong. More investigation is needed with the existing levels.
+- [ ] Add filter drop downs to the Tree and the Edit Entities views.
+- [ ] Add custom tools for creating Walls/Paths and Teleports.
+- [ ] Add validation rules for Walls/Paths and Teleports.
+- [ ] Adding decompression and extraction of levels to the PagkageAdapter so you can directly open from the Editor
 
-## Todo
+## MILLSTONE 2
+- [ ] Hopefully I will get to reverse engineering the MC1 terrain generation as there are slight differences
+- [ ] Implement Hidden Worlds
 
-* Support for editing level mana total and mana target
-* Hopefully integration with the [REMC2](https://github.com/thobbsinteractive/magic-carpet-2-hd) project to have proper realtime map view
-* Magic Carpet 2 level support - unlikely, check out [REMC2](https://github.com/thobbsinteractive/magic-carpet-2-hd) which now includes a Magic Carpet 2 level editor.
-* Make it look nicer
+## Steps: to build and run this code
+### Windows:
+- 1: Install the latest version of Visual Studio 2022 Community. Download and install .Net 7 SDK
+- 2: Pull the development branch
+- 3: Open "MCLevelEdit.sln"
+- 4: Set the MCLevelEdit.Desktop as the startup project
+- 5: Build/run the code
+- 6: Purchase a copy of Magic Carpet 1 from GOG here: https://www.gog.com/game/magic_carpet
+
+### Linux:
+- 1 Avalonia should compile and run on Linux, but I have not tested it.
+
+## License ##
+### Terrain generation code is Copyright 1995 Bullfrog Productions ###
+
+### Additonal Code is Licensed under the following MIT Licence: ###
+Copyright 2024 Tim Hobbs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
