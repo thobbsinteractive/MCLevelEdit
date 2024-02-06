@@ -41,6 +41,13 @@ White - Switch (hidden switches)<br/>
 - [ ] Hopefully I will get to reverse engineering the MC1 terrain generation as there are slight differences
 - [ ] Implement Hidden Worlds
 
+## Build Status:
+
+|Branch|Windows|
+|------|:-----:|
+|master|[![MSBuild CI](https://github.com/thobbsinteractive/MCLevelEdit/actions/workflows/msbuild.yml/badge.svg?branch=master)](https://github.com/thobbsinteractive/MCLevelEdit/actions/workflows/msbuild.yml)
+|development|[![MSBuild CI](https://github.com/thobbsinteractive/MCLevelEdit/actions/workflows/msbuild.yml/badge.svg?branch=development)](https://github.com/thobbsinteractive/MCLevelEdit/actions/workflows/msbuild.yml)
+
 # Steps: to build and run this code #
 ## Windows:
 - 1: Install the latest version of Visual Studio 2022 Community. Download and install .Net 7 SDK
