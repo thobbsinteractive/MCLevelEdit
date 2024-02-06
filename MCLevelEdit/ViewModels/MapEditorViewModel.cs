@@ -434,13 +434,18 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             Task.Run(async () =>
             {
                 this.Log().Debug("Refreshing Preview...");
-                BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(0, 0, 0, 0), Preview);
 
                 var map = _mapService.GetMap();
                 if (map.Terrain is not null)
                 {
                     this.Log().Debug("Drawing Terrain...");
-                    await _terrainService.DrawBitmapAsync(Preview, map.Terrain, _selectedLayer);
+                    var preview = new WriteableBitmap(new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
+                        new Avalonia.Vector(96, 96),
+                        PixelFormat.Rgba8888);
+
+                    BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(0, 0, 0, 0), preview);
+
+                    Preview = await _terrainService.DrawBitmapAsync(preview, map.Terrain, _selectedLayer);
                 }
 
                 this.Log().Debug("Preview refreshed");
