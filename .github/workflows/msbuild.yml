@@ -1,0 +1,44 @@
+name: MSBuild CI
+
+on: 
+  push:
+    branches:
+      [ master, development ]
+  pull_request:
+      types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        BUILD_CONFIGURATION: [Debug, Release]
+        BUILD_PLATFORM: [Any CPU]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1
+      
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit/MCLevelEdit.sln
+
+    - name: Build ${{matrix.BUILD_CONFIGURATION}} ${{matrix.BUILD_PLATFORM}}
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} /p:PlatformTarget=${{matrix.BUILD_PLATFORM}} /p:Platform=${{matrix.BUILD_PLATFORM}} ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit/MCLevelEdit.sln
+      
+    - name: Archive
+      if: ${{ github.REF_NAME == 'master' && matrix.BUILD_CONFIGURATION == 'Debug' && matrix.BUILD_PLATFORM == 'Any CPU' }}    
+      uses: actions/upload-artifact@v3
+      with:
+        name: MCLevelEdit
+        path: ${{env.SOLUTION_FILE_PATH}}/Debug/net7.0/
+        if-no-files-found: error
