@@ -1,8 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
-using MCLevelEdit.Application.Services;
-using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
@@ -24,6 +22,8 @@ namespace MCLevelEdit.ViewModels
         protected readonly IGameService _gameService;
 
         private string[] _levelPaths;
+        private bool _gameIsClassic = false;
+
         private string _gameExePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\Launch Magic Carpet Plus.lnk";
         private string _gameLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\";
         private string _gameCloudLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\cloud_saves\CARPET.CD\LEVELS\";
@@ -45,6 +45,12 @@ namespace MCLevelEdit.ViewModels
         {
             get => _levelPaths;
             set => this.RaiseAndSetIfChanged(ref _levelPaths, value);
+        }
+
+        public bool GameIsClassic
+        {
+            get => _gameIsClassic;
+            set => this.RaiseAndSetIfChanged(ref _gameIsClassic, value);
         }
 
         public string GameExePath
@@ -79,6 +85,8 @@ namespace MCLevelEdit.ViewModels
             {
                 var gameExePath = settings.GameExeLocation;
 
+                GameIsClassic = settings.IsForClassic;
+
                 if (!string.IsNullOrEmpty(gameExePath))
                 {
                     GameExePath = gameExePath;
@@ -91,7 +99,7 @@ namespace MCLevelEdit.ViewModels
                     if (gameLevelFolders.Length > 0)
                         GameLevelsPath = gameLevelFolders[0];
 
-                    if (gameLevelFolders.Length > 1)
+                    if (!settings.IsForClassic && gameLevelFolders.Length > 1)
                         GameCloudLevelsPath = gameLevelFolders[1];
                 }
             }
@@ -201,8 +209,6 @@ namespace MCLevelEdit.ViewModels
             {
                 GameLevelsPath = folder[0].Path.AbsolutePath;
             }
-
-
         }
 
         private async Task SelectCloudLevelsFolder()
@@ -225,7 +231,7 @@ namespace MCLevelEdit.ViewModels
 
         private void AutoPopulateFolders(string gameFolder)
         {
-            GameExePath = GetFilePath(gameFolder, "Launch Magic Carpet Plus");
+            GameExePath = GetFilePath(gameFolder, "Launch Magic Carpet Plus.lnk");
             var gameLevelsFolder = Path.Combine(gameFolder, @"CARPET.CD\LEVELS");
             if (GetFilePath(gameLevelsFolder, "LEVELS.DAT")?.Length > 0 && GetFilePath(gameLevelsFolder, "LEVELS.TAB")?.Length > 0)
             {
@@ -283,6 +289,7 @@ namespace MCLevelEdit.ViewModels
         {
             var settings = new Settings()
             {
+                IsForClassic = this.GameIsClassic,
                 GameExeLocation = this.GameExePath,
                 GameLevelFolders = new string[] { this.GameLevelsPath, this.GameCloudLevelsPath }
             };

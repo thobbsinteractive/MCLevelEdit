@@ -30,6 +30,7 @@
     </Label>
     <Label Grid.Column="1"
            Grid.Row="1"
+           Grid.ColumnSpan="2"
            Margin="5,0"
            HorizontalAlignment="Stretch"
            Content="{Binding ManaTotal}">
