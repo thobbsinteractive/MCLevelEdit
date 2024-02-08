@@ -1,11 +1,17 @@
-﻿namespace MCLevelEdit.ViewModels
+﻿using ReactiveUI;
+using System.Windows.Input;
+
+namespace MCLevelEdit.ViewModels
 {
-    public class AbilitiesViewModel
+    public class AbilitiesViewModel : ReactiveObject
     {
+
         public bool StartsWith { get; set; }
         public bool CannotHave { get; set; }
         public bool WillLearnIfYouDo { get; set; }
         public bool CarriesCannotUse { get; set; }
+
+        public ICommand ChangeSpellCommand { get; }
 
         public AbilitiesViewModel() { }
 
@@ -16,6 +22,11 @@
             CannotHave = value1 == 0 && value2 == 0;
             WillLearnIfYouDo = value1 == 0 && value2 == 1;
             CarriesCannotUse = value1 == 1 && value2 == 0;
+
+            ChangeSpellCommand = ReactiveCommand.Create(() =>
+            {
+                SetNext();
+            });
         }
 
         public (byte, byte) GetBytes()
@@ -33,6 +44,38 @@
                 return new (1, 0);
 
             return new (0, 1);
+        }
+
+        public void SetNext()
+        {
+            if (StartsWith)
+            {
+                StartsWith = false;
+                WillLearnIfYouDo = true;
+                CarriesCannotUse = false;
+                CannotHave = false;
+            }
+            else if (WillLearnIfYouDo)
+            {
+                StartsWith = false;
+                WillLearnIfYouDo = false;
+                CarriesCannotUse = true;
+                CannotHave = false;
+            }
+            else if (CarriesCannotUse)
+            {
+                StartsWith = false;
+                WillLearnIfYouDo = false;
+                CarriesCannotUse = false;
+                CannotHave = true;
+            }
+            else if (CannotHave)
+            {
+                StartsWith = true;
+                WillLearnIfYouDo = false;
+                CarriesCannotUse = false;
+                CannotHave = false;
+            }
         }
     }
 }
