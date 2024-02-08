@@ -2,9 +2,9 @@
 
 public class FileUtils
 {
-    public static void DeleteExistingFiles(string folderPath)
+    public static void DeleteExistingFiles(string folderPath, string levelsFileName = "LEVELS.DAT")
     {
-        string levelsdat = GetFilePath(folderPath, "LEVELS.DAT");
+        string levelsdat = GetFilePath(folderPath, levelsFileName);
         if (levelsdat != null)
         {
             FileInfo fInfo = new FileInfo(levelsdat);
@@ -14,7 +14,7 @@ public class FileUtils
             }
             File.Delete(levelsdat);
         }
-        string levelstab = GetFilePath(folderPath, "LEVELS.TAB");
+        string levelstab = GetFilePath(folderPath, Path.ChangeExtension(levelsFileName, "TAB"));
         if (levelstab != null)
         {
             FileInfo fInfo = new FileInfo(levelstab);
@@ -26,16 +26,16 @@ public class FileUtils
         }
     }
 
-    public static void SetFilesToReadonly(string folderPath)
+    public static void SetFilesToReadonly(string folderPath, string levelsFileName = "LEVELS.DAT")
     {
-        string levelsdat = GetFilePath(folderPath, "LEVELS.DAT");
+        string levelsdat = GetFilePath(folderPath, levelsFileName);
         if (levelsdat != null)
         {
             FileInfo fInfo = new FileInfo(levelsdat);
             fInfo.IsReadOnly = true;
 
         }
-        string levelstab = GetFilePath(folderPath, "LEVELS.TAB");
+        string levelstab = GetFilePath(folderPath, Path.ChangeExtension(levelsFileName, "TAB"));
         if (levelstab != null)
         {
             FileInfo fInfo = new FileInfo(levelstab);
@@ -81,20 +81,19 @@ public class FileUtils
     {
         try
         {
-            string backupPathLevelsdat = GetFilePath(backLevelsFolderPath, levelsFileName);
-            if (string.IsNullOrWhiteSpace(backupPathLevelsdat))
-                throw new ArgumentNullException(nameof(backupPathLevelsdat));
+            if (string.IsNullOrWhiteSpace(levelsFolderPath))
+                throw new ArgumentNullException(nameof(levelsFolderPath));
+
+            string backupPathLevelsdat = GetFilePath(backLevelsFolderPath, Path.ChangeExtension(levelsFileName, "DAT.BK"));
+            if (string.IsNullOrWhiteSpace(backLevelsFolderPath))
+                throw new ArgumentNullException(nameof(backLevelsFolderPath));
 
             if (Directory.Exists(levelsFolderPath))
             {
                 File.Copy(backupPathLevelsdat, Path.Combine(levelsFolderPath, levelsFileName), true);
             }
 
-
-            string backupPathLevelstab = GetFilePath(backLevelsFolderPath, Path.ChangeExtension(levelsFileName, "TAB"));
-
-            if (string.IsNullOrWhiteSpace(backupPathLevelstab))
-                throw new ArgumentNullException(nameof(backupPathLevelstab));
+            string backupPathLevelstab = GetFilePath(backLevelsFolderPath, Path.ChangeExtension(levelsFileName, "TAB.BK"));
 
             if (Directory.Exists(levelsFolderPath))
             {

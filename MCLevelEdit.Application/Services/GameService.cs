@@ -117,6 +117,8 @@ namespace MCLevelEdit.Application.Services
                 {
                     foreach (var gameLevelsPath in gameLevelsPaths)
                     {
+                        FileUtils.DeleteExistingFiles(gameLevelsPath);
+
                         if (!FileUtils.RestoreBackupFiles(gameLevelsPath, gameLevelsBackupPath))
                             return false;
                     }

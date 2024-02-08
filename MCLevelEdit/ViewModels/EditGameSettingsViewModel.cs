@@ -50,6 +50,7 @@ namespace MCLevelEdit.ViewModels
         public ICommand SelectBackupLevelsFolderCommand { get; }
 
         public ICommand SaveCommand { get; }
+        public ICommand RestoreCommand { get; }
 
         public string LevelPathsString => _levelPaths is not null ? string.Join(",", _levelPaths) : string.Empty;
         public bool CanRun => _levelPaths?.Length > 0;
@@ -178,6 +179,11 @@ namespace MCLevelEdit.ViewModels
             SaveCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 return SaveLevelPaths();
+            });
+
+            RestoreCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                return RestoreLevels();
             });
 
             SetDefaultsCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -388,6 +394,25 @@ namespace MCLevelEdit.ViewModels
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error backing up Levels! Do you want to continue?", ButtonEnum.OkCancel, Icon.Warning);
                 var result = await box.ShowAsync();
                 return result == ButtonResult.Ok;
+            }
+            return true;
+        }
+
+        private async Task<bool> RestoreLevels()
+        {
+            var paths = new string[] { this.GameLevelsPath };
+
+            if (!GameIsClassic)
+            {
+                paths = new string[] { this.GameLevelsPath, this.GameCloudLevelsPath };
+            }
+
+            if (!await _gameService.RestoringLevelFiles(this.GameLevelsBackupPath, paths))
+            {
+                Console.WriteLine($"Error restoring you game files Levels!");
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error restoring you game files Levels!", ButtonEnum.Ok, Icon.Error);
+                await box.ShowAsync();
+                return false;
             }
             return true;
         }
