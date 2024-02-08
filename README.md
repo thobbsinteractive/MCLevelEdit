@@ -32,14 +32,17 @@ White - Switch (hidden switches)<br/>
 
 ## MILLSTONE 1
 - [ ] Currently the Mana Calculation is wrong. More investigation is needed with the existing levels.
+- [ ] Implement click and drag of Entities to move them on the map
 - [ ] Add filter drop downs to the Tree and the Edit Entities views.
-- [ ] Add custom tools for creating Walls/Paths and Teleports.
-- [ ] Add validation rules for Walls/Paths and Teleports.
 - [ ] Adding decompression and extraction of levels to the PagkageAdapter so you can directly open from the Editor
 
 ## MILLSTONE 2
+- [ ] Add custom tools for creating Walls/Paths and Teleports.
+- [ ] Add validation rules for Walls/Paths and Teleports.
+
+## MILLSTONE 3
+- [ ] Implement editing and running Hidden Worlds
 - [ ] Hopefully I will get to reverse engineering the MC1 terrain generation as there are slight differences
-- [ ] Implement Hidden Worlds
 
 ## Build Status:
 
@@ -58,13 +61,4 @@ White - Switch (hidden switches)<br/>
 - 6: Purchase a copy of Magic Carpet 1 from GOG here: https://www.gog.com/game/magic_carpet
 
 ## Linux:
-- 1 Avalonia should compile and run on Linux, but I have not tested it.
-
-# Code is Licensed under the following MIT Licence:
-Copyright 2024 Tim Hobbs, Level Packager and Loading and Saving code is converted from Moburma's [repo](https://github.com/Moburma/MCLevelEdit)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+- 1: Avalonia should compile and run on Linux, but I have not tested it.
