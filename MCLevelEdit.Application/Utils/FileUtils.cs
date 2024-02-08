@@ -59,7 +59,12 @@ public class FileUtils
 
             if (Directory.Exists(backLevelsFolderPath))
             {
-                File.Copy(levelsdat, Path.Combine(backLevelsFolderPath, Path.ChangeExtension(levelsFileName, "DAT.BK")), false);
+                var backupLevelsDat = Path.Combine(backLevelsFolderPath, Path.ChangeExtension(levelsFileName, "DAT.BK"));
+
+                if (File.Exists(backupLevelsDat))
+                    return false;
+
+                File.Copy(levelsdat, backupLevelsDat, false);
             }
 
             string levelstab = GetFilePath(folderPath, Path.ChangeExtension(levelsFileName, "TAB"));

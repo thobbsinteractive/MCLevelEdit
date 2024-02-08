@@ -66,11 +66,14 @@ namespace MCLevelEdit.Application.Services
 
             var gameLevelsPaths = settings?.GameLevelFolders;
             var gameExeLocation = settings?.GameExeLocation;
+            var gameLevelsBackupPath = settings?.GameBackupFolder;
 
             if (!string.IsNullOrWhiteSpace(gameExeLocation) && gameLevelsPaths is not null && gameLevelsPaths.Any())
             {
                 try
                 {
+                    await BackupLevelFiles(gameLevelsPaths[0], gameLevelsBackupPath);
+
                     foreach (var gameLevelsPath in gameLevelsPaths)
                     {
                         FileUtils.DeleteExistingFiles(gameLevelsPath);
