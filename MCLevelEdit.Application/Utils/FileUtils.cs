@@ -43,58 +43,70 @@ public class FileUtils
         }
     }
 
-    public static void CopyBackupFiles(string folderPath)
+    public static bool CopyBackupFiles(string folderPath, string backLevelsFolderPath, string levelsFileName = "LEVELS.DAT")
     {
-        string levelsdat = GetFilePath(folderPath, "LEVELS.DAT");
-        if (levelsdat != null)
+        try
         {
-            var backupPath = Path.Combine(Path.GetDirectoryName(levelsdat), "backup");
-            if (!Directory.Exists(backupPath))
+            string levelsdat = GetFilePath(folderPath, levelsFileName);
+
+            if (string.IsNullOrWhiteSpace(levelsdat))
+                throw new ArgumentNullException(nameof(levelsdat));
+
+            if (!Directory.Exists(backLevelsFolderPath))
             {
-                Directory.CreateDirectory(backupPath);
+                Directory.CreateDirectory(backLevelsFolderPath);
             }
 
-            if (Directory.Exists(backupPath))
+            if (Directory.Exists(backLevelsFolderPath))
             {
-                File.Copy(levelsdat, Path.Combine(backupPath, "LEVELS.DAT"), false);
+                File.Copy(levelsdat, Path.Combine(backLevelsFolderPath, Path.ChangeExtension(levelsFileName, "DAT.BK")), false);
+            }
+
+            string levelstab = GetFilePath(folderPath, Path.ChangeExtension(levelsFileName, "TAB"));
+
+            if (Directory.Exists(backLevelsFolderPath))
+            {
+                File.Copy(levelstab, Path.Combine(backLevelsFolderPath, Path.ChangeExtension(levelsFileName, "TAB.BK")), false);
             }
         }
-
-        string levelstab = GetFilePath(folderPath, "LEVELS.TAB");
-        if (levelstab != null)
+        catch (Exception ex)
         {
-            var backupPath = Path.Combine(Path.GetDirectoryName(levelstab), "backup");
-            if (!Directory.Exists(backupPath))
-            {
-                Directory.CreateDirectory(backupPath);
-            }
-
-            if (Directory.Exists(backupPath))
-            {
-                File.Copy(levelstab, Path.Combine(backupPath, "LEVELS.TAB"), false);
-            }
+            Console.WriteLine("Error Copying Files: " + ex.ToString());
+            return false;
         }
+        return true;
     }
 
-    public static void RestoreBackupFiles(string folderPath)
+    public static bool RestoreBackupFiles(string levelsFolderPath, string backLevelsFolderPath, string levelsFileName = "LEVELS.DAT")
     {
-        string backupPathLevelsdat = GetFilePath(Path.Combine(folderPath, "backup"), "LEVELS.DAT");
-        if (backupPathLevelsdat != null)
+        try
         {
-            if (Directory.Exists(folderPath))
-            {
-                File.Copy(Path.Combine(folderPath, "LEVELS.DAT"), Path.Combine(backupPathLevelsdat, "LEVELS.DAT"), true);
-            }
-        }
+            string backupPathLevelsdat = GetFilePath(backLevelsFolderPath, levelsFileName);
+            if (string.IsNullOrWhiteSpace(backupPathLevelsdat))
+                throw new ArgumentNullException(nameof(backupPathLevelsdat));
 
-        string backupPathLevelstab = GetFilePath(Path.Combine(folderPath, "backup"), "LEVELS.TAB");
-        if (backupPathLevelstab != null)
-        {
-            if (Directory.Exists(folderPath))
+            if (Directory.Exists(levelsFolderPath))
             {
-                File.Copy(Path.Combine(folderPath, "LEVELS.TAB"), Path.Combine(backupPathLevelstab, "LEVELS.TAB"), true);
+                File.Copy(backupPathLevelsdat, Path.Combine(levelsFolderPath, levelsFileName), true);
             }
+
+
+            string backupPathLevelstab = GetFilePath(backLevelsFolderPath, Path.ChangeExtension(levelsFileName, "TAB"));
+
+            if (string.IsNullOrWhiteSpace(backupPathLevelstab))
+                throw new ArgumentNullException(nameof(backupPathLevelstab));
+
+            if (Directory.Exists(levelsFolderPath))
+            {
+                File.Copy(backupPathLevelstab, Path.Combine(levelsFolderPath, Path.ChangeExtension(levelsFileName, "TAB")), true);
+            }
+
+        } catch(Exception ex) 
+        {
+            Console.WriteLine("Error Restoring Files: " + ex.ToString());
+            return false;
         }
+        return true;
     }
 
     public static string? GetFilePath(string gameFolder, string fileName)
@@ -103,7 +115,7 @@ public class FileUtils
         if (Directory.Exists(gameFolder))
         {
             string[] files = Directory.GetFiles(gameFolder);
-            return files?.Where(f => f.EndsWith(fileName, System.StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            return files?.Where(f => Path.GetFileName(f).Equals(fileName, System.StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
         }
         return null;
     }

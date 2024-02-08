@@ -93,16 +93,13 @@ namespace MCLevelEdit.Application.Services
             return false;
         }
 
-        public async Task<bool> BackupLevelFiles(string[] gameLevelsPaths)
+        public async Task<bool> BackupLevelFiles(string gameLevelsPath, string gameLevelsBackupPath)
         { 
-            if (gameLevelsPaths is not null && gameLevelsPaths.Any())
+            if (gameLevelsPath is not null)
             {
                 try
                 {
-                    foreach (var gameLevelsPath in gameLevelsPaths)
-                    {
-                        FileUtils.CopyBackupFiles(gameLevelsPath);
-                    }
+                    return FileUtils.CopyBackupFiles(gameLevelsPath, gameLevelsBackupPath);
                 }
                 catch (Exception ex)
                 {
@@ -112,7 +109,7 @@ namespace MCLevelEdit.Application.Services
             return false;
         }
 
-        public async Task<bool> RestoringLevelFiles(string[] gameLevelsPaths)
+        public async Task<bool> RestoringLevelFiles(string gameLevelsBackupPath, string[] gameLevelsPaths)
         {
             if (gameLevelsPaths is not null && gameLevelsPaths.Any())
             {
@@ -120,8 +117,10 @@ namespace MCLevelEdit.Application.Services
                 {
                     foreach (var gameLevelsPath in gameLevelsPaths)
                     {
-                        FileUtils.RestoreBackupFiles(gameLevelsPath);
+                        if (!FileUtils.RestoreBackupFiles(gameLevelsPath, gameLevelsBackupPath))
+                            return false;
                     }
+                    return true;
                 }
                 catch (Exception ex)
                 {

@@ -8,6 +8,7 @@ using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using ReactiveUI;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,14 +27,17 @@ namespace MCLevelEdit.ViewModels
 
         private string _defaultClassicExePath = @"C:\CARPET\CARPET.EXE";
         private string _defaultClassicLevelsPath = @"C:\CARPET\LEVELS\";
+        private string _defaultClassicLevelsBackupPath = @"C:\CARPET\LEVELS\BACKUP\";
 
         private string _defaultGoGExePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\Launch Magic Carpet Plus.lnk";
         private string _defaultGoGLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\";
+        private string _defaultGoGLevelsBackupPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\BACKUP\";
         private string _defaultGoGCloudLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\cloud_saves\CARPET.CD\LEVELS\";
 
         private string _gameExePath;
         private string _gameLevelsPath;
         private string _gameCloudLevelsPath;
+        private string _gameLevelsBackupPath;
 
         public ICommand RunLevelCommand { get; }
         public ICommand CheckLevelCommand { get; }
@@ -43,6 +47,7 @@ namespace MCLevelEdit.ViewModels
         public ICommand SelectGameFolderCommand { get; }
         public ICommand SelectLevelsFolderCommand { get; }
         public ICommand SelectCloudLevelsFolderCommand { get; }
+        public ICommand SelectBackupLevelsFolderCommand { get; }
 
         public ICommand SaveCommand { get; }
 
@@ -79,6 +84,12 @@ namespace MCLevelEdit.ViewModels
             set => this.RaiseAndSetIfChanged(ref _gameCloudLevelsPath, value);
         }
 
+        public string GameLevelsBackupPath
+        {
+            get => _gameLevelsBackupPath;
+            set => this.RaiseAndSetIfChanged(ref _gameLevelsBackupPath, value);
+        }
+
         public EditGameSettingsViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IGameService gameService)
         {
             _eventAggregator = eventAggregator;
@@ -98,6 +109,12 @@ namespace MCLevelEdit.ViewModels
                 if (!string.IsNullOrEmpty(gameExePath))
                 {
                     GameExePath = gameExePath;
+                }
+
+                var gameLevelsBackupPath = settings.GameBackupFolder;
+                if (!string.IsNullOrEmpty(gameLevelsBackupPath))
+                {
+                    GameLevelsBackupPath = gameLevelsBackupPath;
                 }
 
                 var gameLevelFolders = settings.GameLevelFolders;
@@ -136,9 +153,14 @@ namespace MCLevelEdit.ViewModels
                 await SelectCloudLevelsFolder();
             });
 
+            SelectBackupLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                await SelectBackupLevelsFolder();
+            });
+
             RunLevelCommand = ReactiveCommand.CreateFromTask(async() =>
             {
-                if (await CheckForGameLaunch() && SaveLevelPaths())
+                if (await CheckForGameLaunch() && await SaveLevelPaths() && await BackupLevels())
                 {
                     if (!await _gameService.RunLevelFromSettings(LevelPaths))
                     {
@@ -178,12 +200,14 @@ namespace MCLevelEdit.ViewModels
             {
                 GameExePath = _defaultClassicExePath;
                 GameLevelsPath = _defaultClassicLevelsPath;
+                GameLevelsBackupPath = _defaultClassicLevelsBackupPath;
             }
             else
             {
                 GameExePath = _defaultGoGExePath;
                 GameLevelsPath = _defaultGoGLevelsPath;
                 GameCloudLevelsPath = _defaultGoGCloudLevelsPath;
+                GameLevelsBackupPath = _defaultGoGLevelsBackupPath;
             }
         }
 
@@ -221,7 +245,6 @@ namespace MCLevelEdit.ViewModels
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
             {
                 GameExePath = Path.GetDirectoryName(files[0].Path.AbsolutePath);
-                AutoPopulateFolders(GameLevelsPath);
             }
         }
 
@@ -261,72 +284,112 @@ namespace MCLevelEdit.ViewModels
             }
         }
 
-        private void AutoPopulateFolders(string gameFolder)
+        private async Task SelectBackupLevelsFolder()
         {
-            GameExePath = GetFilePath(gameFolder, "Launch Magic Carpet Plus.lnk");
-            var gameLevelsFolder = Path.Combine(gameFolder, @"CARPET.CD\LEVELS");
-            if (GetFilePath(gameLevelsFolder, "LEVELS.DAT")?.Length > 0 && GetFilePath(gameLevelsFolder, "LEVELS.TAB")?.Length > 0)
-            {
-                GameLevelsPath = gameLevelsFolder;
-            }
-            var gameCloudLevelsFolder = Path.Combine(gameFolder, @"cloud_saves\CARPET.CD\LEVELS");
-            if (GetFilePath(gameCloudLevelsFolder, "LEVELS.DAT")?.Length > 0 && GetFilePath(gameCloudLevelsFolder, "LEVELS.TAB")?.Length > 0)
-            {
-                GameCloudLevelsPath = gameCloudLevelsFolder;
-            }
-        }
+            // Get top level from the current control. Alternatively, you can use Window reference instead.
+            var topLevel = TopLevel.GetTopLevel(GameSettingsWindow.I);
 
-        private string? GetFilePath(string gameFolder, string fileName)
-        {
-            gameFolder = Path.GetDirectoryName(gameFolder);
-            if (Directory.Exists(gameFolder))
+            // Start async operation to open the dialog.
+            var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
-                string[] files = Directory.GetFiles(gameFolder);
-                return files?.Where(f => f.EndsWith(fileName, System.StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
-            }
-            return null;
-        }
+                Title = "Select Backup Directory for Levels",
+                AllowMultiple = false
+            });
 
-        private string? GetFolderPath(string gameFolder, string folderName)
-        {
-            gameFolder = Path.GetDirectoryName(gameFolder);
-            if (Directory.Exists(gameFolder) && gameFolder.EndsWith(folderName, System.StringComparison.CurrentCultureIgnoreCase))
+            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.AbsolutePath))
             {
-                return gameFolder;
+                GameLevelsBackupPath = folder[0].Path.AbsolutePath;
             }
-            return null;
         }
 
         private async Task<bool> CheckForGameLaunch()
         {
             if (_levelPaths?.Length > 0 && File.Exists(LevelPaths[0]))
             {
-                if (GetFilePath(GameExePath, Path.GetFileName(GameExePath))?.Length > 0)
+                if (File.Exists(GameExePath))
                 {
-                    if (GetFolderPath(GameLevelsPath, "LEVELS")?.Length > 0)
+                    if (Directory.Exists(GameLevelsPath))
                     {
-                        if (GetFolderPath(GameCloudLevelsPath, "LEVELS")?.Length > 0)
+                        if (!string.IsNullOrWhiteSpace(GameLevelsBackupPath))
                         {
-                            return true;
+                            if (!GameIsClassic)
+                            {
+                                if (Directory.Exists(GameCloudLevelsPath))
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"LEVELS GOG cloud directory not found! Please re-check!");
+                                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS GOG cloud directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
+                                    await box.ShowAsync();
+                                }
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Game Levels Backup directory not set! Please re-check!");
+                            var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Game Levels Backup directory not set! Please re-check!", ButtonEnum.Ok, Icon.Error);
+                            await box.ShowAsync();
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine($"LEVELS directory not found! Please re-check!");
+                        var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
+                        await box.ShowAsync();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Game Exe/lnk not found! Please re-check!");
+                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Game Exe/lnk not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
+                    await box.ShowAsync();
                 }
             }
-            var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Incorrect paths. Please re-check!", ButtonEnum.Ok, Icon.Error);
-            await box.ShowAsync();
+            else
+            {
+                Console.WriteLine($"No Level selected to run! Please re-check!");
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"No Level selected to run! Please re-check!", ButtonEnum.Ok, Icon.Error);
+                await box.ShowAsync();
+            }
             return false;
         }
 
-        private bool SaveLevelPaths()
+        private async Task<bool> SaveLevelPaths()
         {
             var settings = new Settings()
             {
                 IsForClassic = this.GameIsClassic,
                 GameExeLocation = this.GameExePath,
+                GameBackupFolder = this.GameLevelsBackupPath,
                 GameLevelFolders = new string[] { this.GameLevelsPath, this.GameCloudLevelsPath }
             };
 
-            return _settingsPort.SaveSettings(settings);
+            if (!_settingsPort.SaveSettings(settings))
+            {
+                Console.WriteLine($"Error saving settings!");
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error saving settings! Do you want to continue?", ButtonEnum.OkCancel, Icon.Warning);
+                var result = await box.ShowAsync();
+                return result == ButtonResult.Ok;
+            }
+            return true;
+        }
+
+        private async Task<bool> BackupLevels()
+        {
+            if (!await _gameService.BackupLevelFiles(this.GameLevelsPath, this.GameLevelsBackupPath))
+            {
+                Console.WriteLine($"Error backing up Levels!");
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error backing up Levels! Do you want to continue?", ButtonEnum.OkCancel, Icon.Warning);
+                var result = await box.ShowAsync();
+                return result == ButtonResult.Ok;
+            }
+            return true;
         }
     }
 }
