@@ -5,7 +5,6 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
-using MCLevelEdit.Application.Services;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
@@ -19,6 +18,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -65,6 +65,7 @@ public class MainViewModel : ViewModelBase
     public ICommand EditGameSettingsCommand { get; }
     public ICommand DisplayFailCommand { get; }
     public ICommand DisplayWarningsCommand { get; }
+    public ICommand DisplayAboutCommand { get; }
 
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
     public MapTreeViewModel MapTreeViewModel { get; }
@@ -73,6 +74,7 @@ public class MainViewModel : ViewModelBase
     public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowEntitiesDialog { get; }
     public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
+    public Interaction<AboutWindowViewModel, AboutWindowViewModel?> ShowAboutDialog { get; }
 
     public MainViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IMapService mapService, ITerrainService terrainService, IGameService gameService) : base(eventAggregator, mapService, terrainService)
     {
@@ -88,6 +90,7 @@ public class MainViewModel : ViewModelBase
         ShowGameSettingsDialog = new Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?>();
         ShowEntitiesDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
         ShowValidationResultsDialog = new Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?>();
+        ShowAboutDialog = new Interaction<AboutWindowViewModel, AboutWindowViewModel?>();
 
         EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -173,6 +176,15 @@ public class MainViewModel : ViewModelBase
             var vm = new ValidationResultsTableViewModel(_eventAggregator, _mapService);
             vm.Filter = Result.Warning;
             await ShowValidationResultsDialog.Handle(vm);
+        });
+
+        DisplayAboutCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var versionStr = Assembly.GetExecutingAssembly().GetName().Version?.ToString() + "-beta";
+            await ShowAboutDialog.Handle(new AboutWindowViewModel()
+            {
+                Version = versionStr
+            });
         });
 
         MainWindow.I.Title = GetTitle("NewLevel.DAT");

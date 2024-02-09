@@ -25,6 +25,9 @@
       <MenuItem Header="_Game">
         <MenuItem Header="_Game Settings" Command="{Binding EditGameSettingsCommand}"/>
       </MenuItem>
+      <MenuItem Header="_Help">
+        <MenuItem Header="_About" Command="{Binding DisplayAboutCommand}"/>
+      </MenuItem>
     </Menu>
     <Grid Name="grdMain"
           DockPanel.Dock="Bottom"

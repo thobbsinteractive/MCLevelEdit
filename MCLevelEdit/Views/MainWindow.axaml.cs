@@ -16,6 +16,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         this.WhenActivated(action => action(ViewModel!.ShowEntitiesDialog.RegisterHandler(DoShowEditEntitiesDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowGameSettingsDialog.RegisterHandler(DoShowGameDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowValidationResultsDialog.RegisterHandler(DoShowValidationResultsDialogAsync)));
+        this.WhenActivated(action => action(ViewModel!.ShowAboutDialog.RegisterHandler(DoShowAboutDialogAsync)));
     }
 
     private async Task DoShowEditEntitiesDialogAsync(InteractionContext<EntitiesTableViewModel,
@@ -45,6 +46,15 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         dialog.DataContext = interaction.Input;
 
         var result = await dialog.ShowDialog<ValidationResultsTableViewModel?>(this);
+        interaction.SetOutput(result);
+    }
+
+    private async Task DoShowAboutDialogAsync(InteractionContext<AboutWindowViewModel, AboutWindowViewModel?> interaction)
+    {
+        var dialog = new AboutWindow();
+        dialog.DataContext = interaction.Input;
+
+        var result = await dialog.ShowDialog<AboutWindowViewModel?>(this);
         interaction.SetOutput(result);
     }
 }
