@@ -21,7 +21,12 @@
             MinWidth="32"
             Padding="3"
             MinHeight="32"
-            FontWeight="Bold">
+            FontWeight="Bold"
+            Foreground="{Binding Foreground}"
+            Background="{Binding Background}"
+            ToolTip.Tip="{Binding ToolTip}"
+            Content="{Binding SpellNumber}"
+            Command="{Binding ChangeSpellCommand}">
     </Button>
     <Label Name="lblCross"
            Grid.Column="0"
@@ -29,6 +34,9 @@
            HorizontalAlignment="Center"
            VerticalAlignment="Center"
            FontSize="26"
+           Width="15"
+           IsVisible="{Binding IsVisible}"
+           IsEnabled="False"
            Content="\">
     </Label>
   </Grid>

@@ -10,8 +10,6 @@ namespace MCLevelEdit.ViewModels
     {
         private EntityViewModel _entityView;
 
-        public ICommand AddNewEntityCommand { get; }
-
         public EntityViewModel EntityView
         {
             get => _entityView;

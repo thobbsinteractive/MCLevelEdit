@@ -18,9 +18,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="0"
                     Grid.Row="0"
-                    SpellName="Fireball"
-                    DataContext="{Binding Fireball}"
-                    SpellNumber="1">
+                    DataContext="{Binding Fireball}">
     </view:EditSpell>
     <view:EditSpell Name="esPossess"
                     HorizontalAlignment="Center"
@@ -29,9 +27,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="1"
                     Grid.Row="0"
-                    SpellName="Possess"
-                    DataContext="{Binding Possess}"
-                    SpellNumber="2">
+                    DataContext="{Binding Possess}">
     </view:EditSpell>
     <view:EditSpell Name="esAccelerate"
                     HorizontalAlignment="Center"
@@ -40,9 +36,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="2"
                     Grid.Row="0"
-                    SpellName="Accelerate"
-                    DataContext="{Binding Accelerate}"
-                    SpellNumber="3">
+                    DataContext="{Binding Accelerate}">
     </view:EditSpell>
     <view:EditSpell Name="esCastle"
                     HorizontalAlignment="Center"
@@ -51,9 +45,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="3"
                     Grid.Row="0"
-                    SpellName="Castle"
-                    DataContext="{Binding Castle}"
-                    SpellNumber="4"> 
+                    DataContext="{Binding Castle}"> 
     </view:EditSpell>
 
     <view:EditSpell Name="esHeal"
@@ -63,9 +55,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="0"
                     Grid.Row="1"
-                    SpellName="Heal"
-                    DataContext="{Binding Heal}"
-                    SpellNumber="5">
+                    DataContext="{Binding Heal}">
     </view:EditSpell>
     <view:EditSpell Name="esRebound"
                     HorizontalAlignment="Center"
@@ -74,9 +64,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="1"
                     Grid.Row="1"
-                    SpellName="Rebound"
-                    DataContext="{Binding Rebound}"
-                    SpellNumber="6">
+                    DataContext="{Binding Rebound}">
     </view:EditSpell>
     <view:EditSpell Name="esShield"
                     HorizontalAlignment="Center"
@@ -85,9 +73,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="2"
                     Grid.Row="1"
-                    SpellName="Shield"
-                    DataContext="{Binding Shield}"
-                    SpellNumber="7">
+                    DataContext="{Binding Shield}">
     </view:EditSpell>
     <view:EditSpell Name="esInvisible"
                     HorizontalAlignment="Center"
@@ -96,9 +82,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="3"
                     Grid.Row="1"
-                    SpellName="Invisible"
-                    DataContext="{Binding Invisible}"
-                    SpellNumber="8">
+                    DataContext="{Binding Invisible}">
     </view:EditSpell>
 
     <view:EditSpell Name="esEarthquake"
@@ -108,9 +92,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="0"
                     Grid.Row="2"
-                    SpellName="Earthquake"
-                    DataContext="{Binding Earthquake}"
-                    SpellNumber="9">
+                    DataContext="{Binding Earthquake}">
     </view:EditSpell>
     <view:EditSpell Name="esCrater"
                     HorizontalAlignment="Center"
@@ -119,9 +101,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="1"
                     Grid.Row="2"
-                    SpellName="Crater"
-                    DataContext="{Binding Crater}"
-                    SpellNumber="10">
+                    DataContext="{Binding Crater}">
     </view:EditSpell>
     <view:EditSpell Name="esMeteor"
                     HorizontalAlignment="Center"
@@ -130,9 +110,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="2"
                     Grid.Row="2"
-                    SpellName="Meteor"
-                    DataContext="{Binding Meteor}"
-                    SpellNumber="11">
+                    DataContext="{Binding Meteor}">
     </view:EditSpell>
     <view:EditSpell Name="esVolcano"
                     HorizontalAlignment="Center"
@@ -141,9 +119,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="3"
                     Grid.Row="2"
-                    SpellName="Volcano"
-                    DataContext="{Binding Volcano}"
-                    SpellNumber="12">
+                    DataContext="{Binding Volcano}">
     </view:EditSpell>
 
     <view:EditSpell Name="esLightingBolt"
@@ -153,9 +129,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="0"
                     Grid.Row="3"
-                    SpellName="Lighting Bolt"
-                    DataContext="{Binding LightningBolt}"
-                    SpellNumber="13">
+                    DataContext="{Binding LightningBolt}">
     </view:EditSpell>
     <view:EditSpell Name="esLightingStorm"
                     HorizontalAlignment="Center"
@@ -164,9 +138,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="1"
                     Grid.Row="3"
-                    SpellName="Lighting Storm"
-                    DataContext="{Binding LightningStorm}"
-                    SpellNumber="14">
+                    DataContext="{Binding LightningStorm}">
     </view:EditSpell>
     <view:EditSpell Name="esUndeadArmy"
                     HorizontalAlignment="Center"
@@ -175,9 +147,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="2"
                     Grid.Row="3"
-                    SpellName="Undead Army"
-                    DataContext="{Binding UndeadArmy}"
-                    SpellNumber="15">
+                    DataContext="{Binding UndeadArmy}">
     </view:EditSpell>
     <view:EditSpell Name="esManaMagnet"
                     HorizontalAlignment="Center"
@@ -186,9 +156,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="3"
                     Grid.Row="3"
-                    SpellName="Mana Magnet"
-                    DataContext="{Binding ManaMagnet}"
-                    SpellNumber="16">
+                    DataContext="{Binding ManaMagnet}">
     </view:EditSpell>
 
     <view:EditSpell Name="esStealMana"
@@ -198,9 +166,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="0"
                     Grid.Row="4"
-                    SpellName="Steal Mana"
-                    DataContext="{Binding StealMana}"
-                    SpellNumber="17">
+                    DataContext="{Binding StealMana}">
     </view:EditSpell>
     <view:EditSpell Name="esBeyondSight"
                     HorizontalAlignment="Center"
@@ -209,9 +175,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="1"
                     Grid.Row="4"
-                    SpellName="Beyond Sight"
-                    DataContext="{Binding BeyondSight}"
-                    SpellNumber="18">
+                    DataContext="{Binding BeyondSight}">
     </view:EditSpell>
     <view:EditSpell Name="esDuel"
                     HorizontalAlignment="Center"
@@ -220,9 +184,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="2"
                     Grid.Row="4"
-                    SpellName="Duel"
-                    DataContext="{Binding Duel}"
-                    SpellNumber="19">
+                    DataContext="{Binding Duel}">
     </view:EditSpell>
     <view:EditSpell Name="esTeleport"
                     HorizontalAlignment="Center"
@@ -231,9 +193,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="3"
                     Grid.Row="4"
-                    SpellName="Teleport"
-                    DataContext="{Binding Teleport}"
-                    SpellNumber="20">
+                    DataContext="{Binding Teleport}">
     </view:EditSpell>
 
     <view:EditSpell Name="esWallOfFire"
@@ -243,9 +203,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="0"
                     Grid.Row="5"
-                    SpellName="Wall Of Fire"
-                    DataContext="{Binding WallofFire}"
-                    SpellNumber="21">
+                    DataContext="{Binding WallofFire}">
     </view:EditSpell>
     <view:EditSpell Name="esReverse"
                     HorizontalAlignment="Center"
@@ -254,9 +212,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="1"
                     Grid.Row="5"
-                    SpellName="Reverse"
-                    DataContext="{Binding ReverseAcceleration}"
-                    SpellNumber="22">
+                    DataContext="{Binding ReverseAcceleration}">
     </view:EditSpell>
     <view:EditSpell Name="esGlobalDeath"
                     HorizontalAlignment="Center"
@@ -265,9 +221,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="2"
                     Grid.Row="5"
-                    SpellName="Global Death"
-                    DataContext="{Binding GlobalDeath}"
-                    SpellNumber="23">
+                    DataContext="{Binding GlobalDeath}">
     </view:EditSpell>
     <view:EditSpell Name="esRapidFireball"
                     HorizontalAlignment="Center"
@@ -276,9 +230,7 @@
                     VerticalContentAlignment="Center"
                     Grid.Column="3"
                     Grid.Row="5"
-                    SpellName="Rapid Fireball"
-                    DataContext="{Binding Fireball}"
-                    SpellNumber="24">
+                    DataContext="{Binding RapidFireball}">
     </view:EditSpell>
   </Grid>
 </UserControl>

@@ -1,5 +1,4 @@
 ﻿using ReactiveUI;
-using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels;
 
@@ -29,14 +28,4 @@ public class SpellsViewModel : ReactiveObject
     public AbilitiesViewModel ReverseAcceleration { get; set; } = new AbilitiesViewModel();
     public AbilitiesViewModel GlobalDeath { get; set; } = new AbilitiesViewModel();
     public AbilitiesViewModel RapidFireball { get; set; } = new AbilitiesViewModel();
-
-    ICommand ChangeSpellCommand { get; }
-
-    public SpellsViewModel()
-    {
-        ChangeSpellCommand = ReactiveCommand.Create(() =>
-        {
-            
-        });
-    }
 }
