@@ -16,4 +16,10 @@
   <ItemGroup>
     <ProjectReference Include="..\MCLevelEdit\MCLevelEdit.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="editor.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
