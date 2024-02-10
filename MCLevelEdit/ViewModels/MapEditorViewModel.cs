@@ -188,8 +188,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
         set
         {
-            _cursorPosition = new Point(Double.Round(value.X / Globals.SQUARE_SIZE, MidpointRounding.ToZero), 
-                Double.Round(value.Y / Globals.SQUARE_SIZE, MidpointRounding.ToZero));
+            _cursorPosition = new Point(Math.Round(value.X / Globals.SQUARE_SIZE, MidpointRounding.ToZero),
+                Math.Round(value.Y / Globals.SQUARE_SIZE, MidpointRounding.ToZero));
             this.RaisePropertyChanged(nameof(CursorPosition));
         } 
     }
