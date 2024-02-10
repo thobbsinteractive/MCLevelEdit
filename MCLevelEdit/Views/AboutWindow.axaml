@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="200"
+        x:Class="MCLevelEdit.Views.AboutWindow"
+        x:DataType="vm:AboutWindowViewModel"
+        WindowStartupLocation="CenterScreen"
+        Title="About"
+        MinWidth="400"
+        MinHeight="200"
+        MaxWidth="400"
+        MaxHeight="200">
+  <Grid Name="gdAbout"
+        Margin="10"
+        RowDefinitions="40,*"
+        ColumnDefinitions="80,*">
+    <Label Grid.Column="0"
+           Grid.Row="0"
+           FontSize="15"
+           HorizontalAlignment="Left"
+           Content="Version:"/>
+    <Label Grid.Column="1"
+           Grid.Row="0"
+           FontSize="15"
+           HorizontalAlignment="Left"
+           Content="{Binding Version}"/>
+  </Grid>
+</Window>

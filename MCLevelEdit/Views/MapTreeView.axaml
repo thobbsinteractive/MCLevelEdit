@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             x:Class="MCLevelEdit.Views.MapTreeView"
+             x:DataType="vm:MapTreeViewModel">
+  <TreeView Margin="10"
+            ItemsSource="{Binding Nodes}"
+            SelectedItems="{Binding SelectedNodes}"
+            SelectionMode="Single">
+    <TreeView.ItemTemplate>
+      <TreeDataTemplate ItemsSource="{Binding SubNodes}">
+        <Border HorizontalAlignment="Left"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                CornerRadius="5"
+                Padding="3">
+          <Border.ContextMenu>
+            <ContextMenu>
+              <MenuItem Header="Delete"
+                        IsVisible="{Binding CanDelete}"
+                        Command="{Binding DeleteEntityCommand}"/>
+            </ContextMenu>
+          </Border.ContextMenu>
+          <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+              <Image Source="{Binding Icon}" />
+              <TextBlock Text="{Binding Title}" Margin="5,7,0,0"/>
+            </StackPanel>
+            <TextBlock Text="{Binding Subtitle}" FontSize="14" Margin="5,7,0,0" IsVisible="{Binding IsSubtitleSet}"/>
+          </StackPanel>
+        </Border>
+      </TreeDataTemplate>
+    </TreeView.ItemTemplate>
+    <TreeView.Styles>
+      <Style Selector="TreeViewItem">
+        <Setter Property="IsExpanded" Value="True" />
+      </Style>
+    </TreeView.Styles>
+  </TreeView>
+</UserControl>

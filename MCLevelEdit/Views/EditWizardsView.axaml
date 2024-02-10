@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:views="clr-namespace:MCLevelEdit.Views"
+             x:Class="MCLevelEdit.Views.EditWizardsView"
+             x:DataType="vm:EditWizardsViewModel">
+  <StackPanel Margin="20">
+    <TextBlock Text="{Binding #wizardSlider.Value}"
+               HorizontalAlignment="Center"/>
+    <Slider x:Name="wizardSlider"
+            Minimum="1"
+            Maximum="8"
+            TickFrequency="1"
+            IsSnapToTickEnabled="True"
+            Value="{Binding WizardCount}"/>
+  </StackPanel>
+</UserControl>

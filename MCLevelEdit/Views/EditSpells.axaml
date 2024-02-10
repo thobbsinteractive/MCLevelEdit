@@ -1,0 +1,236 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:view="clr-namespace:MCLevelEdit.Views"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="170" d:DesignHeight="260"
+             x:Class="MCLevelEdit.Views.EditSpells"
+             x:DataType="vm:SpellsViewModel">
+  <Grid Name="gdEditSpells"
+        Margin="5"
+        ColumnDefinitions="40,40,40,40"
+        RowDefinitions="40,40,40,40,40,40">
+    <view:EditSpell Name="esFireball"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    DataContext="{Binding Fireball}">
+    </view:EditSpell>
+    <view:EditSpell Name="esPossess"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    DataContext="{Binding Possess}">
+    </view:EditSpell>
+    <view:EditSpell Name="esAccelerate"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    DataContext="{Binding Accelerate}">
+    </view:EditSpell>
+    <view:EditSpell Name="esCastle"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="3"
+                    Grid.Row="0"
+                    DataContext="{Binding Castle}"> 
+    </view:EditSpell>
+
+    <view:EditSpell Name="esHeal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    DataContext="{Binding Heal}">
+    </view:EditSpell>
+    <view:EditSpell Name="esRebound"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    DataContext="{Binding Rebound}">
+    </view:EditSpell>
+    <view:EditSpell Name="esShield"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="2"
+                    Grid.Row="1"
+                    DataContext="{Binding Shield}">
+    </view:EditSpell>
+    <view:EditSpell Name="esInvisible"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="3"
+                    Grid.Row="1"
+                    DataContext="{Binding Invisible}">
+    </view:EditSpell>
+
+    <view:EditSpell Name="esEarthquake"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="0"
+                    Grid.Row="2"
+                    DataContext="{Binding Earthquake}">
+    </view:EditSpell>
+    <view:EditSpell Name="esCrater"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="1"
+                    Grid.Row="2"
+                    DataContext="{Binding Crater}">
+    </view:EditSpell>
+    <view:EditSpell Name="esMeteor"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="2"
+                    Grid.Row="2"
+                    DataContext="{Binding Meteor}">
+    </view:EditSpell>
+    <view:EditSpell Name="esVolcano"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="3"
+                    Grid.Row="2"
+                    DataContext="{Binding Volcano}">
+    </view:EditSpell>
+
+    <view:EditSpell Name="esLightingBolt"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="0"
+                    Grid.Row="3"
+                    DataContext="{Binding LightningBolt}">
+    </view:EditSpell>
+    <view:EditSpell Name="esLightingStorm"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="1"
+                    Grid.Row="3"
+                    DataContext="{Binding LightningStorm}">
+    </view:EditSpell>
+    <view:EditSpell Name="esUndeadArmy"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="2"
+                    Grid.Row="3"
+                    DataContext="{Binding UndeadArmy}">
+    </view:EditSpell>
+    <view:EditSpell Name="esManaMagnet"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="3"
+                    Grid.Row="3"
+                    DataContext="{Binding ManaMagnet}">
+    </view:EditSpell>
+
+    <view:EditSpell Name="esStealMana"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="0"
+                    Grid.Row="4"
+                    DataContext="{Binding StealMana}">
+    </view:EditSpell>
+    <view:EditSpell Name="esBeyondSight"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="1"
+                    Grid.Row="4"
+                    DataContext="{Binding BeyondSight}">
+    </view:EditSpell>
+    <view:EditSpell Name="esDuel"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="2"
+                    Grid.Row="4"
+                    DataContext="{Binding Duel}">
+    </view:EditSpell>
+    <view:EditSpell Name="esTeleport"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="3"
+                    Grid.Row="4"
+                    DataContext="{Binding Teleport}">
+    </view:EditSpell>
+
+    <view:EditSpell Name="esWallOfFire"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="0"
+                    Grid.Row="5"
+                    DataContext="{Binding WallofFire}">
+    </view:EditSpell>
+    <view:EditSpell Name="esReverse"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="1"
+                    Grid.Row="5"
+                    DataContext="{Binding ReverseAcceleration}">
+    </view:EditSpell>
+    <view:EditSpell Name="esGlobalDeath"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="2"
+                    Grid.Row="5"
+                    DataContext="{Binding GlobalDeath}">
+    </view:EditSpell>
+    <view:EditSpell Name="esRapidFireball"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Grid.Column="3"
+                    Grid.Row="5"
+                    DataContext="{Binding RapidFireball}">
+    </view:EditSpell>
+  </Grid>
+</UserControl>

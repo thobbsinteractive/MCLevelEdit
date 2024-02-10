@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels;assembly=MCLevelEdit"
+             xmlns:views="clr-namespace:MCLevelEdit.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+             x:Class="MCLevelEdit.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <DockPanel>
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="_File">
+        <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}"/>
+        <MenuItem Header="_New Random" Command="{Binding NewRandomFileCommand}"/>
+        <Separator/>
+        <MenuItem Header="_Open" Command="{Binding OpenFileCommand}"/>
+        <MenuItem Header="_Save" Command="{Binding SaveFileCommand}"/>
+        <MenuItem Header="Save _As" Command="{Binding SaveFileAsCommand}"/>
+        <Separator/>
+        <MenuItem Header="_Export Height Map" Command="{Binding ExportHeightMapCommand}"/>
+        <MenuItem Header="_Export Terrain Render" Command="{Binding ExportTerrainRenderCommand}"/>
+        <Separator/>
+        <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+      </MenuItem>
+      <MenuItem Header="_Game">
+        <MenuItem Header="_Game Settings" Command="{Binding EditGameSettingsCommand}"/>
+      </MenuItem>
+      <MenuItem Header="_Help">
+        <MenuItem Header="_About" Command="{Binding DisplayAboutCommand}"/>
+      </MenuItem>
+    </Menu>
+    <Grid Name="grdMain"
+          DockPanel.Dock="Bottom"
+          ColumnDefinitions="*"
+          RowDefinitions="*,60">
+      <Grid Grid.Row="0"
+            Grid.Column="0"
+            ColumnDefinitions="256,*,300"
+            RowDefinitions="150,*">
+        <views:EntityToolBarView Name="vmEntityToolBar"
+                                 Grid.Row="0"
+                                 Grid.Column="0"
+                                 Grid.ColumnSpan="2"
+                                 DockPanel.Dock="Top"
+                                 DataContext="{Binding EntityToolBarViewModel}"/>
+        <views:MapTreeView Name="vmMapTree"
+                           Grid.Row="1"
+                           Grid.Column="0"
+                           DataContext="{Binding MapTreeViewModel}"/>
+        <views:MapEditorView Name="vmMapEditor"
+                             Grid.Row="1"
+                             Grid.Column="1"
+                             DataContext="{Binding MapEditorViewModel}"/>
+        <views:NodePropertiesView Name="vmNodeProperties"
+                                  Grid.Row="1"
+                                  Grid.Column="2"
+                                  DataContext="{Binding NodePropertiesViewModel}"/>
+      </Grid>
+      <Grid Grid.Row="1"
+            Grid.Column="0"
+            Margin="10"
+            RowDefinitions="40"
+            ColumnDefinitions="150,*,150,150">
+        <Button Name="btnFailures"
+                Grid.Column="2"
+                Height="38"
+                Command="{Binding DisplayFailCommand}">
+          <StackPanel Orientation="Horizontal">
+            <Image Source="/Assets/error-32.png"/>
+            <Label Content="{Binding FailCount, StringFormat=' {0} Failure(s)'}" />
+          </StackPanel>
+        </Button>
+        <Button Name="btnWarnings"
+                Grid.Column="3"
+                Height="38"
+                Command="{Binding DisplayWarningsCommand}">
+          <StackPanel Orientation="Horizontal">
+            <Image Source="/Assets/warning-32.png"/>
+            <Label Content="{Binding WarningCount, StringFormat=' {0} Warning(s)'}" />
+          </StackPanel>
+        </Button>
+        <Button Name="btnRun"
+                Grid.Column="0"
+                VerticalContentAlignment="Center"
+                HorizontalContentAlignment="Center"
+                Height="38"
+                MinWidth="150"
+                Command="{Binding RunCommand}">
+            Run
+        </Button>
+        <Button Name="btnEdit"
+                Grid.Column="1"
+                VerticalContentAlignment="Center"
+                HorizontalContentAlignment="Center"
+                MinWidth="150"
+                Height="38"
+                Command="{Binding EditEntitiesCommand}">
+          Edit Entities
+        </Button>
+      </Grid>
+    </Grid>
+  </DockPanel>
+</UserControl>

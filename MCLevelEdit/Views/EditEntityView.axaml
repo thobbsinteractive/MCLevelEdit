@@ -1,0 +1,126 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:c="clr-namespace:MCLevelEdit.Converter"
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EditEntityViewModel;assembly=MCLevelEdit"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="400"
+             x:Class="MCLevelEdit.Views.EditEntityView"
+             x:DataType="vm:EditEntityViewModel">
+  <Grid Margin="5"
+        ColumnDefinitions="1*,2*"
+        RowDefinitions="40,30,30,30,30,30,30,30,30,30,*">
+    <Grid.Resources>
+      <c:TypeIdConverter x:Key="typeIdConverter"/>
+      <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
+      <c:KeyValuePairToIdConverter x:Key="keyValuePairToIdConverter"/>
+      <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
+      <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
+    </Grid.Resources>
+    <Label Grid.Column="0"
+           Grid.Row="0"
+           Grid.ColumnSpan="2"
+           HorizontalAlignment="Center">
+      Entity Properties
+    </Label>
+    <Label Grid.Column="0"
+           Grid.Row="1"
+           HorizontalAlignment="Left">
+      Type:
+    </Label>
+    <ComboBox Name="cboEntityType"
+          Grid.Row="1"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          HorizontalAlignment="Stretch"
+          SelectedValue="{Binding EntityView.Type, Converter={StaticResource typeIdConverter}}"
+          DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+          ItemsSource="{Binding Source={x:Static vm:EditEntityViewModel.TypeIds}}">
+    </ComboBox>
+    <Label Grid.Column="0"
+           Grid.Row="2"
+           HorizontalAlignment="Left">
+      Model:
+    </Label>
+    <ComboBox Name="cboEntityModelType"
+          Grid.Row="2"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          HorizontalAlignment="Stretch"
+          SelectedIndex="{Binding EntityView.ModelIdx}"
+          DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+          ItemsSource="{Binding EntityView.ModelTypes}">
+    </ComboBox>
+    <Label Grid.Column="0"
+           Grid.Row="3"
+           HorizontalAlignment="Left">
+      PosX:
+    </Label>
+    <TextBox x:Name="txtPosX"
+             Grid.Row="3"
+             Grid.Column="1"
+             Text="{Binding EntityView.X, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="4"
+           HorizontalAlignment="Left">
+      PosY:
+    </Label>
+    <TextBox x:Name="txtPosY"
+         Grid.Row="4"
+         Grid.Column="1"
+         Text="{Binding EntityView.Y, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="5"
+           HorizontalAlignment="Left">
+      DisId:
+    </Label>
+    <TextBox x:Name="txtDisId"
+        Grid.Row="5"
+        Grid.Column="1"
+        Text="{Binding EntityView.DisId, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="6"
+           HorizontalAlignment="Left">
+      Switch Size:
+    </Label>
+    <TextBox x:Name="txtSwitchSize"
+             Grid.Row="6"
+             Grid.Column="1"
+             Text="{Binding EntityView.SwitchSize, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="7"
+           HorizontalAlignment="Left">
+      Switch Id:
+    </Label>
+    <TextBox x:Name="txtSwitchId"
+             Grid.Row="7"
+             Grid.Column="1"
+             Text="{Binding EntityView.SwitchId, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="8"
+           HorizontalAlignment="Left">
+      Parent:
+    </Label>
+    <TextBox x:Name="txtParent"
+         Grid.Row="8"
+         Grid.Column="1"
+         Text="{Binding EntityView.Parent, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="9"
+           HorizontalAlignment="Left">
+      Child:
+    </Label>
+    <TextBox x:Name="txtChild"
+             Grid.Row="9"
+             Grid.Column="1"
+             Text="{Binding EntityView.Child, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+  </Grid>
+</UserControl>

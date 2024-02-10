@@ -1,0 +1,82 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33801.468
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit", "MCLevelEdit.csproj", "{AD143B86-E3D3-4418-B27E-3DF190FBC7A6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Desktop", "..\MCLevelEdit.Desktop\MCLevelEdit.Desktop.csproj", "{A9EBEC2A-CABA-4508-83CC-5BAA931FBA49}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Test", "..\MCLevelEdit.Test\MCLevelEdit.Test.csproj", "{EF0516AA-9365-467F-8429-FD548366A6CA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Model", "..\MCLevelEdit.Model\MCLevelEdit.Model.csproj", "{A2E7B073-05A1-47BC-80D5-3040F1A4B14D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Application", "..\MCLevelEdit.Application\MCLevelEdit.Application.csproj", "{33B71612-92F4-4054-A745-9955D073814A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Infrastructure", "..\MCLevelEdit.Infrastructure\MCLevelEdit.Infrastructure.csproj", "{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicCarpet2Terrain", "..\MagicCarpet2Terrain\MagicCarpet2Terrain.csproj", "{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicCarpet2Terrain.Test", "..\MagicCarpet2Terrain.Test\MagicCarpet2Terrain.Test.csproj", "{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5} = {D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicCarpetLevelPackager", "..\MagicCarpetLevelPackager\MagicCarpetLevelPackager.csproj", "{0C74DA4C-88B8-4570-A25A-87AC51B7604E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicCarpetLevelPackager.Test", "..\MagicCarpetLevelPackager.Test\MagicCarpetLevelPackager.Test.csproj", "{84F49D02-415A-4244-B9A4-9E1CB0B8B2B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD143B86-E3D3-4418-B27E-3DF190FBC7A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD143B86-E3D3-4418-B27E-3DF190FBC7A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD143B86-E3D3-4418-B27E-3DF190FBC7A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD143B86-E3D3-4418-B27E-3DF190FBC7A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9EBEC2A-CABA-4508-83CC-5BAA931FBA49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9EBEC2A-CABA-4508-83CC-5BAA931FBA49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9EBEC2A-CABA-4508-83CC-5BAA931FBA49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9EBEC2A-CABA-4508-83CC-5BAA931FBA49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF0516AA-9365-467F-8429-FD548366A6CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF0516AA-9365-467F-8429-FD548366A6CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF0516AA-9365-467F-8429-FD548366A6CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF0516AA-9365-467F-8429-FD548366A6CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2E7B073-05A1-47BC-80D5-3040F1A4B14D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2E7B073-05A1-47BC-80D5-3040F1A4B14D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2E7B073-05A1-47BC-80D5-3040F1A4B14D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2E7B073-05A1-47BC-80D5-3040F1A4B14D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33B71612-92F4-4054-A745-9955D073814A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33B71612-92F4-4054-A745-9955D073814A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33B71612-92F4-4054-A745-9955D073814A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33B71612-92F4-4054-A745-9955D073814A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C74DA4C-88B8-4570-A25A-87AC51B7604E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C74DA4C-88B8-4570-A25A-87AC51B7604E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C74DA4C-88B8-4570-A25A-87AC51B7604E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C74DA4C-88B8-4570-A25A-87AC51B7604E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84F49D02-415A-4244-B9A4-9E1CB0B8B2B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84F49D02-415A-4244-B9A4-9E1CB0B8B2B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84F49D02-415A-4244-B9A4-9E1CB0B8B2B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84F49D02-415A-4244-B9A4-9E1CB0B8B2B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {803A3B44-731F-4454-9BD9-24B901164E03}
+	EndGlobalSection
+EndGlobal
