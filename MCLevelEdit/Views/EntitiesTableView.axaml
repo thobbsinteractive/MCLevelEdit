@@ -1,0 +1,157 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:c="clr-namespace:MCLevelEdit.Converter"
+             xmlns:m="clr-namespace:MCLevelEdit.DataModel"
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EntitiesTableViewModel;assembly=MCLevelEdit"  
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MCLevelEdit.Views.EntitiesTableView"
+             x:DataType="vm:EntitiesTableViewModel">
+  <Grid ColumnDefinitions="*"
+        RowDefinitions="*,50">
+    <Grid.Resources>
+      <c:TypeIdConverter x:Key="typeIdConverter"/>
+      <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
+      <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
+      <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
+    </Grid.Resources>
+    <DataGrid Grid.Row="0"
+              Grid.Column="0"
+              Margin="10,10,10,0"
+              x:Name="dgEntities"
+              ItemsSource="{Binding Entities}"
+              IsReadOnly="True"
+              GridLinesVisibility="All"
+              BorderThickness="1" BorderBrush="Gray">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Num"
+                            Width="1*"
+                            Binding="{Binding Id}"/>
+        <DataGridTemplateColumn Header="Type"
+                                Width="2*" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <ComboBox Name="cboEntityType"
+                        Margin="5,0"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        SelectedValue="{Binding Type, Converter={StaticResource typeIdConverter}}"
+                        DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+                        ItemsSource="{Binding Source={x:Static vm:ViewModelBase.TypeIds}}">
+              </ComboBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Name"
+                                Width="2*" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <ComboBox Name="cboEntityModelType"
+                        Margin="5,0"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        SelectedIndex="{Binding ModelIdx}"
+                        DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+                        ItemsSource="{Binding ModelTypes}">
+              </ComboBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="XPos"
+            Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtPosX"
+                       Text="{Binding X, Converter={StaticResource uInt8ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="YPos"
+            Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtPosY"
+                       Text="{Binding Y, Converter={StaticResource uInt8ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="DisId"
+            Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtDisId"
+                       Text="{Binding DisId, Converter={StaticResource uInt16ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="SwSz"
+          Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtSwSz"
+                       Text="{Binding SwitchSize, Converter={StaticResource uInt16ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="SwId"
+          Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtSwId"
+                       Text="{Binding SwitchId, Converter={StaticResource uInt16ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Parent"
+            Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtParent"
+                       Text="{Binding Parent, Converter={StaticResource uInt16ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Child"
+                            Width="1*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Name="txtChild"
+                       Text="{Binding Child, Converter={StaticResource uInt16ToStringConverter}}">
+              </TextBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+    <StackPanel Grid.Row="1"
+                Grid.Column="0"
+                Margin="10,0"
+                Orientation="Horizontal">
+      <Button HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Center"
+              Command="{Binding AddNewEntityCommand}"
+              Name="btnAdd">
+        Add Entity
+      </Button>
+      <Button Name="btnDelete"
+              IsEnabled="{Binding IsSelected}"
+              HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Center"
+              Command="{Binding DeleteEntityCommand}">
+        Delete Entity
+      </Button>
+    </StackPanel>
+  </Grid>
+</UserControl>

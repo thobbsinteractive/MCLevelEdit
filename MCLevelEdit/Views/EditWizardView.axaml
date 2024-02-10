@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="600"
+             xmlns:c="clr-namespace:MCLevelEdit.Converter"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:view="clr-namespace:MCLevelEdit.Views"
+             x:Class="MCLevelEdit.Views.EditWizardView"
+             x:DataType="vm:EditWizardViewModel">
+  <Grid Margin="5"
+        ColumnDefinitions="1*,1*"
+        RowDefinitions="40,30,30,30,30,40,*">
+    <Grid.Resources>
+      <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
+    </Grid.Resources>
+    <Label Grid.Column="0"
+           Grid.Row="0"
+           Grid.ColumnSpan="2"
+           HorizontalAlignment="Center"
+           VerticalAlignment="Center">
+      Wizard Properties
+    </Label>
+    <Label Grid.Column="0"
+           Grid.Row="1"
+           HorizontalAlignment="Left">
+      Agression:
+    </Label>
+    <TextBox Name="txtAgression"
+             Grid.Column="1"
+             Grid.Row="1"
+             Text="{Binding Agression, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="2"
+           HorizontalAlignment="Left">
+      Perception:
+    </Label>
+    <TextBox Name="txtPerception"
+             Grid.Column="1"
+             Grid.Row="2"
+             Text="{Binding Perception, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+       Grid.Row="3"
+       HorizontalAlignment="Left">
+      Reflexes:
+    </Label>
+    <TextBox Name="txtReflexes"
+             Grid.Column="1"
+             Grid.Row="3"
+             Text="{Binding Reflexes, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+       Grid.Row="4"
+       HorizontalAlignment="Left">
+      Castle Level:
+    </Label>
+    <TextBox Name="txtCastleLevel"
+             Grid.Column="1"
+             Grid.Row="4"
+             Text="{Binding CastleLevel, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="5"
+           Grid.ColumnSpan="2"
+           HorizontalAlignment="Center"
+           VerticalAlignment="Center">
+      Wizard Spells
+    </Label>
+    <view:EditSpells Name="esSpells"
+                     Grid.Row="6"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     HorizontalAlignment="Center"
+                     DataContext="{Binding Spells}"/>
+  </Grid>
+</UserControl>

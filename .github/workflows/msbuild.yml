@@ -1,0 +1,61 @@
+name: MSBuild CI
+
+on: 
+  push:
+    branches:
+      [ master, development ]
+  pull_request:
+      types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        BUILD_CONFIGURATION: [Debug, Release]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+      
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit/MCLevelEdit.sln
+
+    - name: Build ${{matrix.BUILD_CONFIGURATION}}
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: dotnet build /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit/MCLevelEdit.sln
+    
+    - name: Run MagicCarpet2Terrain Unit Test
+      if: ${{ matrix.BUILD_CONFIGURATION == 'Debug' }}
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: dotnet test --logger "trx;LogFileName=MagicCarpet2Terrain.trx" /p:Configuration=${{matrix.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}/MagicCarpet2Terrain.Test/MagicCarpet2Terrain.Test.csproj
+
+    - name: Run MagicCarpetLevelPackager Unit Test
+      if: ${{ matrix.BUILD_CONFIGURATION == 'Debug' }}
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: dotnet test --logger "trx;LogFileName=MagicCarpetLevelPackager.trx" /p:Configuration=${{matrix.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}/MagicCarpetLevelPackager.Test/MagicCarpetLevelPackager.Test.csproj
+            
+    - name: Run MCLevelEdit Unit Test
+      if: ${{ matrix.BUILD_CONFIGURATION == 'Debug' }}
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: dotnet test --logger "trx;LogFileName=MCLevelEdit.trx" /p:Configuration=${{matrix.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit.Test/MCLevelEdit.Test.csproj
+
+    - name: Archive
+      if: ${{ github.REF_NAME == 'master' && matrix.BUILD_CONFIGURATION == 'Release' }}    
+      uses: actions/upload-artifact@v3
+      with:
+        name: MCLevelEdit
+        path: ${{env.SOLUTION_FILE_PATH}}/Debug/net7.0/
+        if-no-files-found: error

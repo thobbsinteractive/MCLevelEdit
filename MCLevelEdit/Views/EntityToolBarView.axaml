@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EntityToolBarViewModel;assembly=MCLevelEdit"
+             xmlns:views="clr-namespace:MCLevelEdit.Views"
+             xmlns:c="clr-namespace:MCLevelEdit.Converter"
+             x:DataType="vm:EntityToolBarViewModel"
+             x:Class="MCLevelEdit.Views.EntityToolBarView">
+  <UserControl.Resources>
+    <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
+  </UserControl.Resources>
+  <TabControl Margin="5">
+    <TabItem Header="Create Entities"
+             FontSize="18">
+      <Grid Name="grdEntities"
+            ColumnDefinitions="50,50,50,50,50,50,50,50,*"
+            RowDefinitions="50,40">
+        <ToggleButton Name="btnCursor"
+                      Grid.Row="0"
+                      Grid.Column="0"
+                      Click="btnCursorClick"
+                      IsChecked="true">
+          <Image Source="/Assets/cursor-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnCreatures"
+                      Grid.Row="0"
+                      Grid.Column="1"
+                      ToolTip.Tip="Add Creature"
+                      Click="btnCreatureClick">
+          <Image Source="/Assets/dragon-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnScenary"
+                      Grid.Row="0"
+                      Grid.Column="2"
+                      ToolTip.Tip="Add Scenary"
+                      Click="btnScenaryClick">
+          <Image Source="/Assets/tree-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnEffects"
+                      Grid.Row="0"
+                      Grid.Column="3"
+                      ToolTip.Tip="Add Effect"
+                      Click="btnEffectsClick">
+          <Image Source="/Assets/volcano-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnSpells"
+                      Grid.Row="0"
+                      Grid.Column="4"
+                      ToolTip.Tip="Add Spell Jar"
+                      Click="btnSpellsClick">
+          <Image Source="/Assets/magic-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnSwitches"
+                      Grid.Row="0"
+                      Grid.Column="5"
+                      ToolTip.Tip="Add Switch"
+                      Click="btnSwitchesClick">
+          <Image Source="/Assets/switch-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnWeathers"
+                      Grid.Row="0"
+                      Grid.Column="6"
+                      ToolTip.Tip="Add Weather"
+                      Click="btnWeathersClick">
+          <Image Source="/Assets/wind-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnSpawns"
+                      Grid.Row="0"
+                      Grid.Column="7"
+                      ToolTip.Tip="Add Spawn"
+                      Click="btnSpawnClick">
+          <Image Source="/Assets/magic-carpet-32.png"/>
+        </ToggleButton>
+        <ComboBox Name="cboEntityModelType"
+                  Grid.Row="1"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="7"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Stretch"
+                  SelectedIndex="{Binding AddEntityViewModel.ModelIdx}"
+                  DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+                  ItemsSource="{Binding AddEntityViewModel.ModelTypes}"/>
+      </Grid>
+    </TabItem>
+  </TabControl>
+</UserControl>
