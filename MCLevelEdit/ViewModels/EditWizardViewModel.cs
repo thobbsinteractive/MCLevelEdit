@@ -68,6 +68,36 @@ public class EditWizardViewModel : ReactiveObject
         _mapService = mapService;
         var map = _mapService.GetMap();
         _wizard = map.Wizards.Where(w => w.Name.Equals(wizardName)).Select(w => w.ToWizardViewModel()).First();
+
+        _wizard.Spells.Fireball.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Possess.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Accelerate.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Castle.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Heal.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Rebound.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Shield.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Invisible.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Earthquake.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Crater.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Meteor.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Volcano.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.LightningBolt.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.LightningStorm.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.UndeadArmy.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.ManaMagnet.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.StealMana.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.BeyondSight.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Duel.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.Teleport.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.WallofFire.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.ReverseAcceleration.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.GlobalDeath.SpellsUpdatedEvent += SpellsUpdatedEvent;
+        _wizard.Spells.RapidFireball.SpellsUpdatedEvent += SpellsUpdatedEvent;
+    }
+
+    private void SpellsUpdatedEvent(object? sender, System.EventArgs e)
+    {
+        Update();
     }
 
     public void Update()

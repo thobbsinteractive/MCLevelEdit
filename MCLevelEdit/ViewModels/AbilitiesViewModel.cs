@@ -1,6 +1,6 @@
-﻿using Avalonia.Controls;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using ReactiveUI;
+using System;
 using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels
@@ -104,6 +104,8 @@ namespace MCLevelEdit.ViewModels
 
         public ICommand ChangeSpellCommand { get; }
 
+        public event EventHandler SpellsUpdatedEvent;
+
         public AbilitiesViewModel() 
         {
             ChangeSpellCommand = ReactiveCommand.Create(() =>
@@ -176,6 +178,8 @@ namespace MCLevelEdit.ViewModels
             this.RaisePropertyChanged(nameof(SpellNumber));
             this.RaisePropertyChanged(nameof(ToolTip));
             this.RaisePropertyChanged(nameof(IsVisible));
+
+            SpellsUpdatedEvent?.Invoke(this, new EventArgs());
         }
     }
 }
