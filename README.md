@@ -3,7 +3,7 @@ A C# Level Editor for the Bullfrog Productions game Magic Carpet. 30 years late,
 
 Without Moburma's research and his original repo https://github.com/Moburma/MCLevelEdit this could not have been written. The Level Packager and Loading and Saving code is converted from Moburma's.
 
-![Example Screenshot](MCLevelEdit1.png)
+![Example Screenshot](MCLevelEdit.png)
 
 ## Download the latest Beta Here! ##
 https://github.com/thobbsinteractive/MCLevelEdit/releases/latest
