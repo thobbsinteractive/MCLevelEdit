@@ -15,8 +15,56 @@
 
   
   <ItemGroup>
+    <None Remove="Assets\Spells\accelerate-white.png" />
+    <None Remove="Assets\Spells\accelerate.png" />
+    <None Remove="Assets\Spells\beyondsight-white.png" />
+    <None Remove="Assets\Spells\beyondsight.png" />
+    <None Remove="Assets\Spells\castle-white.png" />
+    <None Remove="Assets\Spells\castle.png" />
+    <None Remove="Assets\Spells\crater-white.png" />
+    <None Remove="Assets\Spells\crater.png" />
     <None Remove="Assets\day-palette.bmp" />
+    <None Remove="Assets\Spells\duel-white.png" />
+    <None Remove="Assets\Spells\duel.png" />
+    <None Remove="Assets\Spells\earthquake-white.png" />
+    <None Remove="Assets\Spells\earthquake.png" />
     <None Remove="Assets\error-32.png" />
+    <None Remove="Assets\Spells\fireball-white.png" />
+    <None Remove="Assets\Spells\fireball.png" />
+    <None Remove="Assets\Spells\globaldeath-white.png" />
+    <None Remove="Assets\Spells\globaldeath.png" />
+    <None Remove="Assets\Spells\heal-white.png" />
+    <None Remove="Assets\Spells\heal.png" />
+    <None Remove="Assets\Spells\invisible-white.png" />
+    <None Remove="Assets\Spells\invisible.png" />
+    <None Remove="Assets\Spells\lightingstorm-white.png" />
+    <None Remove="Assets\Spells\lightingstorm.png" />
+    <None Remove="Assets\Spells\lightningbolt-white.png" />
+    <None Remove="Assets\Spells\lightningbolt.png" />
+    <None Remove="Assets\Spells\manamagnet-white.png" />
+    <None Remove="Assets\Spells\manamagnet.png" />
+    <None Remove="Assets\Spells\meteor-white.png" />
+    <None Remove="Assets\Spells\meteor.png" />
+    <None Remove="Assets\Spells\possess-white.png" />
+    <None Remove="Assets\Spells\possess.png" />
+    <None Remove="Assets\Spells\rapidfireball-white.png" />
+    <None Remove="Assets\Spells\rapidfireball.png" />
+    <None Remove="Assets\Spells\rebound-white.png" />
+    <None Remove="Assets\Spells\rebound.png" />
+    <None Remove="Assets\Spells\reverse-white.png" />
+    <None Remove="Assets\Spells\reverse.png" />
+    <None Remove="Assets\Spells\shield-white.png" />
+    <None Remove="Assets\Spells\shield.png" />
+    <None Remove="Assets\Spells\stealmana-white.png" />
+    <None Remove="Assets\Spells\stealmana.png" />
+    <None Remove="Assets\Spells\teleport-white.png" />
+    <None Remove="Assets\Spells\teleport.png" />
+    <None Remove="Assets\Spells\undeadarmy-white.png" />
+    <None Remove="Assets\Spells\undeadarmy.png" />
+    <None Remove="Assets\Spells\volcano-white.png" />
+    <None Remove="Assets\Spells\volcano.png" />
+    <None Remove="Assets\Spells\walloffire-white.png" />
+    <None Remove="Assets\Spells\walloffire.png" />
     <None Remove="Assets\warning-32.png" />
   </ItemGroup>
 
