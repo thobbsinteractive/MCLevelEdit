@@ -9,9 +9,9 @@ Without Moburma's research and his original repo https://github.com/Moburma/MCLe
 https://github.com/thobbsinteractive/MCLevelEdit/releases/latest
 
 ## Usage
-* Extract the Zip file to the folder of your choice. Run the MCLevelEdit.Desktop.exe.
+* Simply run the installer and click the Magic Carpet Level Editor icon to start
 * Most of the editor is fairly easy to use. The editor should load with randomly generated Terrain.
-* To play levels, simply configure the Game Settings via its menu and click then [Run]. Select Magic Carpet on the main menu click the Globe to run your level!
+* To play levels, simply configure the Game Settings via its menu and click then [Run]. On the main menu click the Globe to run your level!
 * Keep in mind that a large number of the game's levels work by only giving the player the spell inventory they have found at that point, and ignore what is set in the level file. When you use the [Run] button, your level will be the first one in the game and the player will always start with NO spells, regardless what is set in the level file. So include the spells on the ground at map start.
 
 ## Edit Magic Carpet 1 Levels
@@ -33,12 +33,13 @@ White - Switch (hidden switches)<br/>
 ## MILLSTONE 1
 - [ ] Currently the Mana Calculation is wrong. More investigation is needed with the existing levels.
 - [ ] Implement click and drag of Entities to move them on the map
+- [ ] Double Click on error/warning to select entity with said Error/Warning
 - [ ] Add filter drop downs to the Tree and the Edit Entities views.
-- [ ] Adding decompression and extraction of levels to the PagkageAdapter so you can directly open from the Editor
 
 ## MILLSTONE 2
 - [ ] Add custom tools for creating Walls/Paths and Teleports.
 - [ ] Add validation rules for Walls/Paths and Teleports.
+- [ ] Adding decompression and extraction of levels to the PagkageAdapter so you can directly open from the Editor
 
 ## MILLSTONE 3
 - [ ] Implement editing and running Hidden Worlds
