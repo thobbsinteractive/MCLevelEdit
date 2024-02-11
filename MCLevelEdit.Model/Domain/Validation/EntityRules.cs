@@ -9,7 +9,7 @@ namespace MCLevelEdit.Model.Domain.Validation
 
             if (entity is not null && entities is not null && entities.Any())
             {
-                if (entity.SwitchId > 0 && entity.EntityType.TypeId != TypeId.Switch) 
+                if (entity.SwitchId > 0 && entity.SwitchId != ushort.MaxValue && entity.EntityType.TypeId != TypeId.Switch) 
                 {
                     var sw = entities.Where(e => e.EntityType.TypeId == TypeId.Switch && e.SwitchId == entity.SwitchId).FirstOrDefault();
 
