@@ -137,6 +137,7 @@ public class Map
         {
             ValidationResults.Add(EntityRules.HasSwitch(entity, Entities));
             ValidationResults.Add(EntityRules.BuildingHasSwidAndDisIdAndParent(entity));
+            ValidationResults.Add(EntityRules.HasUniqueCoordinates(entity, Entities));
         }
         
         return ValidationResults;

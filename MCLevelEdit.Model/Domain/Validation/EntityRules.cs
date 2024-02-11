@@ -68,5 +68,27 @@ namespace MCLevelEdit.Model.Domain.Validation
                 return new ValidationResult(0, Result.Fail, $"Entity was null!");
             }
         }
+
+        public static ValidationResult HasUniqueCoordinates(Entity entity, IList<Entity> entities)
+        {
+
+            if (entity is not null)
+            {
+                var otherEntities = entities.Where(e => e.Id != entity.Id).ToList();
+
+                if (otherEntities?.Count > 0 && otherEntities.Where(e => e.Position.Equals(entity.Position))?.Count() > 0)
+                {
+                    return new ValidationResult(entity.Id, Result.Fail, $"Entity {entity.Id} has duplicate coordinates with another Entity");
+                }
+                else
+                {
+                    return new ValidationResult(entity.Id, Result.Pass, nameof(HasUniqueCoordinates));
+                }
+            }
+            else
+            {
+                return new ValidationResult(0, Result.Fail, $"Entity was null!");
+            }
+        }
     }
 }
