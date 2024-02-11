@@ -9,6 +9,7 @@ using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Enums;
+using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using Splat;
 using System;
@@ -31,6 +32,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     private Layer _selectedLayer = Layer.Game;
     private bool _showSwitchConnections = false;
+    private EntityViewModel? _selectedEntityViewModel = null;
 
     private Dictionary<int, List<Shape>> _entityShapes = new Dictionary<int, List<Shape>>();
 
@@ -54,6 +56,11 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         get { return _cvEntity; }
     }
 
+    public EntityViewModel SelectedEntityViewModel
+    {
+        get { return _selectedEntityViewModel; }
+    }
+
     public Layer SelectedLayer
     {
         set
@@ -73,6 +80,15 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         get { return _showSwitchConnections; }
     }
 
+    public void OnDeleteSelectedEntity()
+    {
+        if (_selectedEntityViewModel != null)
+        {
+            DeleteEntity(_selectedEntityViewModel);
+            OnEntitySelected(null);
+        }
+    }
+
     public void OnCursorClicked(Point position, bool left, bool right)
     {
         (Point, bool, bool) cursorEvent = (position, left, right);
@@ -81,6 +97,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void OnEntitySelected(Entity? entity)
     {
+        _selectedEntityViewModel = entity?.ToEntityViewModel();
+
         if (_rectSelection is not null)
             _cvEntity.Children.Remove(_rectSelection);
 
