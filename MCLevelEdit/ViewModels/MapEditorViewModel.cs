@@ -90,6 +90,17 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
     }
 
+    public void OnMoveSelectedEntity(int moveX, int moveY)
+    {
+        if (_selectedEntityViewModel != null)
+        {
+            _selectedEntityViewModel.X += (byte)moveX;
+            _selectedEntityViewModel.Y += (byte)moveY;
+
+            UpdateEntity(_selectedEntityViewModel);
+        }
+    }
+
     public void OnCursorClicked(Point position, bool left, bool right)
     {
         (Point, bool, bool) cursorEvent = (position, left, right);
@@ -308,9 +319,24 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         if (arg.Item is not null)
         {
             var key = (Key)arg.Item;
-            if (key == Key.Delete)
+            switch (key)
             {
-                OnDeleteSelectedEntity();
+                case Key.Delete:
+                case Key.Back:
+                    OnDeleteSelectedEntity();
+                    break;
+                case Key.Up:
+                    OnMoveSelectedEntity(0, -1);
+                    break;
+                case Key.Down:
+                    OnMoveSelectedEntity(0, 1);
+                    break;
+                case Key.Left:
+                    OnMoveSelectedEntity(-1, 0);
+                    break;
+                case Key.Right:
+                    OnMoveSelectedEntity(1, 0);
+                    break;
             }
         }
     }
