@@ -45,17 +45,7 @@ namespace MCLevelEdit.Views
 
             this.DataContextChanged += OnDataContextChanged;
 
-            this.KeyDown += OnKeyDown;
-
             ResetView();
-        }
-
-        private void OnKeyDown(object? sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Delete && VmMapEditor != null)
-            {
-                VmMapEditor.OnDeleteSelectedEntity();
-            }
         }
 
         private void OnDataContextChanged(object? sender, EventArgs e)

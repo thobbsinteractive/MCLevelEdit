@@ -1,7 +1,6 @@
 ﻿using Avalonia.Media.Imaging;
 using ReactiveUI;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels;
 

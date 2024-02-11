@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -220,6 +221,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         _eventAggregator.RegisterEvent("DeleteEntity", DeleteEntityHandler);
         _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
         _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
+        _eventAggregator.RegisterEvent("KeyPressed", KeyPressedHandler);
     }
 
     private void AddEntityHandler(object sender, PubSubEventArgs<object> args)
@@ -299,6 +301,18 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
         if (deselect)
             OnEntitySelected(null);
+    }
+
+    public void KeyPressedHandler(object sender, PubSubEventArgs<object> arg)
+    {
+        if (arg.Item is not null)
+        {
+            var key = (Key)arg.Item;
+            if (key == Key.Delete)
+            {
+                OnDeleteSelectedEntity();
+            }
+        }
     }
 
     private void AddEntity(Entity entity)

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
@@ -188,6 +189,11 @@ public class MainViewModel : ViewModelBase
         });
 
         MainWindow.I.Title = GetTitle("NewLevel.DAT");
+    }
+
+    public void OnKeyPressed(Key key)
+    {
+        _eventAggregator.RaiseEvent("KeyPressed", this, new PubSubEventArgs<object>(key));
     }
 
     private async Task ExportImageMap(Model.Enums.Layer layer)

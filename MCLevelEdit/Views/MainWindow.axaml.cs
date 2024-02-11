@@ -1,6 +1,8 @@
-﻿using Avalonia.ReactiveUI;
+﻿using Avalonia.Input;
+using Avalonia.ReactiveUI;
 using MCLevelEdit.ViewModels;
 using ReactiveUI;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MCLevelEdit.Views;
@@ -8,6 +10,9 @@ namespace MCLevelEdit.Views;
 public partial class MainWindow : ReactiveWindow<MainViewModel>
 {
     public static MainWindow I;
+
+    public MainViewModel MainViewModel { get { return (MainViewModel)this.DataContext; } }
+
     public MainWindow()
     {
         I = this;
@@ -17,6 +22,18 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         this.WhenActivated(action => action(ViewModel!.ShowGameSettingsDialog.RegisterHandler(DoShowGameDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowValidationResultsDialog.RegisterHandler(DoShowValidationResultsDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowAboutDialog.RegisterHandler(DoShowAboutDialogAsync)));
+
+        this.KeyDown += OnKeyDown;
+    }
+
+    private void OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        var keys = new Key[] { Key.Delete, Key.Up, Key.Down, Key.Left, Key.Right };
+
+        if (MainViewModel != null && keys.Contains(e.Key))
+        {
+            MainViewModel.OnKeyPressed(e.Key);
+        }
     }
 
     private async Task DoShowEditEntitiesDialogAsync(InteractionContext<EntitiesTableViewModel,

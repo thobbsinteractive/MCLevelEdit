@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using MCLevelEdit.ViewModels;
 using System;
 
 namespace MCLevelEdit.Views;
