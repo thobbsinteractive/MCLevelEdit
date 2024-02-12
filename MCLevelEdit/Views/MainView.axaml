@@ -36,11 +36,11 @@
       <Grid Grid.Row="0"
             Grid.Column="0"
             ColumnDefinitions="256,*,300"
-            RowDefinitions="150,*">
+            RowDefinitions="100,*">
         <views:EntityToolBarView Name="vmEntityToolBar"
                                  Grid.Row="0"
                                  Grid.Column="0"
-                                 Grid.ColumnSpan="2"
+                                 Grid.ColumnSpan="3"
                                  DockPanel.Dock="Top"
                                  DataContext="{Binding EntityToolBarViewModel}"/>
         <views:MapTreeView Name="vmMapTree"
