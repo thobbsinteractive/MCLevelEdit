@@ -32,7 +32,7 @@ namespace MCLevelEdit.ViewModels
             get => _willLearnIfYouDo;
             set { this.RaiseAndSetIfChanged(ref _willLearnIfYouDo, value); }
         }
-        public bool CarriesCannotUse
+        public bool CarriesCannotUse //Might be hardcoded. Is the same as CannotHave in testing
         {
             get => _carriesCannotUse;
             set { this.RaiseAndSetIfChanged(ref _carriesCannotUse, value); }
