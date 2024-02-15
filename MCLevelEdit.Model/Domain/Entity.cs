@@ -25,4 +25,12 @@ public class Entity
     }
 
     public bool IsPathOrWall() => this?.EntityType.TypeId == TypeId.Effect && (this?.EntityType.Model.Id == (int)Effect.Wall || this?.EntityType.Model.Id == (int)Effect.Path);
+    public bool IsSwitch() => 
+        this?.EntityType.TypeId == TypeId.Switch && 
+        (this?.EntityType.Model.Id == (int)Switch.DeathInside || 
+         this?.EntityType.Model.Id == (int)Switch.DeathOutside ||
+         this?.EntityType.Model.Id == (int)Switch.HiddenInside ||
+         this?.EntityType.Model.Id == (int)Switch.HiddenOutside ||
+         this?.EntityType.Model.Id == (int)Switch.HiddenInsideRe ||
+         this?.EntityType.Model.Id == (int)Switch.HiddenOutsideRe);
 };

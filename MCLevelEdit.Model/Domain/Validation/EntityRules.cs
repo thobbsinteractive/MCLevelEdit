@@ -74,15 +74,22 @@ namespace MCLevelEdit.Model.Domain.Validation
 
             if (entity is not null)
             {
-                var otherEntities = entities.Where(e => e.Id != entity.Id).ToList();
-
-                if (otherEntities?.Count > 0 && otherEntities.Where(e => e.Position.Equals(entity.Position))?.Count() > 0)
+                if (!entity.IsSwitch())
                 {
-                    return new ValidationResult(entity.Id, Result.Fail, $"Entity {entity.Id} has duplicate coordinates with another Entity");
+                    var duplicateCoordEntities = entities.Where(e => e.Id != entity.Id && e.Position.Equals(entity.Position)).ToList();
+
+                    if (duplicateCoordEntities?.Count > 0 && !duplicateCoordEntities.All(e => e.IsSwitch()))
+                    {
+                        return new ValidationResult(entity.Id, Result.Fail, $"Entity {entity.Id} {entity.EntityType.TypeId} {entity.EntityType.Model.Name} has duplicate coordinates with another Entity {duplicateCoordEntities.FirstOrDefault().Id}");
+                    }
+                    else
+                    {
+                        return new ValidationResult(entity.Id, Result.Pass, nameof(HasUniqueCoordinates));
+                    }
                 }
                 else
                 {
-                    return new ValidationResult(entity.Id, Result.Pass, nameof(HasUniqueCoordinates));
+                    return new ValidationResult(entity.Id, Result.Pass, "Entity is Switch");
                 }
             }
             else
