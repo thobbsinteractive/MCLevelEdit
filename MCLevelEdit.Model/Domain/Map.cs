@@ -139,6 +139,7 @@ public class Map
             ValidationResults.Add(EntityRules.BuildingHasSwidAndDisIdAndParent(entity));
             ValidationResults.Add(EntityRules.WallAndPathCannotSameChildAndParent(entity));
             ValidationResults.Add(EntityRules.HasUniqueCoordinates(entity, Entities));
+            ValidationResults.Add(EntityRules.CheckConnectedWalls(entity, Entities));
         }
         
         return ValidationResults;

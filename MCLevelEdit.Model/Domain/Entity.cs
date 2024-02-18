@@ -24,7 +24,10 @@ public class Entity
         };
     }
 
-    public bool IsPathOrWall() => this?.EntityType.TypeId == TypeId.Effect && (this?.EntityType.Model.Id == (int)Effect.Wall || this?.EntityType.Model.Id == (int)Effect.Path);
+    public bool IsBuilding() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.VillagerBuilding;
+    public bool IsPath() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Path;
+    public bool IsWall() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Wall;
+    public bool IsPathOrWall() => IsPath() || IsWall();
     public bool IsSwitch() => 
         this?.EntityType.TypeId == TypeId.Switch && 
         (this?.EntityType.Model.Id == (int)Switch.DeathInside || 
