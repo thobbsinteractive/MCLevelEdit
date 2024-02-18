@@ -69,6 +69,34 @@ namespace MCLevelEdit.Model.Domain.Validation
             }
         }
 
+        public static ValidationResult WallAndPathCannotSameChildAndParent(Entity entity)
+        {
+
+            if (entity is not null)
+            {
+                if (entity.EntityType.TypeId == TypeId.Effect && (entity.EntityType.Model.Id == (int)Effect.Wall || entity.EntityType.Model.Id == (int)Effect.Path))
+                {
+                    if (entity.Id == entity.Child)
+                    {
+                        return new ValidationResult(entity.Id, Result.Fail, $"{entity} Wall CANNOT have same Id as its Child Id!");
+                    }
+                    if (entity.Id == entity.Parent)
+                    {
+                        return new ValidationResult(entity.Id, Result.Fail, $"{entity} Wall CANNOT have same Id as its Parent Id!");
+                    }
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(WallAndPathCannotSameChildAndParent)}");
+                }
+                else
+                {
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(WallAndPathCannotSameChildAndParent)}");
+                }
+            }
+            else
+            {
+                return new ValidationResult(0, Result.Fail, $"{entity} was null!");
+            }
+        }
+
         public static ValidationResult HasUniqueCoordinates(Entity entity, IList<Entity> entities)
         {
 
