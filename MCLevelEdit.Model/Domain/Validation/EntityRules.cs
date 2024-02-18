@@ -15,25 +15,25 @@ namespace MCLevelEdit.Model.Domain.Validation
 
                     if (sw is null)
                     {
-                        return new ValidationResult(entity.Id, Result.Warning, $"Entity has no Switch but has SwitchId {entity.SwitchId} set!");
+                        return new ValidationResult(entity.Id, Result.Warning, $"{entity} has no Switch but has SwitchId {entity.SwitchId} set!");
                     } 
                     else if (entity.SwitchId != entity.DisId)
                     {
-                        return new ValidationResult(entity.Id, Result.Warning, $"SwitchId {entity.SwitchId} should be the same as DisId {entity.DisId}!");
+                        return new ValidationResult(entity.Id, Result.Warning, $"{entity} should be the same as DisId {entity.DisId}!");
                     }
                     else
                     {
-                        return new ValidationResult(entity.Id, Result.Pass, nameof(HasSwitch));
+                        return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(HasSwitch)}");
                     }
                 }
                 else
                 {
-                    return new ValidationResult(entity.Id, Result.Pass, nameof(HasSwitch));
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(HasSwitch)}");
                 }
             }
             else
             {
-                return new ValidationResult(0, Result.Fail, $"Entity or Entities was null!");
+                return new ValidationResult(0, Result.Fail, $"{entity} or Entities was null!");
             }
         }
 
@@ -46,26 +46,26 @@ namespace MCLevelEdit.Model.Domain.Validation
                 {
                     if (entity.DisId != ushort.MaxValue)
                     {
-                        return new ValidationResult(entity.Id, Result.Warning, $"Building should have DisId {ushort.MaxValue} set!");
+                        return new ValidationResult(entity.Id, Result.Warning, $"{entity} Building should have DisId {ushort.MaxValue} set!");
                     }
                     if (entity.SwitchId != ushort.MaxValue)
                     {
-                        return new ValidationResult(entity.Id, Result.Warning, $"Building should have SwitchId {ushort.MaxValue} set!");
+                        return new ValidationResult(entity.Id, Result.Warning, $"{entity} Building should have SwitchId {ushort.MaxValue} set!");
                     }
                     if (entity.Parent == 0)
                     {
-                        return new ValidationResult(entity.Id, Result.Warning, $"Building Parent {entity.Parent} should be greater than zero!");
+                        return new ValidationResult(entity.Id, Result.Warning, $"{entity} Building Parent {entity.Parent} should be greater than zero!");
                     }
-                    return new ValidationResult(entity.Id, Result.Pass, nameof(BuildingHasSwidAndDisIdAndParent));
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(BuildingHasSwidAndDisIdAndParent)}");
                 }
                 else
                 {
-                    return new ValidationResult(entity.Id, Result.Pass, nameof(BuildingHasSwidAndDisIdAndParent));
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(BuildingHasSwidAndDisIdAndParent)}");
                 }
             }
             else
             {
-                return new ValidationResult(0, Result.Fail, $"Entity was null!");
+                return new ValidationResult(0, Result.Fail, $"{entity} was null!");
             }
         }
 
@@ -80,21 +80,21 @@ namespace MCLevelEdit.Model.Domain.Validation
 
                     if (duplicateCoordEntities?.Count > 0 && !duplicateCoordEntities.All(e => e.IsSwitch()))
                     {
-                        return new ValidationResult(entity.Id, Result.Fail, $"Entity {entity.Id} {entity.EntityType.TypeId} {entity.EntityType.Model.Name} has duplicate coordinates with another Entity {duplicateCoordEntities.FirstOrDefault().Id}");
+                        return new ValidationResult(entity.Id, Result.Fail, $"{entity} has duplicate coordinates with another Entity {duplicateCoordEntities.FirstOrDefault().Id}");
                     }
                     else
                     {
-                        return new ValidationResult(entity.Id, Result.Pass, nameof(HasUniqueCoordinates));
+                        return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(HasUniqueCoordinates)}");
                     }
                 }
                 else
                 {
-                    return new ValidationResult(entity.Id, Result.Pass, "Entity is Switch");
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} is Switch");
                 }
             }
             else
             {
-                return new ValidationResult(0, Result.Fail, $"Entity was null!");
+                return new ValidationResult(0, Result.Fail, $"{entity} was null!");
             }
         }
     }

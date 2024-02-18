@@ -33,4 +33,9 @@ public class Entity
          this?.EntityType.Model.Id == (int)Switch.HiddenOutside ||
          this?.EntityType.Model.Id == (int)Switch.HiddenInsideRe ||
          this?.EntityType.Model.Id == (int)Switch.HiddenOutsideRe);
+
+    public override string ToString()
+    {
+        return $"Entity {this.Id}: {this.EntityType.TypeId} - {this.EntityType.Model.Name}:";
+    }
 };
