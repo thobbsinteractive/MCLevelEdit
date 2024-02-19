@@ -390,8 +390,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                     {
                         var line = new Line()
                         {
-                            StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                            EndPoint = new Point(connectedEntity.Position.X * Globals.SQUARE_SIZE, connectedEntity.Position.Y * Globals.SQUARE_SIZE),
+                            StartPoint = new Point((entity.Position.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), entity.Position.Y * Globals.SQUARE_SIZE),
+                            EndPoint = new Point(connectedEntity.Position.X * Globals.SQUARE_SIZE, (connectedEntity.Position.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                             Stroke = brush,
                             StrokeThickness = 1,
                             ZIndex = 98
@@ -418,8 +418,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                         var line1 = new Line()
                         {
-                            StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                            EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
+                            StartPoint = new Point((entity.Position.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entity.Position.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                            EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                             Stroke = brush,
                             StrokeThickness = Globals.SQUARE_SIZE,
                             ZIndex = 99
@@ -437,8 +437,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                         var line2 = new Line()
                         {
-                            StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                            EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
+                            StartPoint = new Point((entity.Position.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entity.Position.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                            EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                             Stroke = brush,
                             StrokeThickness = Globals.SQUARE_SIZE,
                             ZIndex = 99

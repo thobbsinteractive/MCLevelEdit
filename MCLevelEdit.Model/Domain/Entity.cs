@@ -36,6 +36,7 @@ public class Entity
          this?.EntityType.Model.Id == (int)Switch.HiddenOutside ||
          this?.EntityType.Model.Id == (int)Switch.HiddenInsideRe ||
          this?.EntityType.Model.Id == (int)Switch.HiddenOutsideRe);
+    public bool IsTeleport() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Teleport;
 
     public override string ToString()
     {
