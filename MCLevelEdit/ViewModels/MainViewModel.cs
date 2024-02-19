@@ -309,6 +309,9 @@ public class MainViewModel : ViewModelBase
             }
         }
 
+        if (string.IsNullOrWhiteSpace(filePath))
+            return false;
+
         if (!string.IsNullOrWhiteSpace(filePath) && !await _mapService.SaveMapToFileAsync(filePath))
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
