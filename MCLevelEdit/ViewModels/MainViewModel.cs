@@ -105,14 +105,20 @@ public class MainViewModel : ViewModelBase
 
         NewFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await mapService.CreateNewMap();
-            MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            if (await PromptSaveAndOrContinue())
+            {
+                await mapService.CreateNewMap();
+                MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            }
         });
 
         NewRandomFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await mapService.CreateNewMap(true);
-            MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            if (await PromptSaveAndOrContinue())
+            {
+                await mapService.CreateNewMap(true);
+                MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            }
         });
 
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -238,6 +244,22 @@ public class MainViewModel : ViewModelBase
 
             MainWindow.I.Title = GetTitle(filePath);
         }
+    }
+
+    private async Task<bool> PromptSaveAndOrContinue()
+    {
+        var box = MessageBoxManager.GetMessageBoxStandard("Question", $"Do you want to Save your changes?", ButtonEnum.YesNoCancel, Icon.Question);
+        var result = await box.ShowAsync();
+
+        if (result == ButtonResult.Yes)
+        {
+            return await SaveFile(false);
+        }
+        else if (result == ButtonResult.Cancel)
+        {
+            return false;
+        }
+        return true;
     }
 
     private async Task<bool> SaveFile(bool saveAs)
