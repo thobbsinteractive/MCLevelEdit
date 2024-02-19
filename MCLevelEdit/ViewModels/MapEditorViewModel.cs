@@ -449,6 +449,51 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 }
             }
 
+            if (entity.IsTeleport())
+            {
+                brush = new SolidColorBrush(Color.FromRgb(255, 128, 255), 1);
+
+                var destinationLine = new Line()
+                {
+                    StartPoint = new Point((entity.Position.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entity.Position.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                    EndPoint = new Point((entity.Child * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entity.Parent * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                    Stroke = brush,
+                    StrokeThickness = 2,
+                    ZIndex = 250
+                };
+                _cvEntity.Children.Add(destinationLine);
+                shapes.Add(destinationLine);
+
+                var circle1 = new Ellipse()
+                {
+                    Width = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
+                    Height = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
+                    Stroke = brush,
+                    StrokeThickness = 2,
+                    ZIndex = 250
+                };
+                Canvas.SetLeft(circle1, (entity.Child * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
+                Canvas.SetTop(circle1, (entity.Parent * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
+
+                _cvEntity.Children.Add(circle1);
+                shapes.Add(circle1);
+
+                var circle2 = new Ellipse()
+                {
+                    Width = Globals.SQUARE_SIZE,
+                    Height = Globals.SQUARE_SIZE,
+                    Stroke = brush,
+                    StrokeThickness = 2,
+                    ZIndex = 250
+                };
+                Canvas.SetLeft(circle2, entity.Child * Globals.SQUARE_SIZE);
+                Canvas.SetTop(circle2, entity.Parent * Globals.SQUARE_SIZE);
+
+                _cvEntity.Children.Add(circle2);
+                shapes.Add(circle2);
+
+            }
+
             _entityShapes.Add(entity.Id, shapes);
         }
     }
