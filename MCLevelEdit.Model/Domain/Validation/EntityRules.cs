@@ -126,6 +126,26 @@ namespace MCLevelEdit.Model.Domain.Validation
             }
         }
 
+        public static ValidationResult TeleportDestinationCoordinatesAreDifferentToStart(Entity entity)
+        {
+
+            if (entity is not null)
+            {
+                if (entity.IsTeleport() && entity.Position.X == entity.Child && entity.Position.Y == entity.Parent)
+                {
+                    return new ValidationResult(entity.Id, Result.Warning, $"{entity} has same destination coordinates as start");
+                }
+                else
+                {
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(TeleportDestinationCoordinatesAreDifferentToStart)}");
+                }
+            }
+            else
+            {
+                return new ValidationResult(0, Result.Fail, $"{entity} was null!");
+            }
+        }
+
         public static ValidationResult CheckConnectedWalls(Entity entity, IList<Entity> entities)
         {
             if (entity is not null && entity.IsWall())
