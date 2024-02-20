@@ -255,7 +255,7 @@ namespace MCLevelEdit.ViewModels
 
             if (files != null)
             {
-                LevelPaths = files.Select(f => f.Path.AbsolutePath).ToArray();
+                LevelPaths = files.Select(f => f.Path.LocalPath).ToArray();
                 SetLevelPaths(LevelPaths);
             }
         }
@@ -272,9 +272,9 @@ namespace MCLevelEdit.ViewModels
                 AllowMultiple = false
             });
 
-            if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
+            if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
             {
-                GameExePath = files[0].Path.AbsolutePath;
+                GameExePath = files[0].Path.LocalPath;
             }
         }
 
@@ -290,9 +290,9 @@ namespace MCLevelEdit.ViewModels
                 AllowMultiple = false
             });
 
-            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.AbsolutePath))
+            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
             {
-                GameLevelsPath = folder[0].Path.AbsolutePath;
+                GameLevelsPath = folder[0].Path.LocalPath;
             }
         }
 
@@ -308,9 +308,9 @@ namespace MCLevelEdit.ViewModels
                 AllowMultiple = false
             });
 
-            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.AbsolutePath))
+            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
             {
-                GameCloudLevelsPath = folder[0].Path.AbsolutePath;
+                GameCloudLevelsPath = folder[0].Path.LocalPath;
             }
         }
 
@@ -326,9 +326,9 @@ namespace MCLevelEdit.ViewModels
                 AllowMultiple = false
             });
 
-            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.AbsolutePath))
+            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
             {
-                GameLevelsBackupPath = folder[0].Path.AbsolutePath;
+                GameLevelsBackupPath = folder[0].Path.LocalPath;
             }
         }
 

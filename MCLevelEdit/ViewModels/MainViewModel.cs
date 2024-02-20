@@ -224,7 +224,7 @@ public class MainViewModel : ViewModelBase
 
         if (file != null)
         {
-            string filePath = file.Path.AbsolutePath;
+            string filePath = file.Path.LocalPath;
             try
             {
                 WriteableBitmap preview = new WriteableBitmap(
@@ -281,9 +281,9 @@ public class MainViewModel : ViewModelBase
             string suggestedFileName = !string.IsNullOrWhiteSpace(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
             IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DOCS_DIRECTORY));
             
-            if (storageFolder != null && !Directory.Exists(storageFolder.Path.AbsolutePath))
+            if (storageFolder != null && !Directory.Exists(storageFolder.Path.LocalPath))
             {
-                Directory.CreateDirectory(storageFolder.Path.AbsolutePath);
+                Directory.CreateDirectory(storageFolder.Path.LocalPath);
             }
 
             if (!string.IsNullOrWhiteSpace(map.FilePath))
@@ -305,7 +305,7 @@ public class MainViewModel : ViewModelBase
 
             if (file != null)
             {
-                filePath = file.Path.AbsolutePath;
+                filePath = file.Path.LocalPath;
             }
         }
 
@@ -338,9 +338,9 @@ public class MainViewModel : ViewModelBase
             AllowMultiple = false
         });
 
-        if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
+        if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
         {
-            string filePath = files[0].Path.AbsolutePath;
+            string filePath = files[0].Path.LocalPath;
             if (!await _mapService.LoadMapFromFileAsync(filePath))
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to load the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
