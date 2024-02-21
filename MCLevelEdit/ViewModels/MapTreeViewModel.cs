@@ -197,7 +197,9 @@ public class MapTreeViewModel : ReactiveObject
     {
         var entityNode = new EntityNode(this, entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity));
         var worldNode = GetWorldNode();
-        worldNode.SubNodes.Add(entityNode);
+
+        if (_entityFilter == 0 || (int)entity.EntityType.TypeId == _entityFilter)
+            worldNode.SubNodes.Add(entityNode);
     }
 
     private void UpdateEntityNode(Entity entity)
@@ -212,6 +214,15 @@ public class MapTreeViewModel : ReactiveObject
             entityNode.Title = GetEntityNodeTitle(entity);
             entityNode.Subtitle = GetEntityNodeSubTitle(entity);
         }
+
+        if (_entityFilter > 0 && (int)entity.EntityType.TypeId != _entityFilter)
+        {
+            var worldNode = GetWorldNode();
+            worldNode.SubNodes.Remove(entityNode);
+            SelectedNodes.Clear();
+            _eventAggregator.RaiseEvent("NodeSelected", this, new PubSubEventArgs<object>(null));
+        }
+
     }
 
     private Node GetWorldNode()
