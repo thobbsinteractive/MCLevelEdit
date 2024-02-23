@@ -93,15 +93,6 @@
                   Command="{Binding RunCommand}">
               Run
           </Button>
-          <Button Name="btnEdit"
-                  Grid.Column="1"
-                  VerticalContentAlignment="Center"
-                  HorizontalContentAlignment="Center"
-                  MinWidth="150"
-                  Height="38"
-                  Command="{Binding EditEntitiesCommand}">
-            Edit Entities
-          </Button>
         </Grid>
       </Border>
     </Grid>

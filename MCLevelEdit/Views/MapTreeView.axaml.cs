@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using MCLevelEdit.ViewModels;
 using System.Collections.Generic;
 
@@ -13,6 +14,12 @@ public partial class MapTreeView : UserControl
         InitializeComponent();
 
         this.cboEntityType.SelectionChanged += CboEntityType_SelectionChanged;
+        this.btnEdit.Click += BtnEdit_Click;
+    }
+
+    private void BtnEdit_Click(object? sender, RoutedEventArgs e)
+    {
+        (this.Parent?.DataContext as MainViewModel)?.OnEditButtonClickedAsync();
     }
 
     private void CboEntityType_SelectionChanged(object? sender, SelectionChangedEventArgs e)

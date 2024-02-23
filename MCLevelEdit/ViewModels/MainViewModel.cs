@@ -62,7 +62,6 @@ public class MainViewModel : ViewModelBase
     public ICommand ExportTerrainRenderCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand RunCommand { get; }
-    public ICommand EditEntitiesCommand { get; }
     public ICommand EditGameSettingsCommand { get; }
     public ICommand DisplayFailCommand { get; }
     public ICommand DisplayWarningsCommand { get; }
@@ -92,11 +91,6 @@ public class MainViewModel : ViewModelBase
         ShowEntitiesDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
         ShowValidationResultsDialog = new Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?>();
         ShowAboutDialog = new Interaction<AboutWindowViewModel, AboutWindowViewModel?>();
-
-        EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
-        {
-            var result = await ShowEntitiesDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
-        });
 
         EditGameSettingsCommand = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -200,6 +194,11 @@ public class MainViewModel : ViewModelBase
     public void OnKeyPressed(Key key)
     {
         _eventAggregator.RaiseEvent("KeyPressed", this, new PubSubEventArgs<object>(key));
+    }
+
+    public async Task OnEditButtonClickedAsync()
+    {
+        var result = await ShowEntitiesDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
     }
 
     private async Task ExportImageMap(Model.Enums.Layer layer)
