@@ -46,7 +46,7 @@
                 <Image Source="{Binding Icon}" />
                 <TextBlock Text="{Binding Title}" Margin="5,7,0,0"/>
               </StackPanel>
-              <TextBlock Text="{Binding Subtitle}" FontSize="14" Margin="5,7,0,0" IsVisible="{Binding IsSubtitleSet}"/>
+              <TextBlock Text="{Binding Subtitle}" Margin="5,7,0,0" IsVisible="{Binding IsSubtitleSet}"/>
             </StackPanel>
           </Border>
         </TreeDataTemplate>
