@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.PanAndZoom;
 using Avalonia.Input;
 using MCLevelEdit.ViewModels;
 using System;
@@ -9,11 +8,6 @@ namespace MCLevelEdit.Views
 {
     public partial class MapEditorView : UserControl
     {
-        private readonly ZoomBorder? _pazMap;
-        private readonly Button? _btnReset;
-        private readonly Image? _imgPreview;
-        private readonly Canvas? _cvEntities;
-
         private Point _ptCursor = new Point();
 
         public Point PtCursor
@@ -27,20 +21,15 @@ namespace MCLevelEdit.Views
         {
             InitializeComponent();
 
-            _cvEntities = this.Find<Canvas>("cvEntities");
-            _pazMap = this.Find<ZoomBorder>("pazMap");
-            _btnReset = this.Find<Button>("btnReset");
-            _imgPreview = this.Find<Image>("imgPreview");
-
-            if (_pazMap != null)
+            if (pazMap != null)
             {
-                _pazMap.PointerReleased += OnPazMap_PointerReleased;
-                _pazMap.PointerMoved += OnPazMap_PointerMoved;
+                pazMap.PointerReleased += OnPazMap_PointerReleased;
+                pazMap.PointerMoved += OnPazMap_PointerMoved;
             }
 
-            if (_btnReset != null)
+            if (btnReset != null)
             {
-                _btnReset.Click += OnBtnReset_Click;
+                btnReset.Click += OnBtnReset_Click;
             }
 
             this.DataContextChanged += OnDataContextChanged;
@@ -52,7 +41,7 @@ namespace MCLevelEdit.Views
         {
             if (VmMapEditor is not null && VmMapEditor.CvEntity is null)
             {
-                VmMapEditor.CvEntity = _cvEntities;
+                VmMapEditor.CvEntity = cvEntities;
             }
         }
 
@@ -83,16 +72,16 @@ namespace MCLevelEdit.Views
 
         private Point GetCursorPoint(PointerEventArgs e)
         {
-            if (_imgPreview != null)
-                return e.GetPosition(_imgPreview);
+            if (imgPreview != null)
+                return e.GetPosition(imgPreview);
             else
                 return new Point();
         }
 
         private void ResetView()
         {
-            _pazMap.ResetMatrix();
-            _pazMap?.AutoFit();
+            pazMap?.ResetMatrix();
+            pazMap?.AutoFit();
         }
     }
 }
