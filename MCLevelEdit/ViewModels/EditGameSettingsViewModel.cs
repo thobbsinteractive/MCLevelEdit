@@ -29,12 +29,14 @@ namespace MCLevelEdit.ViewModels
         private string _defaultClassicLevelsPath = @"C:\CARPET\LEVELS\";
         private string _defaultClassicLevelsBackupPath = @"C:\CARPET\LEVELS\BACKUP\";
 
-        private string _defaultGoGExePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\Launch Magic Carpet Plus.lnk";
+        private string _defaultGoGArgs = @"-conf ""..\dosboxMC.conf"" -conf ""..\dosboxMC_single.conf"" -noconsole -c ""exit""";
+        private string _defaultGoGExePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\DOSBOX\DOSBox.exe";
         private string _defaultGoGLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\";
         private string _defaultGoGLevelsBackupPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\BACKUP\";
         private string _defaultGoGCloudLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\cloud_saves\CARPET.CD\LEVELS\";
 
         private string _gameExePath;
+        private string _gameExeArgs;
         private string _gameLevelsPath;
         private string _gameCloudLevelsPath;
         private string _gameLevelsBackupPath;
@@ -71,6 +73,12 @@ namespace MCLevelEdit.ViewModels
         {
             get => _gameExePath;
             set => this.RaiseAndSetIfChanged(ref _gameExePath, value);
+        }
+
+        public string GameExeArgs
+        {
+            get => _gameExeArgs;
+            set => this.RaiseAndSetIfChanged(ref _gameExeArgs, value);
         }
 
         public string GameLevelsPath
@@ -110,6 +118,13 @@ namespace MCLevelEdit.ViewModels
                 if (!string.IsNullOrEmpty(gameExePath))
                 {
                     GameExePath = gameExePath;
+                }
+
+                var gameArgs = settings.GameArgs;
+
+                if (!string.IsNullOrEmpty(gameArgs))
+                {
+                    GameExeArgs = gameArgs;
                 }
 
                 var gameLevelsBackupPath = settings.GameBackupFolder;
@@ -188,7 +203,13 @@ namespace MCLevelEdit.ViewModels
 
             SetDefaultsCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                SetDefaultPaths();
+                var box = MessageBoxManager.GetMessageBoxStandard("Restore Defaults", $"Restoring defaults will clear your current settings, Are you sure?", ButtonEnum.YesNo, Icon.Question);
+                var result = await box.ShowAsync();
+                if (result == ButtonResult.Yes)
+                {
+                    SetDefaultPaths();
+                    await SaveLevelPaths();
+                }
             });
         }
 
@@ -205,12 +226,15 @@ namespace MCLevelEdit.ViewModels
             if (this.GameIsClassic)
             {
                 GameExePath = _defaultClassicExePath;
+                GameExeArgs = string.Empty;
                 GameLevelsPath = _defaultClassicLevelsPath;
+                GameCloudLevelsPath = string.Empty;
                 GameLevelsBackupPath = _defaultClassicLevelsBackupPath;
             }
             else
             {
                 GameExePath = _defaultGoGExePath;
+                GameExeArgs = _defaultGoGArgs;
                 GameLevelsPath = _defaultGoGLevelsPath;
                 GameCloudLevelsPath = _defaultGoGCloudLevelsPath;
                 GameLevelsBackupPath = _defaultGoGLevelsBackupPath;
@@ -231,7 +255,7 @@ namespace MCLevelEdit.ViewModels
 
             if (files != null)
             {
-                LevelPaths = files.Select(f => f.Path.AbsolutePath).ToArray();
+                LevelPaths = files.Select(f => f.Path.LocalPath).ToArray();
                 SetLevelPaths(LevelPaths);
             }
         }
@@ -248,9 +272,9 @@ namespace MCLevelEdit.ViewModels
                 AllowMultiple = false
             });
 
-            if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
+            if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
             {
-                GameExePath = Path.GetDirectoryName(files[0].Path.AbsolutePath);
+                GameExePath = files[0].Path.LocalPath;
             }
         }
 
@@ -266,9 +290,9 @@ namespace MCLevelEdit.ViewModels
                 AllowMultiple = false
             });
 
-            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.AbsolutePath))
+            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
             {
-                GameLevelsPath = folder[0].Path.AbsolutePath;
+                GameLevelsPath = folder[0].Path.LocalPath;
             }
         }
 
@@ -284,9 +308,9 @@ namespace MCLevelEdit.ViewModels
                 AllowMultiple = false
             });
 
-            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.AbsolutePath))
+            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
             {
-                GameCloudLevelsPath = folder[0].Path.AbsolutePath;
+                GameCloudLevelsPath = folder[0].Path.LocalPath;
             }
         }
 
@@ -302,9 +326,9 @@ namespace MCLevelEdit.ViewModels
                 AllowMultiple = false
             });
 
-            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.AbsolutePath))
+            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
             {
-                GameLevelsBackupPath = folder[0].Path.AbsolutePath;
+                GameLevelsBackupPath = folder[0].Path.LocalPath;
             }
         }
 
@@ -372,6 +396,7 @@ namespace MCLevelEdit.ViewModels
             {
                 IsForClassic = this.GameIsClassic,
                 GameExeLocation = this.GameExePath,
+                GameArgs = this.GameExeArgs,
                 GameBackupFolder = this.GameLevelsBackupPath,
                 GameLevelFolders = new string[] { this.GameLevelsPath, this.GameCloudLevelsPath }
             };
@@ -413,6 +438,11 @@ namespace MCLevelEdit.ViewModels
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error restoring you game files Levels!", ButtonEnum.Ok, Icon.Error);
                 await box.ShowAsync();
                 return false;
+            }
+            else
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Restore Success!", ButtonEnum.Ok, Icon.Info);
+                await box.ShowAsync();
             }
             return true;
         }

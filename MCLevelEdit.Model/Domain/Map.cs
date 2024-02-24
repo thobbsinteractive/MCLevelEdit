@@ -137,6 +137,10 @@ public class Map
         {
             ValidationResults.Add(EntityRules.HasSwitch(entity, Entities));
             ValidationResults.Add(EntityRules.BuildingHasSwidAndDisIdAndParent(entity));
+            ValidationResults.Add(EntityRules.WallAndPathCannotSameChildAndParent(entity));
+            ValidationResults.Add(EntityRules.HasUniqueCoordinates(entity, Entities));
+            ValidationResults.Add(EntityRules.CheckConnectedWalls(entity, Entities));
+            ValidationResults.Add(EntityRules.TeleportDestinationCoordinatesAreDifferentToStart(entity));
         }
         
         return ValidationResults;

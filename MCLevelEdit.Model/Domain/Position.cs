@@ -15,4 +15,6 @@ public class Position
     {
         return new Position(X, Y);
     }
+
+    public bool Equals(Position pos) => this.X == pos.X && this.Y == pos.Y;
 };

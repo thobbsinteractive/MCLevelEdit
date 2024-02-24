@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="100"
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
              xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EntityToolBarViewModel;assembly=MCLevelEdit"
              xmlns:views="clr-namespace:MCLevelEdit.Views"
@@ -12,9 +12,10 @@
   <UserControl.Resources>
     <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
   </UserControl.Resources>
-  <TabControl Margin="5">
-    <TabItem Header="Create Entities"
-             FontSize="18">
+  <Border HorizontalAlignment="Stretch"
+          BorderBrush="LightGray"
+          BorderThickness="0,1"
+          Padding="5">
       <Grid Name="grdEntities"
             ColumnDefinitions="50,50,50,50,50,50,50,50,*"
             RowDefinitions="50,40">
@@ -84,6 +85,5 @@
                   DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
                   ItemsSource="{Binding AddEntityViewModel.ModelTypes}"/>
       </Grid>
-    </TabItem>
-  </TabControl>
+  </Border>
 </UserControl>
