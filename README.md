@@ -33,12 +33,12 @@ White - Switch (hidden switches)<br/>
 ## MILLSTONE 1
 - [ ] Currently the Mana Calculation is wrong. More investigation is needed with the existing levels.
 - [ ] Implement click and drag of Entities to move them on the map
-- [ ] Double Click on error/warning to select entity with said Error/Warning
-- [ ] Add filter drop downs to the Tree and the Edit Entities views.
+- [x] Double Click on error/warning to select entity with said Error/Warning
+- [x] Add filter drop downs to the Tree and the Edit Entities views.
 
 ## MILLSTONE 2
 - [ ] Add custom tools for creating Walls/Paths and Teleports.
-- [ ] Add validation rules for Walls/Paths and Teleports.
+- [x] Add validation rules for Walls/Paths and Teleports.
 - [ ] Adding decompression and extraction of levels to the PagkageAdapter so you can directly open from the Editor
 
 ## MILLSTONE 3
