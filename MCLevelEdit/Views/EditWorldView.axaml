@@ -19,7 +19,8 @@
     <Label Grid.Column="0"
            Grid.Row="0"
            Grid.ColumnSpan="4"
-           HorizontalAlignment="Center"
+           FontWeight="Bold"
+           HorizontalAlignment="Left"
            VerticalAlignment="Center">
       Level Properties
     </Label>
@@ -58,7 +59,8 @@
     <Label Grid.Column="0"
        Grid.Row="4"
        Grid.ColumnSpan="4"
-       HorizontalAlignment="Center"
+       FontWeight="Bold"
+       HorizontalAlignment="Left"
        VerticalAlignment="Center">
       Terrain Generation Variables
     </Label>

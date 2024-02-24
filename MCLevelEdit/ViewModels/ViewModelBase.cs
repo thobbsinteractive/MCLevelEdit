@@ -35,11 +35,17 @@ public class ViewModelBase : ReactiveObject
         if (entity.EntityType.TypeId == TypeId.Spell)
             entity.SwitchId = 1;
 
-        if (entity.EntityType.TypeId == TypeId.Effect && entity.EntityType.Model.Id == (int)Effect.VillagerBuilding)
+        if (entity.IsBuilding())
         {
             entity.DisId = ushort.MaxValue;
             entity.SwitchId = ushort.MaxValue;
             entity.Parent = 1;
+        }
+
+        if (entity.IsWall())
+        {
+            entity.DisId = ushort.MaxValue;
+            entity.SwitchId = 1;
         }
         
         int id = _mapService.AddEntity(entity);

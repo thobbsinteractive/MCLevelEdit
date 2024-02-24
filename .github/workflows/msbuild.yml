@@ -57,5 +57,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: MCLevelEdit
-        path: ${{env.SOLUTION_FILE_PATH}}/Release/net7.0/
+        path: ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit.Desktop/bin/Release/net7.0/
         if-no-files-found: error

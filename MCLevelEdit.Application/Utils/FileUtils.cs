@@ -62,7 +62,7 @@ public class FileUtils
                 var backupLevelsDat = Path.Combine(backLevelsFolderPath, Path.ChangeExtension(levelsFileName, "DAT.BK"));
 
                 if (File.Exists(backupLevelsDat))
-                    return false;
+                    return true;
 
                 File.Copy(levelsdat, backupLevelsDat, false);
             }

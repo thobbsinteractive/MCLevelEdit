@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
@@ -61,7 +62,6 @@ public class MainViewModel : ViewModelBase
     public ICommand ExportTerrainRenderCommand { get; }
     public ICommand ExitCommand { get; }
     public ICommand RunCommand { get; }
-    public ICommand EditEntitiesCommand { get; }
     public ICommand EditGameSettingsCommand { get; }
     public ICommand DisplayFailCommand { get; }
     public ICommand DisplayWarningsCommand { get; }
@@ -92,11 +92,6 @@ public class MainViewModel : ViewModelBase
         ShowValidationResultsDialog = new Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?>();
         ShowAboutDialog = new Interaction<AboutWindowViewModel, AboutWindowViewModel?>();
 
-        EditEntitiesCommand = ReactiveCommand.CreateFromTask(async () =>
-        {
-            var result = await ShowEntitiesDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
-        });
-
         EditGameSettingsCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             var result = await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
@@ -104,14 +99,20 @@ public class MainViewModel : ViewModelBase
 
         NewFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await mapService.CreateNewMap();
-            MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            if (await PromptSaveAndOrContinue())
+            {
+                await mapService.CreateNewMap();
+                MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            }
         });
 
         NewRandomFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await mapService.CreateNewMap(true);
-            MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            if (await PromptSaveAndOrContinue())
+            {
+                await mapService.CreateNewMap(true);
+                MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            }
         });
 
         OpenFileCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -190,6 +191,16 @@ public class MainViewModel : ViewModelBase
         MainWindow.I.Title = GetTitle("NewLevel.DAT");
     }
 
+    public void OnKeyPressed(Key key)
+    {
+        _eventAggregator.RaiseEvent("KeyPressed", this, new PubSubEventArgs<object>(key));
+    }
+
+    public async Task OnEditButtonClickedAsync()
+    {
+        var result = await ShowEntitiesDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
+    }
+
     private async Task ExportImageMap(Model.Enums.Layer layer)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow.I);
@@ -212,7 +223,7 @@ public class MainViewModel : ViewModelBase
 
         if (file != null)
         {
-            string filePath = file.Path.AbsolutePath;
+            string filePath = file.Path.LocalPath;
             try
             {
                 WriteableBitmap preview = new WriteableBitmap(
@@ -234,6 +245,22 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    private async Task<bool> PromptSaveAndOrContinue()
+    {
+        var box = MessageBoxManager.GetMessageBoxStandard("Question", $"Do you want to Save your changes?", ButtonEnum.YesNoCancel, Icon.Question);
+        var result = await box.ShowAsync();
+
+        if (result == ButtonResult.Yes)
+        {
+            return await SaveFile(false);
+        }
+        else if (result == ButtonResult.Cancel)
+        {
+            return false;
+        }
+        return true;
+    }
+
     private async Task<bool> SaveFile(bool saveAs)
     {
         var filePath = _settingsPort.CurrentLevelFilePath;
@@ -253,9 +280,9 @@ public class MainViewModel : ViewModelBase
             string suggestedFileName = !string.IsNullOrWhiteSpace(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
             IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DOCS_DIRECTORY));
             
-            if (storageFolder != null && !Directory.Exists(storageFolder.Path.AbsolutePath))
+            if (storageFolder != null && !Directory.Exists(storageFolder.Path.LocalPath))
             {
-                Directory.CreateDirectory(storageFolder.Path.AbsolutePath);
+                Directory.CreateDirectory(storageFolder.Path.LocalPath);
             }
 
             if (!string.IsNullOrWhiteSpace(map.FilePath))
@@ -277,9 +304,12 @@ public class MainViewModel : ViewModelBase
 
             if (file != null)
             {
-                filePath = file.Path.AbsolutePath;
+                filePath = file.Path.LocalPath;
             }
         }
+
+        if (string.IsNullOrWhiteSpace(filePath))
+            return false;
 
         if (!string.IsNullOrWhiteSpace(filePath) && !await _mapService.SaveMapToFileAsync(filePath))
         {
@@ -307,9 +337,9 @@ public class MainViewModel : ViewModelBase
             AllowMultiple = false
         });
 
-        if (files != null && files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
+        if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
         {
-            string filePath = files[0].Path.AbsolutePath;
+            string filePath = files[0].Path.LocalPath;
             if (!await _mapService.LoadMapFromFileAsync(filePath))
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to load the map file {filePath}!", ButtonEnum.Ok, Icon.Error);

@@ -21,7 +21,8 @@
     <Label Grid.Column="0"
            Grid.Row="0"
            Grid.ColumnSpan="2"
-           HorizontalAlignment="Center">
+           FontWeight="Bold"
+           HorizontalAlignment="Left">
       Entity Properties
     </Label>
     <Label Grid.Column="0"

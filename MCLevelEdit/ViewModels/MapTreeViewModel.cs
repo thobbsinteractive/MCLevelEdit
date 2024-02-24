@@ -4,6 +4,7 @@ using Avalonia.Platform;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,12 +12,19 @@ using System.Linq;
 
 namespace MCLevelEdit.ViewModels;
 
-public class MapTreeViewModel
+public class MapTreeViewModel : ReactiveObject
 {
     protected readonly IMapService _mapService;
     protected readonly ITerrainService _terrainService;
     protected readonly EventAggregator<object> _eventAggregator;
     protected readonly Dictionary<string, Bitmap> _icons;
+    protected int _entityFilter;
+
+    public List<KeyValuePair<int, string>> TypeIds { get; } =
+        Enum.GetValues(typeof(TypeId))
+        .Cast<int>()
+        .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
+        .ToList();
 
     public ObservableCollection<Node> Nodes { get; } = new ObservableCollection<Node>();
     public ObservableCollection<Node> SelectedNodes { get; } = new ObservableCollection<Node>();
@@ -48,6 +56,15 @@ public class MapTreeViewModel
         _eventAggregator.RegisterEvent("DeleteEntity", DeleteEntityHandler);
         _eventAggregator.RegisterEvent("RefreshWizards", RefreshWizardsHandler);
         _eventAggregator.RegisterEvent("OnCursorClicked", SelectNodeHandler);
+
+        TypeIds.Insert(0, new KeyValuePair<int, string>(0, ""));
+        _entityFilter = 0;
+        RefreshData();
+    }
+
+    public void OnCboEntityTypeSelectionChanged(int index)
+    {
+        _entityFilter = index;
         RefreshData();
     }
 
@@ -134,7 +151,7 @@ public class MapTreeViewModel
 
         worldNode.SubNodes.Clear();
 
-        var squareEntities = map.Entities.OrderBy(e => e.Id);
+        var squareEntities = map.Entities.Where(e => (_entityFilter > 0? (int)e.EntityType.TypeId == _entityFilter : true)).OrderBy(e => e.Id);
         if (squareEntities.Any())
         {
             foreach (var entity in squareEntities)
@@ -180,7 +197,9 @@ public class MapTreeViewModel
     {
         var entityNode = new EntityNode(this, entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity));
         var worldNode = GetWorldNode();
-        worldNode.SubNodes.Add(entityNode);
+
+        if (_entityFilter == 0 || (int)entity.EntityType.TypeId == _entityFilter)
+            worldNode.SubNodes.Add(entityNode);
     }
 
     private void UpdateEntityNode(Entity entity)
@@ -195,6 +214,15 @@ public class MapTreeViewModel
             entityNode.Title = GetEntityNodeTitle(entity);
             entityNode.Subtitle = GetEntityNodeSubTitle(entity);
         }
+
+        if (_entityFilter > 0 && (int)entity.EntityType.TypeId != _entityFilter)
+        {
+            var worldNode = GetWorldNode();
+            worldNode.SubNodes.Remove(entityNode);
+            SelectedNodes.Clear();
+            _eventAggregator.RaiseEvent("NodeSelected", this, new PubSubEventArgs<object>(null));
+        }
+
     }
 
     private Node GetWorldNode()
@@ -237,5 +265,4 @@ public class MapTreeViewModel
     {
         _eventAggregator.RaiseEvent("NodeSelected", this, new PubSubEventArgs<object>(SelectedNodes.FirstOrDefault()));
     }
-
 }

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -9,6 +10,7 @@ using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Enums;
+using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using Splat;
 using System;
@@ -31,6 +33,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     private Layer _selectedLayer = Layer.Game;
     private bool _showSwitchConnections = false;
+    private EntityViewModel? _selectedEntityViewModel = null;
 
     private Dictionary<int, List<Shape>> _entityShapes = new Dictionary<int, List<Shape>>();
 
@@ -54,6 +57,11 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         get { return _cvEntity; }
     }
 
+    public EntityViewModel SelectedEntityViewModel
+    {
+        get { return _selectedEntityViewModel; }
+    }
+
     public Layer SelectedLayer
     {
         set
@@ -73,6 +81,26 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         get { return _showSwitchConnections; }
     }
 
+    public void OnDeleteSelectedEntity()
+    {
+        if (_selectedEntityViewModel != null)
+        {
+            DeleteEntity(_selectedEntityViewModel);
+            OnEntitySelected(null);
+        }
+    }
+
+    public void OnMoveSelectedEntity(int moveX, int moveY)
+    {
+        if (_selectedEntityViewModel != null)
+        {
+            _selectedEntityViewModel.X += (byte)moveX;
+            _selectedEntityViewModel.Y += (byte)moveY;
+
+            UpdateEntity(_selectedEntityViewModel);
+        }
+    }
+
     public void OnCursorClicked(Point position, bool left, bool right)
     {
         (Point, bool, bool) cursorEvent = (position, left, right);
@@ -81,6 +109,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void OnEntitySelected(Entity? entity)
     {
+        _selectedEntityViewModel = entity?.ToEntityViewModel();
+
         if (_rectSelection is not null)
             _cvEntity.Children.Remove(_rectSelection);
 
@@ -202,6 +232,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         _eventAggregator.RegisterEvent("DeleteEntity", DeleteEntityHandler);
         _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
         _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
+        _eventAggregator.RegisterEvent("KeyPressed", KeyPressedHandler);
     }
 
     private void AddEntityHandler(object sender, PubSubEventArgs<object> args)
@@ -283,6 +314,33 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             OnEntitySelected(null);
     }
 
+    public void KeyPressedHandler(object sender, PubSubEventArgs<object> arg)
+    {
+        if (arg.Item is not null)
+        {
+            var key = (Key)arg.Item;
+            switch (key)
+            {
+                case Key.Delete:
+                case Key.Back:
+                    OnDeleteSelectedEntity();
+                    break;
+                case Key.Up:
+                    OnMoveSelectedEntity(0, -1);
+                    break;
+                case Key.Down:
+                    OnMoveSelectedEntity(0, 1);
+                    break;
+                case Key.Left:
+                    OnMoveSelectedEntity(-1, 0);
+                    break;
+                case Key.Right:
+                    OnMoveSelectedEntity(1, 0);
+                    break;
+            }
+        }
+    }
+
     private void AddEntity(Entity entity)
     {
         if (_cvEntity is not null && entity is not null)
@@ -332,8 +390,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                     {
                         var line = new Line()
                         {
-                            StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                            EndPoint = new Point(connectedEntity.Position.X * Globals.SQUARE_SIZE, connectedEntity.Position.Y * Globals.SQUARE_SIZE),
+                            StartPoint = new Point((entity.Position.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), entity.Position.Y * Globals.SQUARE_SIZE),
+                            EndPoint = new Point(connectedEntity.Position.X * Globals.SQUARE_SIZE, (connectedEntity.Position.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                             Stroke = brush,
                             StrokeThickness = 1,
                             ZIndex = 98
@@ -360,8 +418,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                         var line1 = new Line()
                         {
-                            StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                            EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
+                            StartPoint = new Point((entity.Position.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entity.Position.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                            EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                             Stroke = brush,
                             StrokeThickness = Globals.SQUARE_SIZE,
                             ZIndex = 99
@@ -379,8 +437,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                         var line2 = new Line()
                         {
-                            StartPoint = new Point(entity.Position.X * Globals.SQUARE_SIZE, entity.Position.Y * Globals.SQUARE_SIZE),
-                            EndPoint = new Point(endPoint.X * Globals.SQUARE_SIZE, endPoint.Y * Globals.SQUARE_SIZE),
+                            StartPoint = new Point((entity.Position.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entity.Position.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                            EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                             Stroke = brush,
                             StrokeThickness = Globals.SQUARE_SIZE,
                             ZIndex = 99
@@ -389,6 +447,51 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                         shapes.Add(line2);
                     }
                 }
+            }
+
+            if (entity.IsTeleport())
+            {
+                brush = new SolidColorBrush(Color.FromRgb(255, 128, 255), 1);
+
+                var destinationLine = new Line()
+                {
+                    StartPoint = new Point((entity.Position.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entity.Position.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                    EndPoint = new Point((entity.Child * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entity.Parent * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                    Stroke = brush,
+                    StrokeThickness = 2,
+                    ZIndex = 250
+                };
+                _cvEntity.Children.Add(destinationLine);
+                shapes.Add(destinationLine);
+
+                var circle1 = new Ellipse()
+                {
+                    Width = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
+                    Height = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
+                    Stroke = brush,
+                    StrokeThickness = 2,
+                    ZIndex = 250
+                };
+                Canvas.SetLeft(circle1, (entity.Child * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
+                Canvas.SetTop(circle1, (entity.Parent * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
+
+                _cvEntity.Children.Add(circle1);
+                shapes.Add(circle1);
+
+                var circle2 = new Ellipse()
+                {
+                    Width = Globals.SQUARE_SIZE,
+                    Height = Globals.SQUARE_SIZE,
+                    Stroke = brush,
+                    StrokeThickness = 2,
+                    ZIndex = 250
+                };
+                Canvas.SetLeft(circle2, entity.Child * Globals.SQUARE_SIZE);
+                Canvas.SetTop(circle2, entity.Parent * Globals.SQUARE_SIZE);
+
+                _cvEntity.Children.Add(circle2);
+                shapes.Add(circle2);
+
             }
 
             _entityShapes.Add(entity.Id, shapes);

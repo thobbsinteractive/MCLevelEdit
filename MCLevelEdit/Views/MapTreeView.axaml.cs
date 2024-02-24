@@ -1,29 +1,30 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using MCLevelEdit.ViewModels;
-using System;
+using System.Collections.Generic;
 
 namespace MCLevelEdit.Views;
 
 public partial class MapTreeView : UserControl
 {
-    public static readonly RoutedEvent<RoutedEventArgs> ValueChangedEvent =
-        RoutedEvent.Register<MapTreeView, RoutedEventArgs>(nameof(ValueChanged), RoutingStrategies.Bubble);
-
-    public event EventHandler<RoutedEventArgs> ValueChanged
-    {
-        add => AddHandler(ValueChangedEvent, value);
-        remove => RemoveHandler(ValueChangedEvent, value);
-    }
-
-    protected virtual void OnValueChanged()
-    {
-        RoutedEventArgs args = new RoutedEventArgs(ValueChangedEvent);
-        RaiseEvent(args);
-    }
+    public MapTreeViewModel? MapTreeViewModel { get { return (MapTreeViewModel?)this.DataContext; } }
 
     public MapTreeView()
     {
         InitializeComponent();
+
+        this.cboEntityType.SelectionChanged += CboEntityType_SelectionChanged;
+        this.btnEdit.Click += BtnEdit_Click;
+    }
+
+    private void BtnEdit_Click(object? sender, RoutedEventArgs e)
+    {
+        (this.Parent?.DataContext as MainViewModel)?.OnEditButtonClickedAsync();
+    }
+
+    private void CboEntityType_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        int index = ((KeyValuePair<int, string>)this?.cboEntityType?.SelectedItem).Key;
+        MapTreeViewModel?.OnCboEntityTypeSelectionChanged(index);
     }
 }

@@ -42,7 +42,9 @@
               ItemsSource="{Binding ValidationResults}"
               IsReadOnly="True"
               GridLinesVisibility="All"
-              BorderThickness="1" BorderBrush="Gray">
+              SelectionMode="Single"
+              DoubleTapped="DataGrid_DoubleTapped"
+              BorderThickness="1" BorderBrush="Gray"> 
       <DataGrid.Columns>
         <DataGridTextColumn Header="Id"
                             Width="Auto"

@@ -24,5 +24,22 @@ public class Entity
         };
     }
 
-    public bool IsPathOrWall() => this?.EntityType.TypeId == TypeId.Effect && (this?.EntityType.Model.Id == (int)Effect.Wall || this?.EntityType.Model.Id == (int)Effect.Path);
+    public bool IsBuilding() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.VillagerBuilding;
+    public bool IsPath() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Path;
+    public bool IsWall() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Wall;
+    public bool IsPathOrWall() => IsPath() || IsWall();
+    public bool IsSwitch() => 
+        this?.EntityType.TypeId == TypeId.Switch && 
+        (this?.EntityType.Model.Id == (int)Switch.DeathInside || 
+         this?.EntityType.Model.Id == (int)Switch.DeathOutside ||
+         this?.EntityType.Model.Id == (int)Switch.HiddenInside ||
+         this?.EntityType.Model.Id == (int)Switch.HiddenOutside ||
+         this?.EntityType.Model.Id == (int)Switch.HiddenInsideRe ||
+         this?.EntityType.Model.Id == (int)Switch.HiddenOutsideRe);
+    public bool IsTeleport() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Teleport;
+
+    public override string ToString()
+    {
+        return $"Entity {this.Id}: {this.EntityType.TypeId} - {this.EntityType.Model.Name}:";
+    }
 };
