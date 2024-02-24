@@ -17,7 +17,8 @@
     <Label Grid.Column="0"
            Grid.Row="0"
            Grid.ColumnSpan="2"
-           HorizontalAlignment="Center"
+           FontWeight="Bold"
+           HorizontalAlignment="Left"
            VerticalAlignment="Center">
       Wizard Properties
     </Label>
@@ -64,7 +65,8 @@
     <Label Grid.Column="0"
            Grid.Row="5"
            Grid.ColumnSpan="2"
-           HorizontalAlignment="Center"
+           FontWeight="Bold"
+           HorizontalAlignment="Left"
            VerticalAlignment="Center">
       Wizard Spells
     </Label>

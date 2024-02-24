@@ -32,15 +32,15 @@
     <Grid Name="grdMain"
           DockPanel.Dock="Bottom"
           ColumnDefinitions="*"
-          RowDefinitions="*,60">
+          RowDefinitions="*,50">
       <Grid Grid.Row="0"
             Grid.Column="0"
             ColumnDefinitions="256,*,300"
-            RowDefinitions="150,*">
+            RowDefinitions="100,*">
         <views:EntityToolBarView Name="vmEntityToolBar"
                                  Grid.Row="0"
                                  Grid.Column="0"
-                                 Grid.ColumnSpan="2"
+                                 Grid.ColumnSpan="3"
                                  DockPanel.Dock="Top"
                                  DataContext="{Binding EntityToolBarViewModel}"/>
         <views:MapTreeView Name="vmMapTree"
@@ -56,48 +56,45 @@
                                   Grid.Column="2"
                                   DataContext="{Binding NodePropertiesViewModel}"/>
       </Grid>
-      <Grid Grid.Row="1"
-            Grid.Column="0"
-            Margin="10"
-            RowDefinitions="40"
-            ColumnDefinitions="150,*,150,150">
-        <Button Name="btnFailures"
-                Grid.Column="2"
-                Height="38"
-                Command="{Binding DisplayFailCommand}">
-          <StackPanel Orientation="Horizontal">
-            <Image Source="/Assets/error-32.png"/>
-            <Label Content="{Binding FailCount, StringFormat=' {0} Failure(s)'}" />
-          </StackPanel>
-        </Button>
-        <Button Name="btnWarnings"
-                Grid.Column="3"
-                Height="38"
-                Command="{Binding DisplayWarningsCommand}">
-          <StackPanel Orientation="Horizontal">
-            <Image Source="/Assets/warning-32.png"/>
-            <Label Content="{Binding WarningCount, StringFormat=' {0} Warning(s)'}" />
-          </StackPanel>
-        </Button>
-        <Button Name="btnRun"
-                Grid.Column="0"
-                VerticalContentAlignment="Center"
-                HorizontalContentAlignment="Center"
-                Height="38"
-                MinWidth="150"
-                Command="{Binding RunCommand}">
-            Run
-        </Button>
-        <Button Name="btnEdit"
-                Grid.Column="1"
-                VerticalContentAlignment="Center"
-                HorizontalContentAlignment="Center"
-                MinWidth="150"
-                Height="38"
-                Command="{Binding EditEntitiesCommand}">
-          Edit Entities
-        </Button>
-      </Grid>
+      <Border HorizontalAlignment="Stretch"
+              Grid.Row="1"
+              Grid.Column="0"
+              BorderBrush="LightGray"
+              BorderThickness="0,1"
+              Padding="5">
+        <Grid RowDefinitions="40"
+              ColumnDefinitions="150,*,150,150">
+          <Button Name="btnFailures"
+                  Grid.Column="2"
+                  Height="38"
+                  HorizontalAlignment="Right"
+                  Command="{Binding DisplayFailCommand}">
+            <StackPanel Orientation="Horizontal">
+              <Image Source="/Assets/error-32.png"/>
+              <Label Content="{Binding FailCount, StringFormat=' {0} Failure(s)'}" />
+            </StackPanel>
+          </Button>
+          <Button Name="btnWarnings"
+                  Grid.Column="3"
+                  Height="38"
+                  HorizontalAlignment="Right"
+                  Command="{Binding DisplayWarningsCommand}">
+            <StackPanel Orientation="Horizontal">
+              <Image Source="/Assets/warning-32.png"/>
+              <Label Content="{Binding WarningCount, StringFormat=' {0} Warning(s)'}" />
+            </StackPanel>
+          </Button>
+          <Button Name="btnRun"
+                  Grid.Column="0"
+                  VerticalContentAlignment="Center"
+                  HorizontalContentAlignment="Center"
+                  Height="38"
+                  MinWidth="150"
+                  Command="{Binding RunCommand}">
+              Run
+          </Button>
+        </Grid>
+      </Border>
     </Grid>
   </DockPanel>
 </UserControl>

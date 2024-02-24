@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using ReactiveUI;
 using System;
 using System.Windows.Input;
@@ -13,6 +14,8 @@ namespace MCLevelEdit.ViewModels
         private bool _carriesCannotUse;
         private readonly int _spellNumber;
         private readonly string _spellName;
+        private readonly Bitmap _blackIcon;
+        private readonly Bitmap _whiteIcon;
 
         public bool StartsWith
         {
@@ -29,7 +32,7 @@ namespace MCLevelEdit.ViewModels
             get => _willLearnIfYouDo;
             set { this.RaiseAndSetIfChanged(ref _willLearnIfYouDo, value); }
         }
-        public bool CarriesCannotUse
+        public bool CarriesCannotUse //Might be hardcoded. Is the same as CannotHave in testing
         {
             get => _carriesCannotUse;
             set { this.RaiseAndSetIfChanged(ref _carriesCannotUse, value); }
@@ -102,6 +105,18 @@ namespace MCLevelEdit.ViewModels
             }
         }
 
+        public Bitmap Icon
+        {
+            get
+            {
+                if (WillLearnIfYouDo)
+                {
+                    return _whiteIcon;
+                }
+                return _blackIcon;
+            }
+        }
+
         public ICommand ChangeSpellCommand { get; }
 
         public event EventHandler SpellsUpdatedEvent;
@@ -114,16 +129,16 @@ namespace MCLevelEdit.ViewModels
             });
         }
 
-        public AbilitiesViewModel((byte, byte) values, int spellNumber, string spellName) : this(values.Item1, values.Item2, spellNumber, spellName) { }
-
-        public AbilitiesViewModel(byte value1, byte value2, int spellNumber, string spellName) : this() 
+        public AbilitiesViewModel((byte, byte) values, int spellNumber, string spellName, Bitmap blackIcon, Bitmap whiteIcon) : this ()
         {
-            StartsWith = value1 == 1 && value2 == 1;
-            CannotHave = value1 == 0 && value2 == 0;
-            WillLearnIfYouDo = value1 == 0 && value2 == 1;
-            CarriesCannotUse = value1 == 1 && value2 == 0;
+            StartsWith = values.Item1 == 1 && values.Item2 == 1;
+            CannotHave = values.Item1 == 0 && values.Item2 == 0;
+            WillLearnIfYouDo = values.Item1 == 0 && values.Item2 == 1;
+            CarriesCannotUse = values.Item1 == 1 && values.Item2 == 0;
             _spellNumber = spellNumber;
             _spellName = spellName;
+            _blackIcon = blackIcon;
+            _whiteIcon = whiteIcon;
         }
 
         public (byte, byte) GetBytes()
@@ -178,6 +193,7 @@ namespace MCLevelEdit.ViewModels
             this.RaisePropertyChanged(nameof(SpellNumber));
             this.RaisePropertyChanged(nameof(ToolTip));
             this.RaisePropertyChanged(nameof(IsVisible));
+            this.RaisePropertyChanged(nameof(Icon));
 
             SpellsUpdatedEvent?.Invoke(this, new EventArgs());
         }

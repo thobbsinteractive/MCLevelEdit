@@ -37,7 +37,7 @@ namespace MCLevelEdit.Application.Services
             });
         }
 
-        public bool RunGame(string gamePath)
+        public bool RunGame(string gamePath, string args)
         {
             try
             {
@@ -47,6 +47,7 @@ namespace MCLevelEdit.Application.Services
                 {
                     StartInfo = new ProcessStartInfo(gamePath)
                     {
+                        Arguments = args,
                         UseShellExecute = true,
                         WorkingDirectory = Path.GetDirectoryName(gamePath)
                     }
@@ -66,6 +67,7 @@ namespace MCLevelEdit.Application.Services
 
             var gameLevelsPaths = settings?.GameLevelFolders;
             var gameExeLocation = settings?.GameExeLocation;
+            var gameArgs = settings?.GameArgs;
             var gameLevelsBackupPath = settings?.GameBackupFolder;
 
             if (!string.IsNullOrWhiteSpace(gameExeLocation) && gameLevelsPaths is not null && gameLevelsPaths.Any())
@@ -86,7 +88,7 @@ namespace MCLevelEdit.Application.Services
                             FileUtils.SetFilesToReadonly(gameLevelsPath);
                         }
 
-                        return RunGame(gameExeLocation);
+                        return RunGame(gameExeLocation, gameArgs);
                     }
                 } catch (Exception ex)
                 {
