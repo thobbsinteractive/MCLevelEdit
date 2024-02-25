@@ -4,7 +4,7 @@ namespace MCLevelEdit.Model.Domain;
 
 public enum TypeId
 {
-    Scenary = 2,
+    Scenery = 2,
     Spawn = 3,
     Creature = 5,
     Weather = 7,

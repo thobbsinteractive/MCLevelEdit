@@ -22,7 +22,7 @@ namespace MCLevelEdit.Views
         {
             this.btnCursor.IsChecked = enable;
             this.btnCreatures.IsChecked = enable;
-            this.btnScenary.IsChecked = enable;
+            this.btnScenery.IsChecked = enable;
             this.btnEffects.IsChecked = enable;
             this.btnSpells.IsChecked = enable;
             this.btnSwitches.IsChecked = enable;
@@ -45,11 +45,11 @@ namespace MCLevelEdit.Views
             EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Creature);
         }
 
-        private void btnScenaryClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private void btnSceneryClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             ToggleButtons(false);
-            this.btnScenary.IsChecked = true;
-            EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Scenary);
+            this.btnScenery.IsChecked = true;
+            EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Scenery);
         }
 
         private void btnEffectsClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

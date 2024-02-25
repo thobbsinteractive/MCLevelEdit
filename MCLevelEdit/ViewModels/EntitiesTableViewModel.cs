@@ -32,7 +32,7 @@ namespace MCLevelEdit.ViewModels
             {
                 var entityViewModel = new EntityViewModel()
                 {
-                    Type = (int)TypeId.Scenary,
+                    Type = (int)TypeId.Scenery,
                     X = 0,
                     Y = 0,
                     DisId = 0,

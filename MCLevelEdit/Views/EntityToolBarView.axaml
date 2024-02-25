@@ -33,11 +33,11 @@
                       Click="btnCreatureClick">
           <Image Source="/Assets/dragon-32.png"/>
         </ToggleButton>
-        <ToggleButton Name="btnScenary"
+        <ToggleButton Name="btnScenery"
                       Grid.Row="0"
                       Grid.Column="2"
-                      ToolTip.Tip="Add Scenary"
-                      Click="btnScenaryClick">
+                      ToolTip.Tip="Add Scenery"
+                      Click="btnSceneryClick">
           <Image Source="/Assets/tree-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnEffects"

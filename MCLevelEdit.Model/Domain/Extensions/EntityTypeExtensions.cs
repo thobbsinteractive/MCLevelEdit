@@ -6,8 +6,8 @@ public static class EntityTypeExtensions
     {
         switch (typeId)
         {
-            case TypeId.Scenary:
-                return new ScenaryType(Scenary.Tree);
+            case TypeId.Scenery:
+                return new SceneryType(Scenery.Tree);
             case TypeId.Spawn:
                 return new SpawnType(Spawn.Flyer1);
             case TypeId.Creature:
@@ -28,7 +28,7 @@ public static class EntityTypeExtensions
     {
         switch (typeId)
         {
-            case TypeId.Scenary:
+            case TypeId.Scenery:
                 return EntityTypes.I.Sceneries[modelId];
             case TypeId.Spawn:
                 return EntityTypes.I.Spawns[modelId];
