@@ -9,11 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Numerics;
 
 namespace MCLevelEdit.ViewModels;
 
 public class MapTreeViewModel : ReactiveObject
 {
+    private float SELECTION_RADIUS = 4;
+
     protected readonly IMapService _mapService;
     protected readonly ITerrainService _terrainService;
     protected readonly EventAggregator<object> _eventAggregator;
@@ -111,6 +114,17 @@ public class MapTreeViewModel : ReactiveObject
             if(world is not null)
             {
                 var entityNode = world?.SubNodes.Select(n => (EntityNode)n).Where(n => n.X == cursorEvent.Item1.X && n.Y == cursorEvent.Item1.Y).FirstOrDefault();
+
+                if(entityNode is null)
+                {
+                    for (int i = 1; i < SELECTION_RADIUS; i++)
+                    {
+                        entityNode = world?.SubNodes.Select(n => (EntityNode)n).Where(n => Vector2.Distance(new Vector2((float)cursorEvent.Item1.X, (float)cursorEvent.Item1.Y), new Vector2((float)n.X, (float)n.Y)) < i).FirstOrDefault();
+                        if (entityNode is not null)
+                            break;
+                    }
+                }
+
                 if (entityNode is not null)
                 {
                     SelectedNodes.Clear();
