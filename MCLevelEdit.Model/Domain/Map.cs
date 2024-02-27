@@ -136,7 +136,11 @@ public class Map
         foreach (var spawnResult in spawnValidation)
             ValidationResults.Add(spawnResult);
 
-        foreach(Entity entity in this.Entities)
+        var wizardValidation = MapRules.HasValidWizardParamters(this);
+        foreach (var wizardResult in wizardValidation)
+            ValidationResults.Add(wizardResult);
+
+        foreach (Entity entity in this.Entities)
         {
             ValidationResults.Add(EntityRules.HasSwitch(entity, Entities));
             ValidationResults.Add(EntityRules.BuildingHasSwidAndDisIdAndParent(entity));

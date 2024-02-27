@@ -43,6 +43,56 @@ namespace MCLevelEdit.Model.Domain.Validation
             return ValidationResults;
         }
 
+        public static IList<ValidationResult> HasValidWizardParamters(Map map)
+        {
+            var ValidationResults = new List<ValidationResult>();
+
+            if (map is not null && map.Entities is not null)
+            {
+                ValidationResults.Add(HasValidParameters(map.Wizards[1], Spawn.Flyer2, map.Entities));
+                ValidationResults.Add(HasValidParameters(map.Wizards[2], Spawn.Flyer3, map.Entities));
+                ValidationResults.Add(HasValidParameters(map.Wizards[3], Spawn.Flyer4, map.Entities));
+                ValidationResults.Add(HasValidParameters(map.Wizards[4], Spawn.Flyer5, map.Entities));
+                ValidationResults.Add(HasValidParameters(map.Wizards[5], Spawn.Flyer6, map.Entities));
+                ValidationResults.Add(HasValidParameters(map.Wizards[6], Spawn.Flyer7, map.Entities));
+                ValidationResults.Add(HasValidParameters(map.Wizards[7], Spawn.Flyer8, map.Entities));
+            }
+            return ValidationResults;
+        }
+
+        private static ValidationResult HasValidParameters(Wizard wizard, Spawn spawn, IList<Entity> entities)
+        {
+            if (wizard.IsActive)
+            {
+                if (wizard.CastleLevel > 0)
+                {
+                    if (wizard.CastleLevel > 7)
+                    {
+                        return new ValidationResult(0, Result.Fail, $"{wizard.Name} Castle Level parameter is too high (greater than 7)! Strange things will happen!");
+                    }
+                    else
+                    {
+                        if (wizard.Spells.Castle != (1, 1))
+                        {
+                            return new ValidationResult(0, Result.Warning, $"{wizard.Name} Castle Level parameter is set but they do not start with a Castle Spell!");
+                        }
+                        else
+                        {
+                            return new ValidationResult(0, Result.Pass, $"{wizard.Name} has Castle spell");
+                        }
+                    }
+                }
+                else
+                {
+                    return new ValidationResult(0, Result.Pass, $"{wizard.Name} does not have a Castle Level");
+                }
+            }
+            else
+            {
+                return new ValidationResult(0, Result.Pass, $"{wizard.Name} Is not active");
+            }
+        }
+
         private static ValidationResult HasWizardSpawn(Wizard wizard, Spawn spawn, IList<Entity> entities)
         {
             if (wizard.IsActive)
