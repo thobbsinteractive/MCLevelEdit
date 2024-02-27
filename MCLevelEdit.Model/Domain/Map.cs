@@ -132,6 +132,9 @@ public class Map
         ValidationResults = new List<ValidationResult>();
 
         ValidationResults.Add(MapRules.HasPlayerSpawn(this.Entities));
+        var spawnValidation = MapRules.HasCorrectNumberOfWizardSpawns(this);
+        foreach (var spawnResult in spawnValidation)
+            ValidationResults.Add(spawnResult);
 
         foreach(Entity entity in this.Entities)
         {
