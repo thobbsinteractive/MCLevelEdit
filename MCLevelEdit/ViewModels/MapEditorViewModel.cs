@@ -494,8 +494,61 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
             }
 
+            if (entity.IsSpawn() && entity.EntityType.Model.Id != (int)Spawn.Flyer1)
+            {
+                var map = _mapService.GetMap();
+                var wizard = map.Wizards[entity.EntityType.Model.Id - 4].ToWizardViewModel();
+
+                for (int i = 1; i < wizard.CastleLevel; i++)
+                {
+                    int width, height;
+                    GetCastleWidthForWizard(i, out width, out height);
+                    var castle = new Rectangle()
+                    {
+                        Width = width,
+                        Height = height,
+                        Stroke = brush,
+                        StrokeThickness = 2,
+                        ZIndex = 99
+                    };
+                    Canvas.SetLeft(castle, rect.X - (width / 2) + (Globals.SQUARE_SIZE / 2));
+                    Canvas.SetTop(castle, rect.Y - (height / 2) + (Globals.SQUARE_SIZE / 2));
+
+                    _cvEntity.Children.Add(castle);
+                    shapes.Add(castle);
+                }
+            }
+
             _entityShapes.Add(entity.Id, shapes);
         }
+    }
+
+    private void GetCastleWidthForWizard(int castleLevel, out int width, out int height)
+    {
+        width = (Globals.SQUARE_SIZE) * CalculateCastleWidth(castleLevel) * 2 + Globals.SQUARE_SIZE;
+        height = (Globals.SQUARE_SIZE) * CalculateCastleWidth(castleLevel) * 2 + Globals.SQUARE_SIZE;
+    }
+
+    private int CalculateCastleWidth(int castleLevel)
+    {
+        if (castleLevel > 7)
+            return 19;
+
+        switch (castleLevel)
+        {
+            case 1:
+                return 1;
+            case 2:
+            case 3:
+                return 6;
+            case 4:
+            case 5:
+                return 13;
+            case 6:
+            case 7:
+                return 19;
+        }
+        return 1;
     }
 
     private Position GetNearestEndPointInMapBounds(ushort mapSize, Position start, Position end)
