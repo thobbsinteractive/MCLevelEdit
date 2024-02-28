@@ -153,6 +153,16 @@ public class MapService : IMapService, IEnableLogger
             return new List<Entity>();
     }
 
+    public List<Entity> GetEntitiesByTypeId(TypeId typeId)
+    {
+        if (typeId > 0)
+        {
+            return MapRepository.Map.Entities.Where(e => e.EntityType.TypeId == typeId).ToList();
+        }
+        else
+            return new List<Entity>();
+    }
+
     public bool UpdateManaTotal(uint manaTotal)
     {
         MapRepository.Map.ManaTotal = manaTotal;

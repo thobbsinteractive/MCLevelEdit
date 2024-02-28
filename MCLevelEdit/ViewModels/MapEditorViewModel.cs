@@ -233,6 +233,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
         _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
         _eventAggregator.RegisterEvent("KeyPressed", KeyPressedHandler);
+        _eventAggregator.RegisterEvent("UpdateWizard", UpdateWizardsHandler);
     }
 
     private void AddEntityHandler(object sender, PubSubEventArgs<object> args)
@@ -242,7 +243,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             lock (_lockPreview)
             {
-                AddEntity(entity);
+                AddEntityToView(entity);
             }
         }
     }
@@ -262,10 +263,33 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                     }
                     _entityShapes.Remove(entity.Id);
                 }
-                AddEntity(entity);
+                AddEntityToView(entity);
                 OnEntitySelected(entity);
             }
         }
+    }
+
+    private void UpdateWizardsHandler(object sender, PubSubEventArgs<object> args)
+    {
+
+        lock (_lockPreview)
+        {
+            var wizardEntites = _mapService.GetEntitiesByTypeId(TypeId.Spawn);
+
+            foreach (var wizardEntity in wizardEntites)
+            {
+                if (_entityShapes.ContainsKey(wizardEntity.Id))
+                {
+                    foreach (var shape in _entityShapes[wizardEntity.Id])
+                    {
+                        _cvEntity.Children.Remove(shape);
+                    }
+                    _entityShapes.Remove(wizardEntity.Id);
+                }
+                AddEntityToView(wizardEntity);
+            }
+        }
+        
     }
 
     private void DeleteEntityHandler(object sender, PubSubEventArgs<object> args)
@@ -341,7 +365,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
     }
 
-    private void AddEntity(Entity entity)
+    private void AddEntityToView(Entity entity)
     {
         if (_cvEntity is not null && entity is not null)
         {
@@ -631,7 +655,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                         {
                             foreach (var entity in entities)
                             {
-                                AddEntity(entity);
+                                AddEntityToView(entity);
                             }
                         }
                     }

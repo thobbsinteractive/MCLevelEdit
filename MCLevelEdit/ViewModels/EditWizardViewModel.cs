@@ -103,5 +103,6 @@ public class EditWizardViewModel : ReactiveObject
     public void Update()
     {
         _mapService.UpdateWizard(_wizard.ToWizard());
+        _eventAggregator.RaiseEvent("UpdateWizard", this, new PubSubEventArgs<object>(_wizard.ToWizard()));
     }
 }
