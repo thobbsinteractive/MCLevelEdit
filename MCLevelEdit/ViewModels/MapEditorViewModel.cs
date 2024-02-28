@@ -523,7 +523,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 var map = _mapService.GetMap();
                 var wizard = map.Wizards[entity.EntityType.Model.Id - 4].ToWizardViewModel();
 
-                for (int i = 1; i < wizard.CastleLevel; i++)
+                for (int i = 1; i < wizard.CastleLevel + 1; i++)
                 {
                     int width, height;
                     GetCastleWidthForWizard(i, out width, out height);
@@ -556,23 +556,23 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private int CalculateCastleWidth(int castleLevel)
     {
         if (castleLevel > 7)
-            return 19;
+            return 22;
 
         switch (castleLevel)
         {
             case 1:
-                return 1;
+                return 2;
             case 2:
             case 3:
-                return 6;
+                return 8;
             case 4:
             case 5:
-                return 13;
+                return 15;
             case 6:
             case 7:
-                return 19;
+                return 22;
         }
-        return 1;
+        return 0;
     }
 
     private Position GetNearestEndPointInMapBounds(ushort mapSize, Position start, Position end)
