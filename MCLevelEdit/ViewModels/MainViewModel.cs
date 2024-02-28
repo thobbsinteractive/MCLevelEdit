@@ -156,11 +156,14 @@ public class MainViewModel : ViewModelBase
             }
         });
 
-        ExitCommand = ReactiveCommand.CreateFromTask(() =>
+        ExitCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
+            if (await PromptSaveAndOrContinue())
             {
-                desktopApp.Shutdown();
+                if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
+                {
+                    desktopApp.Shutdown();
+                }
             }
             return Task.CompletedTask;
         });
