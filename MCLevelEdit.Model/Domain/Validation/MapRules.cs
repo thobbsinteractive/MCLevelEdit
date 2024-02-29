@@ -74,7 +74,7 @@ namespace MCLevelEdit.Model.Domain.Validation
                     {
                         if (wizard.Spells.Castle != (1, 1))
                         {
-                            return new ValidationResult(0, Result.Warning, $"{wizard.Name} Castle Level parameter is set but they do not start with a Castle Spell!");
+                            return new ValidationResult(0, Result.Fail, $"{wizard.Name} Castle Level parameter is set but they do not start with a Castle Spell!");
                         }
                         else
                         {
