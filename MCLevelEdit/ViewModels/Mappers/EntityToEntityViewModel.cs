@@ -15,8 +15,7 @@ public static class EntityToEntityViewModel
             DisId = entity.DisId,
             SwitchSize = entity.SwitchSize, SwitchId = entity.SwitchId,
             Parent = entity.Parent,
-            Child = entity.Child,
-            Colour = new Avalonia.Media.Color(entity.EntityType.Colour.A, entity.EntityType.Colour.R, entity.EntityType.Colour.G, entity.EntityType.Colour.B)
+            Child = entity.Child
         };
     }
 }

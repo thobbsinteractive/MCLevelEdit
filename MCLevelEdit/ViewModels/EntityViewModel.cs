@@ -21,7 +21,6 @@ public class EntityViewModel : ObservableObject
     private ushort _switchId;
     private ushort _parent;
     private ushort _child;
-    private Color _colour;
 
     public IAvaloniaList<KeyValuePair<int, string>> ModelTypes { get; init; } = new AvaloniaList<KeyValuePair<int, string>>();
 
@@ -117,8 +116,28 @@ public class EntityViewModel : ObservableObject
 
     public Color Colour
     {
-        get { return _colour; }
-        set { SetProperty(ref _colour, value); }
+        get 
+        { 
+            switch((TypeId)Type)
+            {
+                case TypeId.Creature:
+                    return Color.FromRgb(255, 0, 0);
+                case TypeId.Effect:
+                    return Color.FromRgb(255, 0, 255);
+                case TypeId.Scenery:
+                    return Color.FromRgb(0, 255, 0);
+                case TypeId.Spawn:
+                    return Color.FromRgb(255, 255, 0);
+                case TypeId.Spell:
+                    return Color.FromRgb(128, 0, 128);
+                case TypeId.Switch:
+                    return Color.FromRgb(255, 255, 255);
+                case TypeId.Weather:
+                    return Color.FromRgb(0, 0, 255);
+                default:
+                    return Color.FromRgb(0, 0, 0);
+            }
+        }
     }
 
     public bool IsBuilding() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.VillagerBuilding;

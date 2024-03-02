@@ -42,7 +42,7 @@ public class CreatureType : EntityType
         { Creature.Wyvern, 50000 },
     };
 
-    public CreatureType(Creature creature) : base(TypeId.Creature, Color.FromArgb(255, 255, 0, 0),((int)creature), creature.ToString(), (ManaCost.ContainsKey(creature) ? ManaCost[creature] : 0)) { }
+    public CreatureType(Creature creature) : base(TypeId.Creature,((int)creature), creature.ToString(), (ManaCost.ContainsKey(creature) ? ManaCost[creature] : 0)) { }
 
     public override ModelType[] ModelTypes
     {

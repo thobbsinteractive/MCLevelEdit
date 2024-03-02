@@ -32,7 +32,7 @@ public enum Spell
 
 public class SpellType : EntityType
 {
-    public SpellType(Spell spell) : base(TypeId.Spell, Color.FromArgb(255, 128, 0, 128), ((int)spell), spell.ToString()) { }
+    public SpellType(Spell spell) : base(TypeId.Spell, ((int)spell), spell.ToString()) { }
 
     public override ModelType[] ModelTypes
     {
