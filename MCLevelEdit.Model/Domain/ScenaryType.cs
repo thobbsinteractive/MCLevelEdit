@@ -1,4 +1,4 @@
-﻿using Avalonia.Media;
+﻿using System.Drawing;
 
 namespace MCLevelEdit.Model.Domain;
 
@@ -14,7 +14,7 @@ public enum Scenery
 
 public class SceneryType : EntityType
 {
-    public SceneryType(Scenery scenery) : base(TypeId.Scenery, Color.FromRgb(0,255,0), ((int)scenery), scenery.ToString()) { }
+    public SceneryType(Scenery scenery) : base(TypeId.Scenery, Color.FromArgb(255, 0,255,0), ((int)scenery), scenery.ToString()) { }
 
     public override ModelType[] ModelTypes
     {

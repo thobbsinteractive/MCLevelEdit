@@ -1,10 +1,12 @@
 ﻿using Avalonia.Collections;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Domain.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Effect = MCLevelEdit.Model.Domain.Effect;
 
 namespace MCLevelEdit.ViewModels;
 
@@ -19,6 +21,7 @@ public class EntityViewModel : ObservableObject
     private ushort _switchId;
     private ushort _parent;
     private ushort _child;
+    private Color _colour;
 
     public IAvaloniaList<KeyValuePair<int, string>> ModelTypes { get; init; } = new AvaloniaList<KeyValuePair<int, string>>();
 
@@ -111,6 +114,27 @@ public class EntityViewModel : ObservableObject
         get { return _child; }
         set { SetProperty(ref _child, value); }
     }
+
+    public Color Colour
+    {
+        get { return _colour; }
+        set { SetProperty(ref _colour, value); }
+    }
+
+    public bool IsBuilding() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.VillagerBuilding;
+    public bool IsPath() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.Path;
+    public bool IsWall() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.Wall;
+    public bool IsPathOrWall() => IsPath() || IsWall();
+    public bool IsSwitch() =>
+        this?.Type == (int)TypeId.Switch &&
+        (this?.Model == (int)Switch.DeathInside ||
+         this?.Model == (int)Switch.DeathOutside ||
+         this?.Model == (int)Switch.HiddenInside ||
+         this?.Model == (int)Switch.HiddenOutside ||
+         this?.Model == (int)Switch.HiddenInsideRe ||
+         this?.Model == (int)Switch.HiddenOutsideRe);
+    public bool IsTeleport() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.Teleport;
+    public bool IsSpawn() => this?.Type == (int)TypeId.Spawn;
 
     private void PopulateModelTypes()
     {

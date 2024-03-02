@@ -103,10 +103,10 @@ namespace MCLevelEdit.ViewModels
                     ushort id = 0;
                     if (ushort.TryParse(node.Name, out id))
                     {
-                        var entity = _mapService.GetEntity(id);
-                        if (entity is not null)
+                        var entityViewModel = _mapService.GetEntity(id)?.ToEntityViewModel();
+                        if (entityViewModel is not null)
                         {
-                            EditEntityViewModel = new EditEntityViewModel(_eventAggregator, _mapService, _terrainService, entity.ToEntityViewModel());
+                            EditEntityViewModel = new EditEntityViewModel(_eventAggregator, _mapService, _terrainService, entityViewModel);
                             ShowEditEntity = true;
                         }
                     }

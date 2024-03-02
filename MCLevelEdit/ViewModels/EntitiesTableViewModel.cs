@@ -17,7 +17,7 @@ namespace MCLevelEdit.ViewModels
         protected IList<EntityViewModel>? _selectedEntityViewModels;
         protected int _entityFilter;
 
-        public List<KeyValuePair<int, string>> TypeIds { get; } =
+        public new List<KeyValuePair<int, string>> TypeIds { get; } =
             Enum.GetValues(typeof(TypeId))
             .Cast<int>()
             .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))

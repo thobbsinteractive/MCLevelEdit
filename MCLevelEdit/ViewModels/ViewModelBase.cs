@@ -31,40 +31,37 @@ public class ViewModelBase : ReactiveObject
 
     protected int AddEntity(EntityViewModel entityView)
     {
-        var entity = entityView.ToEntity();
-        if (entity.EntityType.TypeId == TypeId.Spell)
-            entity.SwitchId = 1;
+        if (entityView.Type == (int)TypeId.Spell)
+            entityView.SwitchId = 1;
 
-        if (entity.IsBuilding())
+        if (entityView.IsBuilding())
         {
-            entity.DisId = ushort.MaxValue;
-            entity.SwitchId = ushort.MaxValue;
-            entity.Parent = 1;
+            entityView.DisId = ushort.MaxValue;
+            entityView.SwitchId = ushort.MaxValue;
+            entityView.Parent = 1;
         }
 
-        if (entity.IsWall())
+        if (entityView.IsWall())
         {
-            entity.DisId = ushort.MaxValue;
-            entity.SwitchId = 1;
+            entityView.DisId = ushort.MaxValue;
+            entityView.SwitchId = 1;
         }
         
-        int id = _mapService.AddEntity(entity);
-        entity.Id = id;
-        _eventAggregator.RaiseEvent("AddEntity", this, new PubSubEventArgs<object>(entity));
+        int id = _mapService.AddEntity(entityView.ToEntity());
+        entityView.Id = id;
+        _eventAggregator.RaiseEvent("AddEntity", this, new PubSubEventArgs<object>(entityView));
         return id;
     }
 
     protected void DeleteEntity(EntityViewModel entityView)
     {
-        var entity = entityView.ToEntity();
-        _mapService.DeleteEntity(entity);
-        _eventAggregator.RaiseEvent("DeleteEntity", this, new PubSubEventArgs<object>(entity));
+        _mapService.DeleteEntity(entityView.ToEntity());
+        _eventAggregator.RaiseEvent("DeleteEntity", this, new PubSubEventArgs<object>(entityView));
     }
 
     protected void UpdateEntity(EntityViewModel entityView)
     {
-        var entity = entityView.ToEntity();
-        _mapService.UpdateEntity(entity);
-        _eventAggregator.RaiseEvent("UpdateEntity", this, new PubSubEventArgs<object>(entity));
+        _mapService.UpdateEntity(entityView.ToEntity());
+        _eventAggregator.RaiseEvent("UpdateEntity", this, new PubSubEventArgs<object>(entityView));
     }
 }

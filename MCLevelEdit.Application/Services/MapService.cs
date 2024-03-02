@@ -1,6 +1,4 @@
-﻿using Avalonia.Media.Imaging;
-using MagicCarpet2Terrain.Model;
-using MCLevelEdit.Application.Extensions;
+﻿using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
@@ -61,35 +59,6 @@ public class MapService : IMapService, IEnableLogger
         {
             this.Log().Error(ex, $"Error saving level {filePath}:\n{ex.Message}");
             return false;
-        }
-    }
-
-    public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, IList<Entity> entities)
-    {
-        return Task.Run(() =>
-        {
-            for (int i = 0; i < entities.Count; i++)
-            {
-                DrawEntity(entities[i], bitmap);
-            }
-
-            //var result = SaveBitmap(bitmap).Result;
-
-            return bitmap;
-        });
-    }
-
-    public void DrawEntity(Entity entity, WriteableBitmap bitmap)
-    {
-        using (var fb = bitmap.Lock())
-        {
-            for (int sx = 0; sx < Globals.SQUARE_SIZE; sx++)
-            {
-                for (int sy = 0; sy < Globals.SQUARE_SIZE; sy++)
-                {
-                    fb.SetPixel((entity.Position.X * Globals.SQUARE_SIZE) + sx, (entity.Position.Y * Globals.SQUARE_SIZE) + sy, entity.EntityType.Colour);
-                }
-            }
         }
     }
 

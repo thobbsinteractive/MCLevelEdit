@@ -1,4 +1,4 @@
-﻿using Avalonia.Media;
+﻿using System.Drawing;
 
 namespace MCLevelEdit.Model.Domain;
 
@@ -61,7 +61,7 @@ public enum Effect
 
 public class EffectType : EntityType
 {
-    public EffectType(Effect effect) : base(TypeId.Effect, Color.FromRgb(255, 0, 255), ((int)effect), effect.ToString()) { }
+    public EffectType(Effect effect) : base(TypeId.Effect, Color.FromArgb(255, 255, 0, 255), ((int)effect), effect.ToString()) { }
 
     public override ModelType[] ModelTypes
     {

@@ -1,4 +1,4 @@
-﻿using Avalonia.Media;
+﻿using System.Drawing;
 
 namespace MCLevelEdit.Model.Domain;
 
@@ -40,7 +40,7 @@ public enum Switch
 
 public class SwitchType : EntityType
 {
-    public SwitchType(Switch gameSwitch) : base(TypeId.Switch, Color.FromRgb(255, 255, 255), ((int)gameSwitch), gameSwitch.ToString()) { }
+    public SwitchType(Switch gameSwitch) : base(TypeId.Switch, Color.FromArgb(255, 255, 255, 255), ((int)gameSwitch), gameSwitch.ToString()) { }
 
     public override ModelType[] ModelTypes
     {

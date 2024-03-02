@@ -50,6 +50,13 @@ namespace MagicCarpet2Terrain
 
         private int MaxMapSize = 256;
 
+        public Task<Terrain> CalculateTerrainAsync(GenerationParameters genParams, byte stage = 18)
+        {
+            return Task.Run(() => {
+                return CalculateTerrain(genParams, stage);
+            });
+        }
+
         public Terrain CalculateTerrain(GenerationParameters genParams, byte stage = 18)
         {
             MaxMapSize = genParams.MapSize;
@@ -1529,13 +1536,6 @@ namespace MagicCarpet2Terrain
                     mapShading_12B4E0[index.Word] = tempIndex.X;
                 }
             }
-        }
-
-        public Task<Terrain> CalculateTerrainAsync(GenerationParameters genParams, byte stage = 18)
-        {
-            return Task.Run(() => {
-                return CalculateTerrain(genParams, stage);
-            });
         }
     }
 }

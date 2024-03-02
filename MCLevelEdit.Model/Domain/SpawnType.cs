@@ -1,4 +1,4 @@
-﻿using Avalonia.Media;
+﻿using System.Drawing;
 
 namespace MCLevelEdit.Model.Domain;
 
@@ -16,7 +16,7 @@ public enum Spawn
 
 public class SpawnType : EntityType
 {
-    public SpawnType(Spawn spawn) : base(TypeId.Spawn, Color.FromRgb(255,255,0), ((int)spawn), spawn.ToString()) { }
+    public SpawnType(Spawn spawn) : base(TypeId.Spawn, Color.FromArgb(255, 255, 255, 0), ((int)spawn), spawn.ToString()) { }
 
     public override ModelType[] ModelTypes
     {

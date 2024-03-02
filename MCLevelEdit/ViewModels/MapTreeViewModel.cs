@@ -4,6 +4,7 @@ using Avalonia.Platform;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -78,22 +79,22 @@ public class MapTreeViewModel : ReactiveObject
 
     private void AddEntityHandler(object sender, PubSubEventArgs<object> args)
     {
-        var entity = (Entity)args.Item;
-        if (entity is not null)
-            AddEntityNode(entity);
+        var entityViewModel = (EntityViewModel)args.Item;
+        if (entityViewModel is not null)
+            AddEntityNode(entityViewModel);
     }
 
     private void UpdateEntityHandler(object sender, PubSubEventArgs<object> args)
     {
-        var entity = (Entity)args.Item;
-        if (entity is not null)
-            UpdateEntityNode(entity);
+        var entityViewModel = (EntityViewModel)args.Item;
+        if (entityViewModel is not null)
+            UpdateEntityNode(entityViewModel);
     }
 
     private void DeleteEntityHandler(object sender, PubSubEventArgs<object> args)
     {
-        var entity = (Entity)args.Item;
-        if (entity is not null)
+        var entityViewModel = (EntityViewModel)args.Item;
+        if (entityViewModel is not null)
         {
             SelectedNodes.Clear();
             RefreshEntitiesData();
@@ -134,10 +135,10 @@ public class MapTreeViewModel : ReactiveObject
         }
     }
 
-    private Bitmap GetIconFromEntity(EntityType entityType)
+    private Bitmap GetIconFromEntity(EntityViewModel entityViewModel)
     {
-        if (_icons.ContainsKey(entityType.TypeId.ToString()))
-            return _icons[entityType.TypeId.ToString()];
+        if (_icons.ContainsKey(((TypeId)entityViewModel.Type).ToString()))
+            return _icons[((TypeId)entityViewModel.Type).ToString()];
 
         return null;
     }
@@ -165,12 +166,12 @@ public class MapTreeViewModel : ReactiveObject
 
         worldNode.SubNodes.Clear();
 
-        var squareEntities = map.Entities.Where(e => (_entityFilter > 0? (int)e.EntityType.TypeId == _entityFilter : true)).OrderBy(e => e.Id);
-        if (squareEntities.Any())
+        var squareEntities = map?.Entities?.Where(e => (_entityFilter > 0 ? (int)e.EntityType.TypeId == _entityFilter : true))?.OrderBy(e => e.Id)?.ToEntityViewModels();
+        if (squareEntities?.Any() ?? false)
         {
             foreach (var entity in squareEntities)
             {
-                worldNode.SubNodes.Add(new EntityNode(this, entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity)));
+                worldNode.SubNodes.Add(new EntityNode(this, entity.Id.ToString(), entity.X, entity.Y, GetIconFromEntity(entity), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity)));
             }
         }
     }
@@ -199,37 +200,37 @@ public class MapTreeViewModel : ReactiveObject
 
     public void DeleteEntityNode(int id)
     {
-        var entity = _mapService.GetEntity((ushort)id);
-        if (entity != null)
+        var entityViewModel = _mapService?.GetEntity((ushort)id)?.ToEntityViewModel();
+        if (entityViewModel is not null)
         {
-            _mapService.DeleteEntity(entity);
-            _eventAggregator.RaiseEvent("DeleteEntity", this, new PubSubEventArgs<object>(entity));
+            _mapService.DeleteEntity(entityViewModel.ToEntity());
+            _eventAggregator.RaiseEvent("DeleteEntity", this, new PubSubEventArgs<object>(entityViewModel));
         }
     }
 
-    private void AddEntityNode(Entity entity)
+    private void AddEntityNode(EntityViewModel entityViewModel)
     {
-        var entityNode = new EntityNode(this, entity.Id.ToString(), entity.Position.X, entity.Position.Y, GetIconFromEntity(entity.EntityType), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity));
+        var entityNode = new EntityNode(this, entityViewModel.Id.ToString(), entityViewModel.X, entityViewModel.Y, GetIconFromEntity(entityViewModel), GetEntityNodeTitle(entityViewModel), GetEntityNodeSubTitle(entityViewModel));
         var worldNode = GetWorldNode();
 
-        if (_entityFilter == 0 || (int)entity.EntityType.TypeId == _entityFilter)
+        if (_entityFilter == 0 || entityViewModel.Type == _entityFilter)
             worldNode.SubNodes.Add(entityNode);
     }
 
-    private void UpdateEntityNode(Entity entity)
+    private void UpdateEntityNode(EntityViewModel entityViewModel)
     {
-        var entityNode = GetEntityNodeById(entity.Id);
+        var entityNode = GetEntityNodeById(entityViewModel.Id);
 
         if (entityNode is not null)
         {
-            entityNode.X = entity.Position.X;
-            entityNode.Y = entity.Position.Y;
-            entityNode.Icon = GetIconFromEntity(entity.EntityType);
-            entityNode.Title = GetEntityNodeTitle(entity);
-            entityNode.Subtitle = GetEntityNodeSubTitle(entity);
+            entityNode.X = entityViewModel.X;
+            entityNode.Y = entityViewModel.Y;
+            entityNode.Icon = GetIconFromEntity(entityViewModel);
+            entityNode.Title = GetEntityNodeTitle(entityViewModel);
+            entityNode.Subtitle = GetEntityNodeSubTitle(entityViewModel);
         }
 
-        if (_entityFilter > 0 && (int)entity.EntityType.TypeId != _entityFilter)
+        if (_entityFilter > 0 && (int)entityViewModel.Type != _entityFilter)
         {
             var worldNode = GetWorldNode();
             worldNode.SubNodes.Remove(entityNode);
@@ -265,14 +266,14 @@ public class MapTreeViewModel : ReactiveObject
         return null;
     }
 
-    private string GetEntityNodeTitle(Entity entity)
+    private string GetEntityNodeTitle(EntityViewModel entityViewModel)
     {
-        return $"{string.Format("{0:D4}", entity.Id)}: ({string.Format("{0:D3}", entity.Position.X)},{string.Format("{0:D3}", entity.Position.Y)})";
+        return $"{string.Format("{0:D4}", entityViewModel.Id)}: ({string.Format("{0:D3}", entityViewModel.X)},{string.Format("{0:D3}", entityViewModel.Y)})";
     }
 
-    private string GetEntityNodeSubTitle(Entity entity)
+    private string GetEntityNodeSubTitle(EntityViewModel entityViewModel)
     {
-        return $"{entity.EntityType.Model.Name}";
+        return $"{entityViewModel.ToEntity().EntityType.Model.Name}";
     }
 
     private void SelectedNodes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

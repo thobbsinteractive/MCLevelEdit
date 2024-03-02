@@ -7,7 +7,7 @@ namespace MCLevelEdit.Model.Domain.Validation
         public static ValidationResult HasSwitch(Entity entity, IList<Entity> entities)
         {
 
-            if (entity is not null && entities is not null && entities.Any())
+            if (entity is not null && (entities?.Any() ?? false))
             {
                 if (entity.SwitchId > 0 && entity.SwitchId != ushort.MaxValue && entity.EntityType.TypeId != TypeId.Switch) 
                 {
@@ -172,9 +172,9 @@ namespace MCLevelEdit.Model.Domain.Validation
 
         private static ValidationResult CheckNextWallChild(Entity entity, IList<Entity> entities)
         {
-            var nextWalls = entities.Where(e => entity.IsWall() && entity.Child > 0 && entity.Child == e.Id);
+            var nextWalls = entities?.Where(e => entity.IsWall() && entity.Child > 0 && entity.Child == e.Id);
 
-            if (nextWalls.Any())
+            if (nextWalls?.Any() ?? false)
             {
                 foreach (var wall in nextWalls)
                 {
@@ -190,9 +190,9 @@ namespace MCLevelEdit.Model.Domain.Validation
 
         private static ValidationResult CheckNextWallParent(Entity entity, IList<Entity> entities)
         {
-            var nextWalls = entities.Where(e => entity.IsWall() && entity.Parent > 0 && entity.Parent == e.Id);
+            var nextWalls = entities?.Where(e => entity.IsWall() && entity.Parent > 0 && entity.Parent == e.Id);
 
-            if (nextWalls.Any())
+            if (nextWalls?.Any() ?? false)
             {
                 foreach (var wall in nextWalls)
                 {
