@@ -250,21 +250,18 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     private void UpdateEntityHandler(object sender, PubSubEventArgs<object> args)
     {
-        var entity = (EntityViewModel)args.Item;
-        if (entity is not null)
+        var entityViewModel = (EntityViewModel)args.Item;
+        if (entityViewModel is not null)
         {
             lock (_lockPreview)
             {
-                if (_entityShapes.ContainsKey(entity.Id))
+                RemoveEntityShapes(entityViewModel.Id);
+                AddEntityToView(entityViewModel);
+                if (entityViewModel.IsPathOrWall())
                 {
-                    foreach (var shape in _entityShapes[entity.Id])
-                    {
-                        _cvEntity.Children.Remove(shape);
-                    }
-                    _entityShapes.Remove(entity.Id);
+                    RefreshWallsAndPaths();
                 }
-                AddEntityToView(entity);
-                OnEntitySelected(entity);
+                OnEntitySelected(entityViewModel);
             }
         }
     }
@@ -276,36 +273,28 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             var wizardEntities = _mapService.GetEntitiesByTypeId(TypeId.Spawn)?.ToEntityViewModels();
 
-            foreach (var wizardEntity in wizardEntities)
+            if (wizardEntities?.Any() ?? false)
             {
-                if (_entityShapes.ContainsKey(wizardEntity.Id))
+                foreach (var wizardEntity in wizardEntities)
                 {
-                    foreach (var shape in _entityShapes[wizardEntity.Id])
-                    {
-                        _cvEntity.Children.Remove(shape);
-                    }
-                    _entityShapes.Remove(wizardEntity.Id);
+                    RemoveEntityShapes(wizardEntity.Id);
+                    AddEntityToView(wizardEntity);
                 }
-                AddEntityToView(wizardEntity);
             }
         }
-        
     }
 
     private void DeleteEntityHandler(object sender, PubSubEventArgs<object> args)
     {
-        var entity = (EntityViewModel)args.Item;
-        if (entity is not null)
+        var entityViewModel = (EntityViewModel)args.Item;
+        if (entityViewModel is not null)
         {
             lock (_lockPreview)
             {
-                if (_entityShapes.ContainsKey(entity.Id))
+                RemoveEntityShapes(entityViewModel.Id);
+                if (entityViewModel.IsPathOrWall())
                 {
-                    foreach (var shape in _entityShapes[entity.Id])
-                    {
-                        _cvEntity.Children.Remove(shape);
-                    }
-                    _entityShapes.Remove(entity.Id);
+                    RefreshWallsAndPaths();
                 }
                 OnEntitySelected(null);
             }
@@ -361,6 +350,31 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 case Key.Right:
                     OnMoveSelectedEntity(1, 0);
                     break;
+            }
+        }
+    }
+
+    private void RemoveEntityShapes(int id)
+    {
+        if (_entityShapes.ContainsKey(id))
+        {
+            foreach (var shape in _entityShapes[id])
+            {
+                _cvEntity.Children.Remove(shape);
+            }
+            _entityShapes.Remove(id);
+        }
+    }
+
+    private void RefreshWallsAndPaths()
+    {
+        var wallEntities = _mapService.GetEntitiesByTypeId(TypeId.Effect)?.Where(e => e.IsPathOrWall())?.ToEntityViewModels();
+        if (wallEntities?.Any() ?? false)
+        {
+            foreach(var wallEntity in wallEntities)
+            {
+                RemoveEntityShapes(wallEntity.Id);
+                AddEntityToView(wallEntity);
             }
         }
     }
