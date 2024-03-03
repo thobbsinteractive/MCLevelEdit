@@ -40,10 +40,10 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private Canvas _cvEntity;
     private Rectangle _rectSelection;
     private Rectangle _outerRectSelection;
-    private Line _horizontalSelection1;
-    private Line _horizontalSelection2;
-    private Line _verticalSelection1;
-    private Line _verticalSelection2;
+    private Line _horizontalSelectionLeft;
+    private Line _horizontalSelectionRight;
+    private Line _verticalSelectionTop;
+    private Line _verticalSelectionBottom;
 
     public WriteableBitmap Preview 
     {
@@ -117,17 +117,17 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         if (_outerRectSelection is not null)
             _cvEntity.Children.Remove(_outerRectSelection);
 
-        if (_horizontalSelection1 is not null)
-            _cvEntity.Children.Remove(_horizontalSelection1);
+        if (_horizontalSelectionLeft is not null)
+            _cvEntity.Children.Remove(_horizontalSelectionLeft);
 
-        if (_horizontalSelection2 is not null)
-            _cvEntity.Children.Remove(_horizontalSelection2);
+        if (_horizontalSelectionRight is not null)
+            _cvEntity.Children.Remove(_horizontalSelectionRight);
 
-        if (_verticalSelection1 is not null)
-            _cvEntity.Children.Remove(_verticalSelection1);
+        if (_verticalSelectionTop is not null)
+            _cvEntity.Children.Remove(_verticalSelectionTop);
 
-        if (_verticalSelection2 is not null)
-            _cvEntity.Children.Remove(_verticalSelection2);
+        if (_verticalSelectionBottom is not null)
+            _cvEntity.Children.Remove(_verticalSelectionBottom);
 
         if (entity is not null)
         {
@@ -153,37 +153,37 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 ZIndex = 200
             };
 
-            _horizontalSelection1 = new Line()
+            _horizontalSelectionLeft = new Line()
             {
-                StartPoint = new Point(-16, 7),
+                StartPoint = new Point((-entity.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), 7),
                 EndPoint = new Point(0, 7),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 200
             };
 
-            _horizontalSelection2 = new Line()
+            _horizontalSelectionRight = new Line()
             {
                 StartPoint = new Point(14, 7),
-                EndPoint = new Point(30, 7),
+                EndPoint = new Point((256 * Globals.SQUARE_SIZE) - (entity.X * Globals.SQUARE_SIZE), 7),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 200
             };
 
-            _verticalSelection1 = new Line()
+            _verticalSelectionTop = new Line()
             {
-                StartPoint = new Point(7, -16),
+                StartPoint = new Point(7, (-entity.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                 EndPoint = new Point(7, 0),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 200
             };
 
-            _verticalSelection2 = new Line()
+            _verticalSelectionBottom = new Line()
             {
                 StartPoint = new Point(7, 14),
-                EndPoint = new Point(7, 30),
+                EndPoint = new Point(7, (256 * Globals.SQUARE_SIZE) - (entity.Y * Globals.SQUARE_SIZE)),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 200
@@ -193,21 +193,21 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             Canvas.SetTop(_rectSelection, rect.Y);
             Canvas.SetLeft(_outerRectSelection, rect.X - 11);
             Canvas.SetTop(_outerRectSelection, rect.Y - 11);
-            Canvas.SetLeft(_horizontalSelection1, rect.X);
-            Canvas.SetTop(_horizontalSelection1, rect.Y);
-            Canvas.SetLeft(_horizontalSelection2, rect.X);
-            Canvas.SetTop(_horizontalSelection2, rect.Y);
-            Canvas.SetLeft(_verticalSelection1, rect.X);
-            Canvas.SetTop(_verticalSelection1, rect.Y);
-            Canvas.SetLeft(_verticalSelection2, rect.X);
-            Canvas.SetTop(_verticalSelection2, rect.Y);
+            Canvas.SetLeft(_horizontalSelectionLeft, rect.X);
+            Canvas.SetTop(_horizontalSelectionLeft, rect.Y);
+            Canvas.SetLeft(_horizontalSelectionRight, rect.X);
+            Canvas.SetTop(_horizontalSelectionRight, rect.Y);
+            Canvas.SetLeft(_verticalSelectionTop, rect.X);
+            Canvas.SetTop(_verticalSelectionTop, rect.Y);
+            Canvas.SetLeft(_verticalSelectionBottom, rect.X);
+            Canvas.SetTop(_verticalSelectionBottom, rect.Y);
 
             _cvEntity.Children.Add(_rectSelection);
             _cvEntity.Children.Add(_outerRectSelection);
-            _cvEntity.Children.Add(_horizontalSelection1);
-            _cvEntity.Children.Add(_horizontalSelection2);
-            _cvEntity.Children.Add(_verticalSelection1);
-            _cvEntity.Children.Add(_verticalSelection2);
+            _cvEntity.Children.Add(_horizontalSelectionLeft);
+            _cvEntity.Children.Add(_horizontalSelectionRight);
+            _cvEntity.Children.Add(_verticalSelectionTop);
+            _cvEntity.Children.Add(_verticalSelectionBottom);
         }
     }
 
