@@ -4,7 +4,7 @@ namespace MCLevelEdit.Model.Domain;
 
 public enum Effect
 {
-    Unknown0 = 0,  
+    Explosion = 0,  
     BigExplosion = 1, 
     Unknown1 = 2,
     Unknown2 = 3,
