@@ -1,6 +1,6 @@
-﻿using MagicCarpet2Terrain;
-using MagicCarpet2Terrain.Model;
+﻿using MagicCarpet2Terrain.Model;
 using NUnit.Framework;
+using System.Drawing;
 
 namespace MagicCarpet2Terrain.Test
 {
@@ -9,6 +9,45 @@ namespace MagicCarpet2Terrain.Test
         [SetUp]
         public void Setup()
         {
+        }
+
+        [TestCase(256)]
+        [TestCase(512)]
+        public void GenerationTerrain(int mapSize)
+        {
+            var sut = new TerrainGenerator();
+            var terrain = sut.CalculateTerrain(new GenerationParameters()
+            {
+                MapSize = mapSize,
+                MapType = MapType.Night,
+                Seed = 49098,
+                Offset = 48953,
+                Raise = 1140,
+                Gnarl = 98,
+                River = 49,
+                LRiver = 84,
+                Source = 136,
+                SnLin = 13,
+                SnFlt = 97,
+                BhLin = 31,
+                BhFlt = 35,
+                RkSte = 10
+            });
+
+
+            using var bitmap = new Bitmap(mapSize, mapSize);
+            {
+                for (int y = 0; y < mapSize; y++)
+                {
+                    for (int x = 0; x < mapSize; x++)
+                    {
+                        int index = (y * mapSize) + x;
+                        bitmap.SetPixel(x, y, Color.FromArgb(255, terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index], terrain.MapHeightmap_11B4E0[index]));
+                    }
+                }
+
+                bitmap.Save($"TestHeightMap_{mapSize}.bmp");
+            }
         }
 
         [TestCase(1, @"Resources\mapEntityIndex_decompress_15B4E0.bin", @"Resources\mapAngle_decompress_13B4E0.bin", @"Resources\mapHeightmap_decompress_11B4E0.bin", @"Resources\mapShading_decompress_12B4E0.bin", @"Resources\mapTerrainType_decompress_10B4E0.bin")]

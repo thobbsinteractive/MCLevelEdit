@@ -863,7 +863,7 @@ namespace MagicCarpet2Terrain
             byte maxHeight;
             byte minHeight;
             UAxis2D index = new UAxis2D();
-            for (int i = 0; i < 256 * 256; i++)
+            for (int i = 0; i < MaxMapSize * MaxMapSize; i++)
             {
                 index.Word = (ushort)i;
                 if (mapHeightmap_11B4E0[index.Word] > maxHeightCut)
