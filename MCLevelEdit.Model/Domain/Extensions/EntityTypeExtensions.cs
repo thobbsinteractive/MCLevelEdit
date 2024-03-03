@@ -13,7 +13,7 @@ public static class EntityTypeExtensions
             case TypeId.Creature:
                 return new CreatureType(Creature.Vulture);
             case TypeId.Effect:
-                return new EffectType(Effect.Unknown0);
+                return new EffectType(Effect.Explosion);
             case TypeId.Weather:
                 return new WeatherType(Weather.Wind);
             case TypeId.Spell:
