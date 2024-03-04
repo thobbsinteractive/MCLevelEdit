@@ -143,7 +143,10 @@ public class EntityViewModel : ObservableObject
     public bool IsBuilding() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.VillagerBuilding;
     public bool IsPath() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.Path;
     public bool IsWall() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.Wall;
+    public bool IsCanyon() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.Canyon;
+    public bool IsRidge() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.RidgeNode;
     public bool IsPathOrWall() => IsPath() || IsWall();
+    public bool IsPathOrWallOrCanyonOrRidge() => IsPath() || IsWall() || IsCanyon() || IsRidge();
     public bool IsSwitch() =>
         this?.Type == (int)TypeId.Switch &&
         (this?.Model == (int)Switch.DeathInside ||

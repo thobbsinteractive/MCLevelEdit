@@ -257,7 +257,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             {
                 RemoveEntityShapes(entityViewModel.Id);
                 AddEntityToView(entityViewModel);
-                if (entityViewModel.IsPathOrWall())
+                if (entityViewModel.IsPathOrWallOrCanyonOrRidge())
                 {
                     RefreshWallsAndPaths();
                 }
@@ -292,7 +292,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             lock (_lockPreview)
             {
                 RemoveEntityShapes(entityViewModel.Id);
-                if (entityViewModel.IsPathOrWall())
+                if (entityViewModel.IsPathOrWallOrCanyonOrRidge())
                 {
                     RefreshWallsAndPaths();
                 }
@@ -368,7 +368,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     private void RefreshWallsAndPaths()
     {
-        var wallEntities = _mapService.GetEntitiesByTypeId(TypeId.Effect)?.Where(e => e.IsPathOrWall())?.ToEntityViewModels();
+        var wallEntities = _mapService.GetEntitiesByTypeId(TypeId.Effect)?.Where(e => e.IsPathOrWall() || e.IsCanyon())?.ToEntityViewModels();
         if (wallEntities?.Any() ?? false)
         {
             foreach(var wallEntity in wallEntities)
@@ -424,7 +424,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                 if (connectedEntities?.Any() ?? false)
                 {
-                    foreach(var connectedEntity in connectedEntities)
+                    foreach (var connectedEntity in connectedEntities)
                     {
                         var line = new Line()
                         {
@@ -440,124 +440,198 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 }
             }
 
-            if (entityViewModel.IsPathOrWall())
-            {
-                brush = new SolidColorBrush(Color.FromRgb(128,128,128), 1);
-
-                if (entityViewModel.Model == (int)Effect.Path)
-                    brush = new SolidColorBrush(Color.FromRgb(90, 60, 40), 1);
-
-                if (entityViewModel.Child > 0)
-                {
-                    var endEntity = _mapService?.GetEntity(entityViewModel.Child)?.ToEntityViewModel();
-                    if (endEntity != null && endEntity.IsPathOrWall())
-                    {
-                        var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, new Position(entityViewModel.X, entityViewModel.Y), new Position(endEntity.X, endEntity.Y));
-
-                        var line1 = new Line()
-                        {
-                            StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                            EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                            Stroke = brush,
-                            StrokeThickness = Globals.SQUARE_SIZE,
-                            ZIndex = 99
-                        };
-                        _cvEntity.Children.Add(line1);
-                        shapes.Add(line1);
-                    }
-                }
-                if (entityViewModel.Parent > 0)
-                {
-                    var endEntity = _mapService?.GetEntity(entityViewModel.Parent)?.ToEntityViewModel();
-                    if (endEntity != null && endEntity.IsPathOrWall())
-                    {
-                        var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, new Position(entityViewModel.X, entityViewModel.Y), new Position(endEntity.X, endEntity.Y));
-
-                        var line2 = new Line()
-                        {
-                            StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                            EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                            Stroke = brush,
-                            StrokeThickness = Globals.SQUARE_SIZE,
-                            ZIndex = 99
-                        };
-                        _cvEntity.Children.Add(line2);
-                        shapes.Add(line2);
-                    }
-                }
-            }
-
-            if (entityViewModel.IsTeleport())
-            {
-                brush = new SolidColorBrush(Color.FromRgb(255, 128, 255), 1);
-
-                var destinationLine = new Line()
-                {
-                    StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                    EndPoint = new Point((entityViewModel.Child * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Parent * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                    Stroke = brush,
-                    StrokeThickness = 2,
-                    ZIndex = 250
-                };
-                _cvEntity.Children.Add(destinationLine);
-                shapes.Add(destinationLine);
-
-                var circle1 = new Ellipse()
-                {
-                    Width = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
-                    Height = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
-                    Stroke = brush,
-                    StrokeThickness = 2,
-                    ZIndex = 250
-                };
-                Canvas.SetLeft(circle1, (entityViewModel.Child * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
-                Canvas.SetTop(circle1, (entityViewModel.Parent * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
-
-                _cvEntity.Children.Add(circle1);
-                shapes.Add(circle1);
-
-                var circle2 = new Ellipse()
-                {
-                    Width = Globals.SQUARE_SIZE,
-                    Height = Globals.SQUARE_SIZE,
-                    Stroke = brush,
-                    StrokeThickness = 2,
-                    ZIndex = 250
-                };
-                Canvas.SetLeft(circle2, entityViewModel.Child * Globals.SQUARE_SIZE);
-                Canvas.SetTop(circle2, entityViewModel.Parent * Globals.SQUARE_SIZE);
-
-                _cvEntity.Children.Add(circle2);
-                shapes.Add(circle2);
-
-            }
-
-            if (entityViewModel.IsSpawn() && entityViewModel.Model != (int)Spawn.Flyer1)
-            {
-                var map = _mapService.GetMap();
-                var wizard = map.Wizards[entityViewModel.Model - 4].ToWizardViewModel();
-
-                for (int i = 1; i < wizard.CastleLevel + 1; i++)
-                {
-                    int width, height;
-                    GetCastleWidthForWizard(i, out width, out height);
-                    var castle = new Rectangle()
-                    {
-                        Width = width,
-                        Height = height,
-                        Stroke = brush,
-                        StrokeThickness = 2,
-                        ZIndex = 99
-                    };
-                    Canvas.SetLeft(castle, rect.X - (width / 2) + (Globals.SQUARE_SIZE / 2));
-                    Canvas.SetTop(castle, rect.Y - (height / 2) + (Globals.SQUARE_SIZE / 2));
-
-                    _cvEntity.Children.Add(castle);
-                    shapes.Add(castle);
-                }
-            }
+            DrawCanyon(entityViewModel, shapes);
+            DrawPathOrWall(entityViewModel, shapes);
+            DrawTeleport(entityViewModel, shapes);
+            DrawCastle(entityViewModel, shapes, rect, brush);
 
             _entityShapes.Add(entityViewModel.Id, shapes);
+        }
+    }
+
+    private void DrawCastle(EntityViewModel entityViewModel, List<Shape> shapes, Rect rect, SolidColorBrush brush)
+    {
+        if (entityViewModel.IsSpawn() && entityViewModel.Model != (int)Spawn.Flyer1)
+        {
+            var map = _mapService.GetMap();
+            var wizard = map.Wizards[entityViewModel.Model - 4].ToWizardViewModel();
+
+            for (int i = 1; i < wizard.CastleLevel + 1; i++)
+            {
+                int width, height;
+                GetCastleWidthForWizard(i, out width, out height);
+                var castle = new Rectangle()
+                {
+                    Width = width,
+                    Height = height,
+                    Stroke = brush,
+                    StrokeThickness = 2,
+                    ZIndex = 99
+                };
+                Canvas.SetLeft(castle, rect.X - (width / 2) + (Globals.SQUARE_SIZE / 2));
+                Canvas.SetTop(castle, rect.Y - (height / 2) + (Globals.SQUARE_SIZE / 2));
+
+                _cvEntity.Children.Add(castle);
+                shapes.Add(castle);
+            }
+        }
+    }
+
+    private void DrawTeleport(EntityViewModel entityViewModel, List<Shape> shapes)
+    {
+        if (entityViewModel.IsTeleport())
+        {
+            SolidColorBrush brush = new SolidColorBrush(Color.FromRgb(255, 128, 255), 1);
+
+            var destinationLine = new Line()
+            {
+                StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                EndPoint = new Point((entityViewModel.Child * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Parent * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 250
+            };
+            _cvEntity.Children.Add(destinationLine);
+            shapes.Add(destinationLine);
+
+            var circle1 = new Ellipse()
+            {
+                Width = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
+                Height = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 250
+            };
+            Canvas.SetLeft(circle1, (entityViewModel.Child * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
+            Canvas.SetTop(circle1, (entityViewModel.Parent * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
+
+            _cvEntity.Children.Add(circle1);
+            shapes.Add(circle1);
+
+            var circle2 = new Ellipse()
+            {
+                Width = Globals.SQUARE_SIZE,
+                Height = Globals.SQUARE_SIZE,
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 250
+            };
+            Canvas.SetLeft(circle2, entityViewModel.Child * Globals.SQUARE_SIZE);
+            Canvas.SetTop(circle2, entityViewModel.Parent * Globals.SQUARE_SIZE);
+
+            _cvEntity.Children.Add(circle2);
+            shapes.Add(circle2);
+        }
+    }
+
+    private void DrawCanyon(EntityViewModel entityViewModel, List<Shape> shapes)
+    {
+        if (entityViewModel.IsCanyon())
+        {
+            SolidColorBrush brush = new SolidColorBrush(Color.FromRgb(0, 0, 0), 0.25);
+
+            var circle = new Ellipse()
+            {
+                Width = (7 * Globals.SQUARE_SIZE),
+                Height = (7 * Globals.SQUARE_SIZE),
+                Stroke = brush,
+                Fill = new SolidColorBrush(Color.FromRgb(0, 0, 0), 0.5),
+                StrokeThickness = 1,
+                ZIndex = 80
+            };
+            Canvas.SetLeft(circle, (entityViewModel.X * Globals.SQUARE_SIZE));
+            Canvas.SetTop(circle, (entityViewModel.Y * Globals.SQUARE_SIZE) - ((Globals.SQUARE_SIZE * 7) / 2) + (Globals.SQUARE_SIZE / 2));
+            _cvEntity.Children.Add(circle);
+            shapes.Add(circle);
+
+            if (entityViewModel.Child > 0)
+            {
+                var endEntity = _mapService?.GetEntity(entityViewModel.Child)?.ToEntityViewModel();
+                if (endEntity != null && endEntity.IsCanyon())
+                {
+                    var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, new Position(entityViewModel.X, entityViewModel.Y), new Position(endEntity.X, endEntity.Y));
+
+                    var line1 = new Line()
+                    {
+                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + ((Globals.SQUARE_SIZE * 7) / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + ((Globals.SQUARE_SIZE * 7) / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        Stroke = brush,
+                        StrokeThickness = Globals.SQUARE_SIZE * 7,
+                        ZIndex = 80
+                    };
+                    _cvEntity.Children.Add(line1);
+                    shapes.Add(line1);
+                }
+            }
+            if (entityViewModel.Parent > 0)
+            {
+                var endEntity = _mapService?.GetEntity(entityViewModel.Parent)?.ToEntityViewModel();
+                if (endEntity != null && endEntity.IsCanyon())
+                {
+                    var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, new Position(entityViewModel.X, entityViewModel.Y), new Position(endEntity.X, endEntity.Y));
+
+                    var line2 = new Line()
+                    {
+                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + ((Globals.SQUARE_SIZE * 7) / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + ((Globals.SQUARE_SIZE * 7) / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        Stroke = brush,
+                        StrokeThickness = Globals.SQUARE_SIZE * 7,
+                        ZIndex = 80
+                    };
+                    _cvEntity.Children.Add(line2);
+                    shapes.Add(line2);
+                }
+            }
+        }
+    }
+
+    private void DrawPathOrWall(EntityViewModel entityViewModel, List<Shape> shapes)
+    {
+        if (entityViewModel.IsPathOrWall())
+        {
+            SolidColorBrush brush = new SolidColorBrush(Color.FromRgb(128, 128, 128), 1);
+
+            if (entityViewModel.Model == (int)Effect.Path)
+                brush = new SolidColorBrush(Color.FromRgb(90, 60, 40), 1);
+
+            if (entityViewModel.Child > 0)
+            {
+                var endEntity = _mapService?.GetEntity(entityViewModel.Child)?.ToEntityViewModel();
+                if (endEntity != null && endEntity.IsPathOrWall())
+                {
+                    var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, new Position(entityViewModel.X, entityViewModel.Y), new Position(endEntity.X, endEntity.Y));
+
+                    var line1 = new Line()
+                    {
+                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        Stroke = brush,
+                        StrokeThickness = Globals.SQUARE_SIZE,
+                        ZIndex = 99
+                    };
+                    _cvEntity.Children.Add(line1);
+                    shapes.Add(line1);
+                }
+            }
+            if (entityViewModel.Parent > 0)
+            {
+                var endEntity = _mapService?.GetEntity(entityViewModel.Parent)?.ToEntityViewModel();
+                if (endEntity != null && endEntity.IsPathOrWall())
+                {
+                    var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, new Position(entityViewModel.X, entityViewModel.Y), new Position(endEntity.X, endEntity.Y));
+
+                    var line2 = new Line()
+                    {
+                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        Stroke = brush,
+                        StrokeThickness = Globals.SQUARE_SIZE,
+                        ZIndex = 99
+                    };
+                    _cvEntity.Children.Add(line2);
+                    shapes.Add(line2);
+                }
+            }
         }
     }
 

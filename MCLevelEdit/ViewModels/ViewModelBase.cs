@@ -41,7 +41,7 @@ public class ViewModelBase : ReactiveObject
             entityView.Parent = 1;
         }
 
-        if (entityView.IsWall())
+        if (entityView.IsPathOrWall() || entityView.IsCanyon() || entityView.IsRidge())
         {
             entityView.DisId = ushort.MaxValue;
             entityView.SwitchId = 1;

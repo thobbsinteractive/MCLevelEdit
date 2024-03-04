@@ -27,6 +27,8 @@ public class Entity
     public bool IsBuilding() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.VillagerBuilding;
     public bool IsPath() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Path;
     public bool IsWall() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Wall;
+    public bool IsCanyon() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Canyon;
+    public bool IsRidge() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.RidgeNode;
     public bool IsPathOrWall() => IsPath() || IsWall();
     public bool IsSwitch() => 
         this?.EntityType.TypeId == TypeId.Switch && 
