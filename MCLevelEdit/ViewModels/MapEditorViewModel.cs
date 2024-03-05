@@ -368,7 +368,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     private void RefreshWallsAndPaths()
     {
-        var wallEntities = _mapService.GetEntitiesByTypeId(TypeId.Effect)?.Where(e => e.IsPathOrWall() || e.IsCanyon())?.ToEntityViewModels();
+        var wallEntities = _mapService.GetEntitiesByTypeId(TypeId.Effect)?.Where(e => e.IsPathOrWall() || e.IsCanyonOrRidge())?.ToEntityViewModels();
         if (wallEntities?.Any() ?? false)
         {
             foreach(var wallEntity in wallEntities)
@@ -440,7 +440,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 }
             }
 
-            DrawCanyon(entityViewModel, shapes);
+            DrawCanyonOrRidge(entityViewModel, shapes);
             DrawPathOrWall(entityViewModel, shapes);
             DrawTeleport(entityViewModel, shapes);
             DrawCastle(entityViewModel, shapes, rect, brush);
@@ -524,22 +524,29 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
     }
 
-    private void DrawCanyon(EntityViewModel entityViewModel, List<Shape> shapes)
+    private void DrawCanyonOrRidge(EntityViewModel entityViewModel, List<Shape> shapes)
     {
-        if (entityViewModel.IsCanyon())
+        if (entityViewModel.IsCanyon() || entityViewModel.IsRidge())
         {
-            SolidColorBrush brush = new SolidColorBrush(Color.FromRgb(0, 0, 0), 0.25);
+            var brush = new SolidColorBrush(Color.FromRgb(0, 0, 0), 0.25);
+            var circleBrush = new SolidColorBrush(Color.FromRgb(0, 0, 0), 0.5);
+
+            if (entityViewModel.IsRidge())
+            {
+                brush = new SolidColorBrush(Color.FromRgb(32, 32, 32), 0.25);
+                circleBrush = new SolidColorBrush(Color.FromRgb(32, 32, 32), 0.5);
+            }
 
             var circle = new Ellipse()
             {
                 Width = (7 * Globals.SQUARE_SIZE),
                 Height = (7 * Globals.SQUARE_SIZE),
                 Stroke = brush,
-                Fill = new SolidColorBrush(Color.FromRgb(0, 0, 0), 0.5),
+                Fill = circleBrush,
                 StrokeThickness = 1,
                 ZIndex = 80
             };
-            Canvas.SetLeft(circle, (entityViewModel.X * Globals.SQUARE_SIZE));
+            Canvas.SetLeft(circle, (entityViewModel.X * Globals.SQUARE_SIZE) - ((Globals.SQUARE_SIZE * 7) / 2) + (Globals.SQUARE_SIZE / 2));
             Canvas.SetTop(circle, (entityViewModel.Y * Globals.SQUARE_SIZE) - ((Globals.SQUARE_SIZE * 7) / 2) + (Globals.SQUARE_SIZE / 2));
             _cvEntity.Children.Add(circle);
             shapes.Add(circle);
@@ -547,14 +554,14 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             if (entityViewModel.Child > 0)
             {
                 var endEntity = _mapService?.GetEntity(entityViewModel.Child)?.ToEntityViewModel();
-                if (endEntity != null && endEntity.IsCanyon())
+                if (endEntity != null && (endEntity.IsCanyon() || endEntity.IsRidge()))
                 {
                     var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, new Position(entityViewModel.X, entityViewModel.Y), new Position(endEntity.X, endEntity.Y));
 
                     var line1 = new Line()
                     {
-                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + ((Globals.SQUARE_SIZE * 7) / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + ((Globals.SQUARE_SIZE * 7) / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         Stroke = brush,
                         StrokeThickness = Globals.SQUARE_SIZE * 7,
                         ZIndex = 80
@@ -566,14 +573,14 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             if (entityViewModel.Parent > 0)
             {
                 var endEntity = _mapService?.GetEntity(entityViewModel.Parent)?.ToEntityViewModel();
-                if (endEntity != null && endEntity.IsCanyon())
+                if (endEntity != null && (endEntity.IsCanyon() || endEntity.IsRidge()))
                 {
                     var endPoint = GetNearestEndPointInMapBounds(Globals.MAX_MAP_SIZE, new Position(entityViewModel.X, entityViewModel.Y), new Position(endEntity.X, endEntity.Y));
 
                     var line2 = new Line()
                     {
-                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + ((Globals.SQUARE_SIZE * 7) / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + ((Globals.SQUARE_SIZE * 7) / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         Stroke = brush,
                         StrokeThickness = Globals.SQUARE_SIZE * 7,
                         ZIndex = 80

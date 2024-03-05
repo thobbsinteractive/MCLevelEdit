@@ -30,6 +30,7 @@ public class Entity
     public bool IsCanyon() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Canyon;
     public bool IsRidge() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.RidgeNode;
     public bool IsPathOrWall() => IsPath() || IsWall();
+    public bool IsCanyonOrRidge() => IsCanyon() || IsRidge();
     public bool IsSwitch() => 
         this?.EntityType.TypeId == TypeId.Switch && 
         (this?.EntityType.Model.Id == (int)Switch.DeathInside || 
