@@ -20,7 +20,7 @@ public class EntityNode : Node
         set => this.SetProperty(ref _y, value);
     }
 
-    public EntityNode(MapTreeViewModel parent, string name, int x, int y, Bitmap icon, string title, string subTitle) : base(icon, name, title)
+    public EntityNode(MapTreeViewModel parent, string name, int x, int y, Bitmap icon, string title, string subTitle, string toolTip) : base(icon, name, title, toolTip)
     {
         X = x;
         Y = y;
@@ -37,7 +37,7 @@ public class EntityNode : Node
         });
     }
 
-    public EntityNode(MapTreeViewModel parent, string name, int x, int y, Bitmap icon, string title, string subTitle, ObservableCollection<Node> subNodes) : base(null, name, title, subNodes)
+    public EntityNode(MapTreeViewModel parent, string name, int x, int y, Bitmap icon, string title, string subTitle, string toolTip, ObservableCollection<Node> subNodes) : base(null, name, title, toolTip, subNodes)
     {
         X = x;
         Y = y;

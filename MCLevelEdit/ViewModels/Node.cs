@@ -11,6 +11,7 @@ public class Node : ObservableObject
     private string _name;
     private string _title;
     private string _subtitle;
+    private string _tooltip;
     private bool _canDelete;
 
     public ICommand DeleteEntityCommand { get; protected set; }
@@ -38,6 +39,11 @@ public class Node : ObservableObject
         get => _subtitle;
         set => this.SetProperty(ref _subtitle, value);
     }
+    public string ToolTip
+    {
+        get => _tooltip;
+        set => this.SetProperty(ref _tooltip, value);
+    }
     public bool CanDelete
     {
         get => _canDelete;
@@ -46,18 +52,20 @@ public class Node : ObservableObject
 
     public bool IsSubtitleSet => _subtitle?.Length > 0;
 
-    public Node(Bitmap icon, string name, string title)
+    public Node(Bitmap icon, string name, string title, string toolTip)
     {
         Icon = icon;
         Name = name;
         Title = title;
+        ToolTip = toolTip;
     }
 
-    public Node(Bitmap icon, string name, string title, ObservableCollection<Node> subNodes)
+    public Node(Bitmap icon, string name, string title, string toolTip, ObservableCollection<Node> subNodes)
     {
         Icon = icon;
         Name = name;
         Title = title;
+        ToolTip = toolTip;
         SubNodes = subNodes;
     }
 }

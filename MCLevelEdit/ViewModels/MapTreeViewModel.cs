@@ -160,7 +160,7 @@ public class MapTreeViewModel : ReactiveObject
 
         if (worldNode == null)
         {
-            worldNode = new Node(_icons["World"], $"World", "", entitiesCoords);
+            worldNode = new Node(_icons["World"], $"World", "", "World", entitiesCoords);
             Nodes.Add(worldNode);
         }
 
@@ -171,7 +171,7 @@ public class MapTreeViewModel : ReactiveObject
         {
             foreach (var entity in squareEntities)
             {
-                worldNode.SubNodes.Add(new EntityNode(this, entity.Id.ToString(), entity.X, entity.Y, GetIconFromEntity(entity), GetEntityNodeTitle(entity), GetEntityNodeSubTitle(entity)));
+                worldNode.SubNodes.Add(new EntityNode(this, entity.Id.ToString(), entity.X, entity.Y, GetIconFromEntity(entity), GetEntityNodeTitle(entity), string.Empty, GetEntityNodeToolTip(entity)));
             }
         }
     }
@@ -184,7 +184,7 @@ public class MapTreeViewModel : ReactiveObject
 
         if (wizardsNode == null)
         {
-            wizardsNode = new Node(_icons["Wizard"], $"Wizards", "", nodeWizards);
+            wizardsNode = new Node(_icons["Wizard"], $"Wizards", "", "", nodeWizards);
             Nodes.Add(wizardsNode);
         }
 
@@ -193,7 +193,7 @@ public class MapTreeViewModel : ReactiveObject
         foreach (var wizard in map.Wizards)
         {
             if (wizard.IsActive)
-                wizardsNode.SubNodes.Add(new Node(null, wizard.Name, wizard.Name));
+                wizardsNode.SubNodes.Add(new Node(null, wizard.Name, wizard.Name, wizard.Name));
         }
 
     }
@@ -210,7 +210,7 @@ public class MapTreeViewModel : ReactiveObject
 
     private void AddEntityNode(EntityViewModel entityViewModel)
     {
-        var entityNode = new EntityNode(this, entityViewModel.Id.ToString(), entityViewModel.X, entityViewModel.Y, GetIconFromEntity(entityViewModel), GetEntityNodeTitle(entityViewModel), GetEntityNodeSubTitle(entityViewModel));
+        var entityNode = new EntityNode(this, entityViewModel.Id.ToString(), entityViewModel.X, entityViewModel.Y, GetIconFromEntity(entityViewModel), GetEntityNodeTitle(entityViewModel), string.Empty, GetEntityNodeToolTip(entityViewModel));
         var worldNode = GetWorldNode();
 
         if (_entityFilter == 0 || entityViewModel.Type == _entityFilter)
@@ -268,12 +268,17 @@ public class MapTreeViewModel : ReactiveObject
 
     private string GetEntityNodeTitle(EntityViewModel entityViewModel)
     {
-        return $"{string.Format("{0:D4}", entityViewModel.Id)}: ({string.Format("{0:D3}", entityViewModel.X)},{string.Format("{0:D3}", entityViewModel.Y)})";
+        return $"{string.Format("{0:D4}", entityViewModel.Id)}: {entityViewModel.ToEntity().EntityType.Model.Name}";
     }
 
     private string GetEntityNodeSubTitle(EntityViewModel entityViewModel)
     {
         return $"{entityViewModel.ToEntity().EntityType.Model.Name}";
+    }
+
+    private string GetEntityNodeToolTip(EntityViewModel entityViewModel)
+    {
+        return $"{string.Format("{0:D4}", entityViewModel.Id)}: ({string.Format("{0:D3}", entityViewModel.X)},{string.Format("{0:D3}", entityViewModel.Y)}): {entityViewModel.ToEntity().EntityType.Model.Name}";
     }
 
     private void SelectedNodes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

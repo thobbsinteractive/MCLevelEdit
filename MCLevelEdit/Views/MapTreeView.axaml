@@ -42,9 +42,9 @@
               </ContextMenu>
             </Border.ContextMenu>
             <StackPanel Orientation="Vertical">
-              <StackPanel Orientation="Horizontal">
+              <StackPanel Orientation="Horizontal" ToolTip.Tip="{Binding ToolTip}">
                 <Image Source="{Binding Icon}" />
-                <TextBlock Text="{Binding Title}" Margin="5,7,0,0"/>
+                <TextBlock Text="{Binding Title}" Margin="5,7,0,10"/>
               </StackPanel>
               <TextBlock Text="{Binding Subtitle}" Margin="5,7,0,0" IsVisible="{Binding IsSubtitleSet}"/>
             </StackPanel>
