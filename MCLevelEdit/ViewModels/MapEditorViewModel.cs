@@ -234,6 +234,10 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
         _eventAggregator.RegisterEvent("KeyPressed", KeyPressedHandler);
         _eventAggregator.RegisterEvent("UpdateWizard", UpdateWizardsHandler);
+        _eventAggregator.RegisterEvent("ShowConnections", (sender, args) =>
+        {
+            ShowSwitchConnections = !ShowSwitchConnections;
+        });
     }
 
     private void AddEntityHandler(object sender, PubSubEventArgs<object> args)

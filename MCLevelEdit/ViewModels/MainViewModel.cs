@@ -66,6 +66,10 @@ public class MainViewModel : ViewModelBase
     public ICommand DisplayFailCommand { get; }
     public ICommand DisplayWarningsCommand { get; }
     public ICommand DisplayAboutCommand { get; }
+    public ICommand ResetViewCommand { get; }
+    public ICommand ShowConnectionsCommand { get; }
+    public ICommand ShadedCommand { get; }
+    public ICommand HeightMapCommand { get; }
 
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
     public MapTreeViewModel MapTreeViewModel { get; }
@@ -132,28 +136,17 @@ public class MainViewModel : ViewModelBase
 
         ExportHeightMapCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await ExportImageMap(Model.Enums.Layer.Height);
+            await ExportImageMap(Layer.Height);
         });
 
         ExportTerrainRenderCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await ExportImageMap(Model.Enums.Layer.Game);
+            await ExportImageMap(Layer.Game);
         });
 
         RunCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            if (await SaveFile(false) && !string.IsNullOrWhiteSpace(_settingsPort.CurrentLevelFilePath) && File.Exists(_settingsPort.CurrentLevelFilePath))
-            {
-                var settings = _settingsPort.LoadSettings();
-                if (settings == null || string.IsNullOrWhiteSpace(settings.GameExeLocation))
-                {
-                    await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
-                }
-                else
-                {
-                    await _gameService.RunLevelFromSettings(new string[] { _settingsPort.CurrentLevelFilePath });
-                }
-            }
+            await RunLevel();
         });
 
         ExitCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -191,7 +184,43 @@ public class MainViewModel : ViewModelBase
             });
         });
 
+        ResetViewCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            _eventAggregator.RaiseEvent("ResetView", this, new PubSubEventArgs<object>(null));
+        });
+
+        ShowConnectionsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            eventAggregator.RaiseEvent("ShowConnections", this, new PubSubEventArgs<object>(null));
+        });
+
+        ShadedCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            eventAggregator.RaiseEvent("SwitchLayer", this, new PubSubEventArgs<object>(Layer.Game));
+        });
+
+        HeightMapCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            eventAggregator.RaiseEvent("SwitchLayer", this, new PubSubEventArgs<object>(Layer.Height));
+        });
+
         MainWindow.I.Title = GetTitle("NewLevel.DAT");
+    }
+
+    private async Task RunLevel()
+    {
+        if (await SaveFile(false) && !string.IsNullOrWhiteSpace(_settingsPort.CurrentLevelFilePath) && File.Exists(_settingsPort.CurrentLevelFilePath))
+        {
+            var settings = _settingsPort.LoadSettings();
+            if (settings == null || string.IsNullOrWhiteSpace(settings.GameExeLocation))
+            {
+                await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
+            }
+            else
+            {
+                await _gameService.RunLevelFromSettings(new string[] { _settingsPort.CurrentLevelFilePath });
+            }
+        }
     }
 
     public void OnKeyPressed(Key key)
@@ -204,7 +233,7 @@ public class MainViewModel : ViewModelBase
         var result = await ShowEntitiesDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
     }
 
-    private async Task ExportImageMap(Model.Enums.Layer layer)
+    private async Task ExportImageMap(Layer layer)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow.I);
 

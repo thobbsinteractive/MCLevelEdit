@@ -22,6 +22,13 @@
         <Separator/>
         <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
       </MenuItem>
+      <MenuItem Header="View">
+        <MenuItem Header="_Reset" Command="{Binding ResetViewCommand}"/>
+        <MenuItem Header="Show _Connections" Command="{Binding ShowConnectionsCommand}"/>
+        <Separator/>
+        <MenuItem Header="_Shaded" Command="{Binding ShadedCommand}"/>
+        <MenuItem Header="_Height Map" Command="{Binding HeightMapCommand}"/>
+      </MenuItem>
       <MenuItem Header="_Game">
         <MenuItem Header="_Game Settings" Command="{Binding EditGameSettingsCommand}"/>
       </MenuItem>
