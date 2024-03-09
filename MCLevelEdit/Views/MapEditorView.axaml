@@ -11,7 +11,7 @@
              x:Class="MCLevelEdit.Views.MapEditorView"
              x:DataType="vm:MapEditorViewModel">
   <Grid Name="grdMapEditor"
-        ColumnDefinitions="100,100,160,Auto,70,70,Auto,60,60,*,60"
+        ColumnDefinitions="100,100,160,Auto,70,70,Auto,*,35,35,60"
         RowDefinitions="30,*">
     <Grid.Resources>
       <c:LayerToBooleanConverter x:Key="layerToBooleanConverter"/>
@@ -55,7 +55,21 @@
            Margin="3"
            Grid.Column="6"
            Grid.Row="0"
-           Content="{Binding #pazMap.ZoomX, StringFormat='Zoom: {0:0.00}'}"/>   
+           Content="{Binding #pazMap.ZoomX, StringFormat='Zoom: {0:0.00}'}"/>
+    <Button Name="btnZoomIn"
+            Margin="1"
+            Grid.Column="8"
+            Grid.Row="0"
+            ToolTip.Tip="Zoom In">
+      <Image Source="/Assets/zoom-in-16.png"/>
+    </Button>
+    <Button Name="btnZoomOut"
+            Margin="1"
+            Grid.Column="9"
+            Grid.Row="0"
+            ToolTip.Tip="Zoom Out">
+      <Image Source="/Assets/zoom-out-16.png"/>
+    </Button>
     <Button Name="btnReset"
             Margin="1"
             Grid.Column="10"
