@@ -160,7 +160,7 @@ public class MapTreeViewModel : ReactiveObject
 
         if (worldNode == null)
         {
-            worldNode = new Node(_icons["World"], $"World", "", "World", entitiesCoords);
+            worldNode = new Node(_icons["World"], $"World", "Level", "Level", entitiesCoords);
             Nodes.Add(worldNode);
         }
 
@@ -184,7 +184,7 @@ public class MapTreeViewModel : ReactiveObject
 
         if (wizardsNode == null)
         {
-            wizardsNode = new Node(_icons["Wizard"], $"Wizards", "", "", nodeWizards);
+            wizardsNode = new Node(_icons["Wizard"], $"Wizards", "Wizards", "Wizards", nodeWizards);
             Nodes.Add(wizardsNode);
         }
 
