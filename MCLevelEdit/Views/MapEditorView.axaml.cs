@@ -27,6 +27,48 @@ namespace MCLevelEdit.Views
                 pazMap.PointerMoved += OnPazMap_PointerMoved;
             }
 
+            if (btnPanLeft != null)
+            {
+                btnPanLeft.Click += (sender, args) =>
+                {
+                    pazMap?.PanDelta(10, 0);
+                };
+            }
+
+            if (btnPanRight != null)
+            {
+                btnPanRight.Click += (sender, args) =>
+                {
+                    pazMap?.PanDelta(-10, 0);
+                };
+            }
+
+            if (btnPanUp != null)
+            {
+                btnPanUp.Click += (sender, args) =>
+                {
+                    pazMap?.PanDelta(0, 10);
+                };
+            }
+
+            if (btnPanDown != null)
+            {
+                btnPanDown.Click += (sender, args) =>
+                {
+                    pazMap?.PanDelta(0, -10);
+                };
+            }
+
+            if (btnZoomIn != null)
+            {
+                //btnZoomIn.Click += OnBtnZoomIn_Click;
+            }
+
+            if (btnZoomOut != null)
+            {
+                //btnZoomOut.Click += OnBtnZoomOut_Click;
+            }
+
             if (btnReset != null)
             {
                 btnReset.Click += OnBtnReset_Click;
@@ -44,6 +86,37 @@ namespace MCLevelEdit.Views
                 VmMapEditor.CvEntity = cvEntities;
             }
         }
+
+        //private void OnBtnZoomIn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        //{
+        //    if (pazMap is not null)
+        //    {
+        //        var center = MatrixHelper.ScaleAndTranslate(pazMap.ZoomX, pazMap.ZoomY, pazMap.OffsetX, pazMap.OffsetY).Transform(new Point(128 * 8, 128 * 8));
+        //        var x = pazMap.Bounds.Width / 2.0;
+        //        var y = pazMap.Bounds.Height / 2.0;
+        //        var zoom = pazMap.ZoomX * pazMap.ZoomSpeed;
+
+        //        if (zoom < 4.0)
+        //            pazMap.ZoomTo(pazMap.ZoomSpeed, center.X, center.Y);
+        //        else
+        //            pazMap.Zoom(4.0, center.X, center.Y);
+        //    }
+        //}
+
+        //private void OnBtnZoomOut_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        //{
+        //    if (pazMap is not null)
+        //    {
+        //        var x = pazMap.Bounds.Width / 2.0;
+        //        var y = pazMap.Bounds.Height / 2.0;
+        //        var zoom = pazMap.ZoomX * (1 / pazMap.ZoomSpeed);
+
+        //        if (zoom > 0.25)
+        //            pazMap.ZoomTo(1 / pazMap.ZoomSpeed, x, y);
+        //        else
+        //            ResetView();
+        //    }
+        //}
 
         private void OnBtnReset_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {

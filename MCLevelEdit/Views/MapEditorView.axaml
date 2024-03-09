@@ -11,7 +11,7 @@
              x:Class="MCLevelEdit.Views.MapEditorView"
              x:DataType="vm:MapEditorViewModel">
   <Grid Name="grdMapEditor"
-        ColumnDefinitions="100,100,160,Auto,70,70,Auto,*,35,35,60"
+        ColumnDefinitions="100,100,160,Auto,70,70,Auto,*,35,35,35,35,35,60"
         RowDefinitions="30,*">
     <Grid.Resources>
       <c:LayerToBooleanConverter x:Key="layerToBooleanConverter"/>
@@ -56,29 +56,70 @@
            Grid.Column="6"
            Grid.Row="0"
            Content="{Binding #pazMap.ZoomX, StringFormat='Zoom: {0:0.00}'}"/>
+    <Button Name="btnPanLeft"
+        Margin="1"
+        Grid.Column="8"
+        Grid.Row="0"
+        ToolTip.Tip="Pan Left"
+        HorizontalAlignment="Stretch">
+      <Image Source="/Assets/left-8.png" 
+             Stretch="None"/>
+    </Button>
+    <StackPanel Grid.Row="0"
+                Grid.Column="9">
+      <Button Name="btnPanUp"
+              Margin="1"
+              Grid.Row="0"
+              MaxHeight="13"
+              HorizontalAlignment="Stretch"
+              ToolTip.Tip="Pan Up">
+        <Image Source="/Assets/up-8.png"
+               Stretch="None"
+               Height="8"/>
+      </Button>
+      <Button Name="btnPanDown"
+              Margin="1"
+              Grid.Row="0"
+              MaxHeight="13"
+              HorizontalAlignment="Stretch"
+              ToolTip.Tip="Pan Down">
+        <Image Source="/Assets/down-8.png"
+               Stretch="None"
+               Height="8"/>
+      </Button>
+    </StackPanel>
+    <Button Name="btnPanRight"
+            Margin="1"
+            Grid.Column="10"
+            Grid.Row="0"
+            HorizontalAlignment="Stretch"
+            ToolTip.Tip="Pan Right">
+      <Image Source="/Assets/right-8.png"
+             Stretch="None"/>
+    </Button>
     <Button Name="btnZoomIn"
             Margin="1"
-            Grid.Column="8"
+            Grid.Column="11"
             Grid.Row="0"
             ToolTip.Tip="Zoom In">
       <Image Source="/Assets/zoom-in-16.png"/>
     </Button>
     <Button Name="btnZoomOut"
             Margin="1"
-            Grid.Column="9"
+            Grid.Column="12"
             Grid.Row="0"
             ToolTip.Tip="Zoom Out">
       <Image Source="/Assets/zoom-out-16.png"/>
     </Button>
     <Button Name="btnReset"
             Margin="1"
-            Grid.Column="10"
+            Grid.Column="13"
             Grid.Row="0"
             Content="Reset"/>
     <paz:ZoomBorder Name="pazMap"
                     Background="LightBlue"
                     Grid.Column="0"
-                    Grid.ColumnSpan="11"
+                    Grid.ColumnSpan="14"
                     Grid.Row="1"
                     ClipToBounds="True"
                     VerticalAlignment="Center"
