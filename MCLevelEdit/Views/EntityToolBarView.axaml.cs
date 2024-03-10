@@ -43,6 +43,7 @@ namespace MCLevelEdit.Views
             ToggleButtons(false);
             this.btnCreatures.IsChecked = true;
             EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Creature);
+            cboEntityModelType.SelectedIndex = 0;
         }
 
         private void btnSceneryClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -50,6 +51,7 @@ namespace MCLevelEdit.Views
             ToggleButtons(false);
             this.btnScenery.IsChecked = true;
             EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Scenery);
+            cboEntityModelType.SelectedIndex = 0;
         }
 
         private void btnEffectsClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -57,6 +59,7 @@ namespace MCLevelEdit.Views
             ToggleButtons(false);
             this.btnEffects.IsChecked = true;
             EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Effect);
+            cboEntityModelType.SelectedIndex = 0;
         }
 
         private void btnSpellsClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -64,6 +67,7 @@ namespace MCLevelEdit.Views
             ToggleButtons(false);
             this.btnSpells.IsChecked = true;
             EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Spell);
+            cboEntityModelType.SelectedIndex = 0;
         }
 
         private void btnSwitchesClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -71,6 +75,7 @@ namespace MCLevelEdit.Views
             ToggleButtons(false);
             this.btnSwitches.IsChecked = true;
             EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Switch);
+            cboEntityModelType.SelectedIndex = 0;
         }
 
         private void btnWeathersClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -78,6 +83,7 @@ namespace MCLevelEdit.Views
             ToggleButtons(false);
             this.btnWeathers.IsChecked = true;
             EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Weather);
+            cboEntityModelType.SelectedIndex = 0;
         }
 
         private void btnSpawnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -85,6 +91,7 @@ namespace MCLevelEdit.Views
             ToggleButtons(false);
             this.btnSpawns.IsChecked = true;
             EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Spawn);
+            cboEntityModelType.SelectedIndex = 0;
         }
     }
 }
