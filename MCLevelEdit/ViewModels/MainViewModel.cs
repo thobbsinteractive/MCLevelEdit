@@ -246,7 +246,7 @@ public class MainViewModel : ViewModelBase
         // Start async operation to open the dialog.
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Export Height Map",
+            Title = "Export Heightmap",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             DefaultExtension = suggestedExtension,
@@ -269,7 +269,7 @@ public class MainViewModel : ViewModelBase
             }
             catch (Exception ex)
             {
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the height map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the heightmap file {filePath}!", ButtonEnum.Ok, Icon.Error);
                 await box.ShowAsync();
             }
 

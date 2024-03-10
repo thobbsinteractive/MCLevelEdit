@@ -11,25 +11,14 @@
              x:Class="MCLevelEdit.Views.MapEditorView"
              x:DataType="vm:MapEditorViewModel">
   <Grid Name="grdMapEditor"
-        ColumnDefinitions="100,100,160,Auto,70,70,Auto,*,35,35,35,35,35,60"
+        ColumnDefinitions="200,0,160,160,Auto,*,35,35,35,35,35,60"
         RowDefinitions="30,*">
-    <Grid.Resources>
-      <c:LayerToBooleanConverter x:Key="layerToBooleanConverter"/>
-    </Grid.Resources>
-    <RadioButton Name="rbShaded"
-                 Margin="1"
-                 Grid.Column="0"
-                 Grid.Row="0"
-                 IsChecked="{Binding SelectedLayer, Converter={StaticResource layerToBooleanConverter}, ConverterParameter=Game}"
-                 GroupName="grpMapRender"
-                 Content="Shaded"/>
-    <RadioButton Name="rbHeightMap"
-                 Margin="1"
-                 Grid.Column="1"
-                 Grid.Row="0"
-                 IsChecked="{Binding SelectedLayer, Converter={StaticResource layerToBooleanConverter}, ConverterParameter=Height}"
-                 GroupName="grpMapRender"
-                 Content="Height"/>
+    <CheckBox Name="chkShowHeightMap"
+              Margin="4,1"
+              Grid.Column="0"
+              Grid.Row="0"
+              IsChecked="{Binding ShowHeightMap}"
+              Content="Show Heightmap"/>
     <CheckBox Name="chkShowConnections"
               Grid.Column="2"
               Grid.Row="0"
@@ -37,28 +26,18 @@
       Show Connections
     </CheckBox>
     <Label Name="lblCoords"
-           Margin="3"
+           Margin="0,4,0,0"
            Grid.Column="3"
            Grid.Row="0"
-           Content="Cursor"/>
-    <Label Name="lblCoordX"
-           Margin="3"
-           Grid.Column="4"
-           Grid.Row="0"
-           Content="{Binding CursorPosition.X, StringFormat='X: {0:000}'}"/>
-    <Label Name="lblCoordY"
-           Margin="3"
-           Grid.Column="5"
-           Grid.Row="0"
-           Content="{Binding CursorPosition.Y, StringFormat='Y: {0:000}'}"/>
+           Content="{Binding CursorPositionStr}"/>
     <Label Name="lblZoom"
-           Margin="3"
-           Grid.Column="6"
+           Margin="0,4,0,0"
+           Grid.Column="4"
            Grid.Row="0"
            Content="{Binding #pazMap.ZoomX, StringFormat='Zoom: {0:0.00}'}"/>
     <Button Name="btnPanLeft"
         Margin="1"
-        Grid.Column="8"
+        Grid.Column="6"
         Grid.Row="0"
         ToolTip.Tip="Pan Left"
         HorizontalAlignment="Stretch">
@@ -66,7 +45,7 @@
              Stretch="None"/>
     </Button>
     <StackPanel Grid.Row="0"
-                Grid.Column="9">
+                Grid.Column="7">
       <Button Name="btnPanUp"
               Margin="1"
               Grid.Row="0"
@@ -90,7 +69,7 @@
     </StackPanel>
     <Button Name="btnPanRight"
             Margin="1"
-            Grid.Column="10"
+            Grid.Column="8"
             Grid.Row="0"
             HorizontalAlignment="Stretch"
             ToolTip.Tip="Pan Right">
@@ -99,27 +78,27 @@
     </Button>
     <Button Name="btnZoomIn"
             Margin="1"
-            Grid.Column="11"
+            Grid.Column="9"
             Grid.Row="0"
             ToolTip.Tip="Zoom In">
       <Image Source="/Assets/zoom-in-16.png"/>
     </Button>
     <Button Name="btnZoomOut"
             Margin="1"
-            Grid.Column="12"
+            Grid.Column="10"
             Grid.Row="0"
             ToolTip.Tip="Zoom Out">
       <Image Source="/Assets/zoom-out-16.png"/>
     </Button>
     <Button Name="btnReset"
             Margin="1"
-            Grid.Column="13"
+            Grid.Column="11"
             Grid.Row="0"
             Content="Reset"/>
     <paz:ZoomBorder Name="pazMap"
                     Background="LightBlue"
                     Grid.Column="0"
-                    Grid.ColumnSpan="14"
+                    Grid.ColumnSpan="12"
                     Grid.Row="1"
                     ClipToBounds="True"
                     VerticalAlignment="Center"

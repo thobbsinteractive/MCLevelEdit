@@ -17,17 +17,17 @@
         <MenuItem Header="_Save" Command="{Binding SaveFileCommand}"/>
         <MenuItem Header="Save _As" Command="{Binding SaveFileAsCommand}"/>
         <Separator/>
-        <MenuItem Header="_Export Height Map" Command="{Binding ExportHeightMapCommand}"/>
+        <MenuItem Header="_Export Heightmap" Command="{Binding ExportHeightMapCommand}"/>
         <MenuItem Header="_Export Terrain Render" Command="{Binding ExportTerrainRenderCommand}"/>
         <Separator/>
         <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
       </MenuItem>
-      <MenuItem Header="View">
-        <MenuItem Header="_Reset" Command="{Binding ResetViewCommand}"/>
+      <MenuItem Header="_View">
+        <MenuItem Header="_Reset View" Command="{Binding ResetViewCommand}"/>
         <MenuItem Header="Show _Connections" Command="{Binding ShowConnectionsCommand}"/>
         <Separator/>
-        <MenuItem Header="_Shaded" Command="{Binding ShadedCommand}"/>
-        <MenuItem Header="_Height Map" Command="{Binding HeightMapCommand}"/>
+        <MenuItem Header="Show _Shaded" Command="{Binding ShadedCommand}"/>
+        <MenuItem Header="Show _Heightmap" Command="{Binding HeightMapCommand}"/>
       </MenuItem>
       <MenuItem Header="_Game">
         <MenuItem Header="_Game Settings" Command="{Binding EditGameSettingsCommand}"/>

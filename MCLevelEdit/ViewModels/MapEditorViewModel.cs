@@ -62,14 +62,14 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         get { return _selectedEntityViewModel; }
     }
 
-    public Layer SelectedLayer
+    public bool ShowHeightMap
     {
         set
-        { 
-            this.RaiseAndSetIfChanged(ref _selectedLayer, value);
+        {
+            this.RaiseAndSetIfChanged(ref _selectedLayer, (value? Layer.Height: Layer.Game));
             RefreshPreviewAsync();
         }
-        get { return _selectedLayer; }
+        get { return _selectedLayer == Layer.Height; }
     }
 
     public bool ShowSwitchConnections
@@ -211,17 +211,27 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
     }
 
-    public Point CursorPosition { 
-        get 
-        { 
-            return _cursorPosition; 
+    public Point CursorPosition
+    {
+        get
+        {
+            return _cursorPosition;
         }
         set
         {
-            _cursorPosition = new Point(Double.Round(value.X / Globals.SQUARE_SIZE, MidpointRounding.ToZero), 
+            _cursorPosition = new Point(Double.Round(value.X / Globals.SQUARE_SIZE, MidpointRounding.ToZero),
                 Double.Round(value.Y / Globals.SQUARE_SIZE, MidpointRounding.ToZero));
             this.RaisePropertyChanged(nameof(CursorPosition));
-        } 
+            this.RaisePropertyChanged(nameof(CursorPositionStr));
+        }
+    }
+
+    public string CursorPositionStr
+    {
+        get
+        {
+            return string.Format("Cursor X: {0:000} Y: {0:000}", CursorPosition.X, CursorPosition.Y);
+        }
     }
 
     public MapEditorViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
@@ -234,6 +244,12 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
         _eventAggregator.RegisterEvent("KeyPressed", KeyPressedHandler);
         _eventAggregator.RegisterEvent("UpdateWizard", UpdateWizardsHandler);
+        _eventAggregator.RegisterEvent("SwitchLayer", (sender, args) =>
+        {
+            var layer = (Layer?)args?.Item;
+            if (layer is not null)
+                ShowHeightMap = layer == Layer.Height;
+        });
         _eventAggregator.RegisterEvent("ShowConnections", (sender, args) =>
         {
             ShowSwitchConnections = !ShowSwitchConnections;
