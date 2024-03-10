@@ -101,6 +101,25 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
     }
 
+    public void OnCursorDragged(Point origin, Point dest)
+    {
+        if (_selectedEntityViewModel != null)
+        {
+            var newlocation = GetCursorPointFromCanvasPoint(dest);
+
+            var vStart = new Vector2((float)newlocation.X, (float)newlocation.Y);
+            var vEnd = new Vector2(_selectedEntityViewModel.X, _selectedEntityViewModel.Y);
+            var shortestDistance = Vector2.Distance(vStart, vEnd);
+            if (shortestDistance < 4)
+            {
+                _selectedEntityViewModel.X = (byte)newlocation.X;
+                _selectedEntityViewModel.Y = (byte)newlocation.Y;
+
+                UpdateEntity(_selectedEntityViewModel);
+            }
+        }
+    }
+
     public void OnCursorClicked(Point position, bool left, bool right)
     {
         (Point, bool, bool) cursorEvent = (position, left, right);
@@ -219,11 +238,16 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
         set
         {
-            _cursorPosition = new Point(Double.Round(value.X / Globals.SQUARE_SIZE, MidpointRounding.ToZero),
-                Double.Round(value.Y / Globals.SQUARE_SIZE, MidpointRounding.ToZero));
+            _cursorPosition = GetCursorPointFromCanvasPoint(value);
             this.RaisePropertyChanged(nameof(CursorPosition));
             this.RaisePropertyChanged(nameof(CursorPositionStr));
         }
+    }
+
+    private Point GetCursorPointFromCanvasPoint(Point value)
+    {
+        return new Point(Double.Round(value.X / Globals.SQUARE_SIZE, MidpointRounding.ToZero),
+            Double.Round(value.Y / Globals.SQUARE_SIZE, MidpointRounding.ToZero));
     }
 
     public string CursorPositionStr
