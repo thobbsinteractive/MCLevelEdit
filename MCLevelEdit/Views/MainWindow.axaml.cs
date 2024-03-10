@@ -1,6 +1,9 @@
 ﻿using Avalonia.Input;
 using Avalonia.ReactiveUI;
+using MCLevelEdit.Application.Services;
 using MCLevelEdit.ViewModels;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 using ReactiveUI;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +13,8 @@ namespace MCLevelEdit.Views;
 public partial class MainWindow : ReactiveWindow<MainViewModel>
 {
     public static MainWindow I;
+
+    private bool _userClosed = false;
 
     public MainViewModel MainViewModel { get { return (MainViewModel)this.DataContext; } }
 
@@ -24,6 +29,21 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         this.WhenActivated(action => action(ViewModel!.ShowAboutDialog.RegisterHandler(DoShowAboutDialogAsync)));
 
         this.KeyDown += OnKeyDown;
+
+        this.Closing += OnClosing;
+    }
+
+    private async void OnClosing(object? sender, Avalonia.Controls.WindowClosingEventArgs e)
+    {
+        if (!_userClosed)
+        {
+            e.Cancel = true;
+            if (await MainViewModel.PromptSaveAndOrContinue())
+            {
+                _userClosed = true;
+                this.Close();
+            }
+        }
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
