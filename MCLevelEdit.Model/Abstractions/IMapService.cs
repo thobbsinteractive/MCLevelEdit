@@ -10,6 +10,7 @@ public interface IMapService
     Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE);
     Task<bool> LoadMapFromFileAsync(string filePath);
     Task<bool> SaveMapToFileAsync(string filePath);
+    Task<bool> ValidateMapAsync();
     Task<bool> RecalculateTerrain(GenerationParameters generationParameters);
     Map GetMap();
     Entity? GetEntity(ushort id);

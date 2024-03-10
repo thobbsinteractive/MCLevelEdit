@@ -62,6 +62,23 @@ public class MapService : IMapService, IEnableLogger
         }
     }
 
+    public async Task<bool> ValidateMapAsync()
+    {
+        try
+        {
+            await Task.Run(() =>
+            {
+                MapRepository.Map.ValidateEntities();
+            });
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error validating level:\n{ex.Message}");
+            return false;
+        }
+        return true;
+    }
+
     public Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE)
     {
         MapRepository.Map = new Map();

@@ -70,6 +70,7 @@ public class MainViewModel : ViewModelBase
     public ICommand ShowConnectionsCommand { get; }
     public ICommand ShadedCommand { get; }
     public ICommand HeightMapCommand { get; }
+    public ICommand ValidateCommand { get; }
 
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
     public MapTreeViewModel MapTreeViewModel { get; }
@@ -202,6 +203,12 @@ public class MainViewModel : ViewModelBase
         HeightMapCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             eventAggregator.RaiseEvent("SwitchLayer", this, new PubSubEventArgs<object>(Layer.Height));
+        });
+
+        ValidateCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            await _mapService.ValidateMapAsync();
+            RefreshData();
         });
 
         MainWindow.I.Title = GetTitle("NewLevel.DAT");

@@ -31,6 +31,7 @@
       </MenuItem>
       <MenuItem Header="_Game">
         <MenuItem Header="_Game Settings" Command="{Binding EditGameSettingsCommand}"/>
+        <MenuItem Header="_Validate Level" Command="{Binding ValidateCommand}"/>
         <MenuItem Header="_Run Current Level" Command="{Binding RunCommand}"/>
       </MenuItem>
       <MenuItem Header="_Help">
