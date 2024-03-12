@@ -231,12 +231,21 @@ public class MapService : IMapService, IEnableLogger
 
     public uint CalculateMana()
     {
-        uint total = 0;
+        //Player starts with 1000 mana
+        uint total = 1000;
 
         if (MapRepository.Map?.Entities.Count() > 0)
         {
+            var modelCountsDic = new Dictionary<string, int>();
+
             foreach (var entity in MapRepository.Map.Entities)
             {
+                string key = $"Id {entity.EntityType.Model.Id}: {entity.EntityType.Model.Name}";
+                if (!modelCountsDic.ContainsKey(key))
+                    modelCountsDic.Add(key, 1);
+                else
+                    modelCountsDic[key]++;
+
                 if (entity.EntityType.TypeId == TypeId.Creature)
                 {
                     total += entity.EntityType.Model.Mana;
@@ -244,9 +253,29 @@ public class MapService : IMapService, IEnableLogger
 
                 if (entity.EntityType.TypeId == TypeId.Effect)
                 {
-                    if (((Effect)entity.EntityType.Model.Id) == Effect.ManaBall || (Effect)entity.EntityType.Model.Id == Effect.VillagerBuilding)
+                    if ((Effect)entity.EntityType.Model.Id == Effect.ManaBall || (Effect)entity.EntityType.Model.Id == Effect.VillagerBuilding)
                         total += 512;
                 }
+            }
+        }
+
+        var activeWizards = MapRepository.Map.Wizards.Where(w => w.IsActive && w.Name != "Player");
+
+        if (activeWizards?.Count() > 1)
+        {
+            foreach (var wizard in  activeWizards)
+            {
+                var wizardTotal = 1000u;
+                if (wizard.CastleLevel > 0)
+                {
+                    var castleTotal = 5000u;
+                    for (int i = 1; i < wizard.CastleLevel; i++)
+                    {
+                        castleTotal += castleTotal;
+                    }
+                    wizardTotal += castleTotal;
+                }
+                total += wizardTotal;
             }
         }
 
