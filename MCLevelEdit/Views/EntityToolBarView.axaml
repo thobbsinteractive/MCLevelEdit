@@ -17,7 +17,7 @@
           BorderThickness="0,1"
           Padding="5">
       <Grid Name="grdEntities"
-            ColumnDefinitions="50,50,50,50,50,50,50,50,*"
+            ColumnDefinitions="50,50,50,50,50,50,50,50,50,50,50,50,50"
             RowDefinitions="50,40">
         <ToggleButton Name="btnCursor"
                       Grid.Row="0"
@@ -74,6 +74,34 @@
                       ToolTip.Tip="Add Spawn"
                       Click="btnSpawnClick">
           <Image Source="/Assets/magic-carpet-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnWall"
+                      Grid.Row="0"
+                      Grid.Column="9"
+                      ToolTip.Tip="Create Walls"
+                      Click="btnWallClick">
+          <Image Source="/Assets/wall-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnPath"
+                      Grid.Row="0"
+                      Grid.Column="10"
+                      ToolTip.Tip="Create Path"
+                      Click="btnPathClick">
+          <Image Source="/Assets/path-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnCanyon"
+                      Grid.Row="0"
+                      Grid.Column="11"
+                      ToolTip.Tip="Create Canyon"
+                      Click="btnCanyonClick">
+          <Image Source="/Assets/canyon-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnRidge"
+                      Grid.Row="0"
+                      Grid.Column="12"
+                      ToolTip.Tip="Create Ridge"
+                      Click="btnRidgeClick">
+          <Image Source="/Assets/ridge-32.png"/>
         </ToggleButton>
         <ComboBox Name="cboEntityModelType"
                   Grid.Row="1"

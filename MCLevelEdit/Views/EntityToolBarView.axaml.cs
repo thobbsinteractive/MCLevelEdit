@@ -28,6 +28,10 @@ namespace MCLevelEdit.Views
             this.btnSwitches.IsChecked = enable;
             this.btnWeathers.IsChecked = enable;
             this.btnSpawns.IsChecked = enable;
+            this.btnWall.IsChecked = enable;
+            this.btnPath.IsChecked = enable;
+            this.btnCanyon.IsChecked = enable;
+            this.btnRidge.IsChecked = enable;
             this.cboEntityModelType.SelectedIndex = 0;
         }
 
@@ -92,6 +96,34 @@ namespace MCLevelEdit.Views
             this.btnSpawns.IsChecked = true;
             EntityViewModel.OnEntityTypeSelected(Model.Domain.TypeId.Spawn);
             cboEntityModelType.SelectedIndex = 0;
+        }
+
+        private void btnWallClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            ToggleButtons(false);
+            this.btnWall.IsChecked = true;
+            EntityViewModel.ClearSelection();
+        }
+
+        private void btnPathClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            ToggleButtons(false);
+            this.btnPath.IsChecked = true;
+            EntityViewModel.ClearSelection();
+        }
+
+        private void btnCanyonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            ToggleButtons(false);
+            this.btnCanyon.IsChecked = true;
+            EntityViewModel.ClearSelection();
+        }
+
+        private void btnRidgeClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            ToggleButtons(false);
+            this.btnRidge.IsChecked = true;
+            EntityViewModel.ClearSelection();
         }
     }
 }
