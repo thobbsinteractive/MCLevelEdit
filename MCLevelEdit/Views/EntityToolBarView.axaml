@@ -22,85 +22,96 @@
         <ToggleButton Name="btnCursor"
                       Grid.Row="0"
                       Grid.Column="0"
-                      Click="btnCursorClick"
-                      IsChecked="true">
+                      Command="{Binding CursorSelectedCommand}"
+                      IsChecked="{Binding CursorSelected}">
           <Image Source="/Assets/cursor-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnCreatures"
                       Grid.Row="0"
                       Grid.Column="1"
                       ToolTip.Tip="Add Creature"
-                      Click="btnCreatureClick">
+                      Command="{Binding CreaturesSelectedCommand}"
+                      IsChecked="{Binding CreaturesSelected}">
           <Image Source="/Assets/dragon-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnScenery"
                       Grid.Row="0"
                       Grid.Column="2"
                       ToolTip.Tip="Add Scenery"
-                      Click="btnSceneryClick">
+                      Command="{Binding ScenarySelectedCommand}"
+                      IsChecked="{Binding ScenerySelected}">
           <Image Source="/Assets/tree-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnEffects"
                       Grid.Row="0"
                       Grid.Column="3"
                       ToolTip.Tip="Add Effect"
-                      Click="btnEffectsClick">
+                      Command="{Binding EffectsSelectedCommand}"
+                      IsChecked="{Binding EffectsSelected}">
           <Image Source="/Assets/volcano-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnSpells"
                       Grid.Row="0"
                       Grid.Column="4"
                       ToolTip.Tip="Add Spell Jar"
-                      Click="btnSpellsClick">
+                      Command="{Binding SpellsSelectedCommand}"
+                      IsChecked="{Binding SpellsSelected}">
           <Image Source="/Assets/magic-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnSwitches"
                       Grid.Row="0"
                       Grid.Column="5"
                       ToolTip.Tip="Add Switch"
-                      Click="btnSwitchesClick">
+                      Command="{Binding SwitchesSelectedCommand}"
+                      IsChecked="{Binding SwitchesSelected}">
           <Image Source="/Assets/switch-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnWeathers"
                       Grid.Row="0"
                       Grid.Column="6"
                       ToolTip.Tip="Add Weather"
-                      Click="btnWeathersClick">
+                      Command="{Binding WeathersSelectedCommand}"
+                      IsChecked="{Binding WeathersSelected}">
           <Image Source="/Assets/wind-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnSpawns"
                       Grid.Row="0"
                       Grid.Column="7"
                       ToolTip.Tip="Add Spawn"
-                      Click="btnSpawnClick">
+                      Command="{Binding SpawnsSelectedCommand}"
+                      IsChecked="{Binding SpawnsSelected}">
           <Image Source="/Assets/magic-carpet-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnWall"
                       Grid.Row="0"
                       Grid.Column="9"
                       ToolTip.Tip="Create Walls"
-                      Click="btnWallClick">
+                      Command="{Binding WallSelectedCommand}"
+                      IsChecked="{Binding WallSelected}">
           <Image Source="/Assets/wall-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnPath"
                       Grid.Row="0"
                       Grid.Column="10"
                       ToolTip.Tip="Create Path"
-                      Click="btnPathClick">
+                      Command="{Binding PathSelectedCommand}"
+                      IsChecked="{Binding PathSelected}">
           <Image Source="/Assets/path-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnCanyon"
                       Grid.Row="0"
                       Grid.Column="11"
                       ToolTip.Tip="Create Canyon"
-                      Click="btnCanyonClick">
+                      Command="{Binding CanyonSelectedCommand}"
+                      IsChecked="{Binding CanyonSelected}">
           <Image Source="/Assets/canyon-32.png"/>
         </ToggleButton>
         <ToggleButton Name="btnRidge"
                       Grid.Row="0"
                       Grid.Column="12"
                       ToolTip.Tip="Create Ridge"
-                      Click="btnRidgeClick">
+                      Command="{Binding RidgeSelectedCommand}"
+                      IsChecked="{Binding RidgeSelected}">
           <Image Source="/Assets/ridge-32.png"/>
         </ToggleButton>
         <ComboBox Name="cboEntityModelType"

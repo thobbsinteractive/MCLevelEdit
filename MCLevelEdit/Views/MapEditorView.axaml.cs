@@ -128,14 +128,14 @@ namespace MCLevelEdit.Views
 
         private void OnPazMap_PointerReleased(object? sender, PointerReleasedEventArgs e)
         {
-            if (e.InitialPressMouseButton == MouseButton.Left)
+            if (e.InitialPressMouseButton == MouseButton.Left || e.InitialPressMouseButton == MouseButton.Right)
             {
                 _ptCursorDragStart = null;
                 _ptCursor = GetCursorPoint(e);
                 if (VmMapEditor != null)
                 {
                     VmMapEditor.CursorPosition = _ptCursor;
-                    VmMapEditor.OnCursorClicked(VmMapEditor.CursorPosition, true, false);
+                    VmMapEditor.OnCursorClicked(VmMapEditor.CursorPosition, e.InitialPressMouseButton == MouseButton.Left, e.InitialPressMouseButton == MouseButton.Right);
                 }
             }
         }
