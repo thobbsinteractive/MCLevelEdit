@@ -34,10 +34,10 @@ namespace MagicCarpetLevelPackager.Test
             var result = sut.PackageFiles(fullPaths.ToArray(), Directory.GetCurrentDirectory());
 
             Assert.That(result, Is.EqualTo(true));
-            Assert.IsTrue(File.Exists(levelsdat));
-            Assert.IsTrue(File.Exists(levelstab));
-            Assert.IsTrue(ByteArrayCompare(File.ReadAllBytes(levelsdatref), File.ReadAllBytes(levelsdat)));
-            //Assert.IsTrue(ByteArrayCompare(File.ReadAllBytes(levelstabref), File.ReadAllBytes(levelstab)));
+            Assert.That(File.Exists(levelsdat));
+            Assert.That(File.Exists(levelstab));
+            Assert.That(ByteArrayCompare(File.ReadAllBytes(levelsdatref), File.ReadAllBytes(levelsdat)));
+            //Assert.That(ByteArrayCompare(File.ReadAllBytes(levelstabref), File.ReadAllBytes(levelstab)));
         }
 
         private bool ByteArrayCompare(byte[] a1, byte[] a2)
