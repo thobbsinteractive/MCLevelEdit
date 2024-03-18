@@ -140,6 +140,23 @@ public class EntityViewModel : ObservableObject
         }
     }
 
+    public EntityViewModel Copy()
+    {
+        return new EntityViewModel()
+        {
+            Id = this.Id,
+            Type = this.Type,
+            ModelIdx = this.ModelIdx,
+            X = this.X,
+            Y = this.Y,
+            DisId = this.DisId,
+            SwitchSize = this.SwitchSize,
+            SwitchId = this.SwitchId,
+            Parent = this.Parent,
+            Child = this.Child
+        };
+    }
+
     public bool IsBuilding() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.VillagerBuilding;
     public bool IsPath() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.Path;
     public bool IsWall() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.Wall;

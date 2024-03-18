@@ -315,19 +315,21 @@ public class EntityToolBarViewModel : ViewModelBase
 
                 if (existingEntities is null || !existingEntities.Any())
                 {
-                    _addEntityViewModel.X = (byte)cursorEvent.Item1.X;
-                    _addEntityViewModel.Y = (byte)cursorEvent.Item1.Y;
+                    var addEntityViewModel = _addEntityViewModel.Copy();
+                    addEntityViewModel.X = (byte)cursorEvent.Item1.X;
+                    addEntityViewModel.Y = (byte)cursorEvent.Item1.Y;
+
                     if (_previousPathNodeViewModel is not null && _previousPathNodeViewModel.Type == _addEntityViewModel.Type && _previousPathNodeViewModel.Model == _addEntityViewModel.Model)
                     {
-                        _addEntityViewModel.Child = (ushort)_previousPathNodeViewModel.Id;
+                        addEntityViewModel.Child = (ushort)_previousPathNodeViewModel.Id;
                     }
-                    int id = this.AddEntity(_addEntityViewModel);
+                    int id = this.AddEntity(addEntityViewModel);
                     if (_previousPathNodeViewModel is not null && _previousPathNodeViewModel.Type == _addEntityViewModel.Type && _previousPathNodeViewModel.Model == _addEntityViewModel.Model)
                     {
                         _previousPathNodeViewModel.Parent = (ushort)id;
                         this.UpdateEntity(_previousPathNodeViewModel);
                     }
-                    _previousPathNodeViewModel = AddEntityViewModel;
+                    _previousPathNodeViewModel = addEntityViewModel.Copy();
                 }
             }
             else if (cursorEvent.Item3)
