@@ -2,6 +2,8 @@
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.ViewModels.Extensions;
+using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Linq;
 using System.Windows.Input;
@@ -319,17 +321,31 @@ public class EntityToolBarViewModel : ViewModelBase
                     addEntityViewModel.X = (byte)cursorEvent.Item1.X;
                     addEntityViewModel.Y = (byte)cursorEvent.Item1.Y;
 
-                    if (_previousPathNodeViewModel is not null && _previousPathNodeViewModel.Type == _addEntityViewModel.Type && _previousPathNodeViewModel.Model == _addEntityViewModel.Model)
+                    if (_previousPathNodeViewModel is not null && _previousPathNodeViewModel.EqualsTypeAndModel(_addEntityViewModel))
                     {
                         addEntityViewModel.Child = (ushort)_previousPathNodeViewModel.Id;
                     }
                     int id = this.AddEntity(addEntityViewModel);
-                    if (_previousPathNodeViewModel is not null && _previousPathNodeViewModel.Type == _addEntityViewModel.Type && _previousPathNodeViewModel.Model == _addEntityViewModel.Model)
+                    if (_previousPathNodeViewModel is not null && _previousPathNodeViewModel.EqualsTypeAndModel(_addEntityViewModel))
                     {
                         _previousPathNodeViewModel.Parent = (ushort)id;
                         this.UpdateEntity(_previousPathNodeViewModel);
                     }
                     _previousPathNodeViewModel = addEntityViewModel.Copy();
+                }
+                else if (_previousPathNodeViewModel is not null && _previousPathNodeViewModel.Parent == 0 && existingEntities.Any())
+                {
+                    var parent = existingEntities.Where(e => (int)e.EntityType.TypeId == _previousPathNodeViewModel.Type && (int)e.EntityType.Model.Id == _previousPathNodeViewModel.Model)?.FirstOrDefault()?.ToEntityViewModel();
+
+                    if (parent is not null && _previousPathNodeViewModel.Id != parent.Id)
+                    {
+                        parent.Child = (ushort)_previousPathNodeViewModel.Id;
+                        this.UpdateEntity(parent);
+                        _previousPathNodeViewModel.Parent = (ushort)parent.Id;
+                        this.UpdateEntity(_previousPathNodeViewModel);
+
+                        ClearSelection();
+                    }
                 }
             }
             else if (cursorEvent.Item3)
