@@ -102,13 +102,13 @@ namespace MCLevelEdit.Model.Domain.Validation
 
             if (entity is not null)
             {
-                if (!entity.IsSwitch() && !entity.IsCanyonOrRidge() && !entity.IsPathOrWall())
+                if (!entity.IsSwitch() && !entity.IsCanyonOrRidge() && !entity.IsWall())
                 {
                     var duplicateCoordEntities = entities.Where(e => e.Id != entity.Id && e.Position.Equals(entity.Position)).ToList();
 
-                    if (duplicateCoordEntities?.Count > 0 && !duplicateCoordEntities.All(e => e.IsSwitch() && !e.IsCanyonOrRidge() && !e.IsPathOrWall()))
+                    if (duplicateCoordEntities?.Count > 0 && !duplicateCoordEntities.All(e => e.IsSwitch()))
                     {
-                        return new ValidationResult(entity.Id, Result.Fail, $"{entity} has duplicate coordinates with another Entity {duplicateCoordEntities.FirstOrDefault().Id}");
+                        return new ValidationResult(entity.Id, Result.Warning, $"{entity} has duplicate coordinates with another Entity {duplicateCoordEntities.FirstOrDefault().Id}");
                     }
                     else
                     {
@@ -117,7 +117,7 @@ namespace MCLevelEdit.Model.Domain.Validation
                 }
                 else
                 {
-                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} is Switch");
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} is Switch, Wall, Path or Canyon node");
                 }
             }
             else
