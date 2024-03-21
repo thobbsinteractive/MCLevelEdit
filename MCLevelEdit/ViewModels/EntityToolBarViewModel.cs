@@ -333,20 +333,6 @@ public class EntityToolBarViewModel : ViewModelBase
                     }
                     _previousPathNodeViewModel = addEntityViewModel.Copy();
                 }
-                else if (_previousPathNodeViewModel is not null && _previousPathNodeViewModel.Parent == 0 && existingEntities.Any())
-                {
-                    var parent = existingEntities.Where(e => (int)e.EntityType.TypeId == _previousPathNodeViewModel.Type && (int)e.EntityType.Model.Id == _previousPathNodeViewModel.Model)?.FirstOrDefault()?.ToEntityViewModel();
-
-                    if (parent is not null && _previousPathNodeViewModel.Id != parent.Id)
-                    {
-                        parent.Child = (ushort)_previousPathNodeViewModel.Id;
-                        this.UpdateEntity(parent);
-                        _previousPathNodeViewModel.Parent = (ushort)parent.Id;
-                        this.UpdateEntity(_previousPathNodeViewModel);
-
-                        ClearSelection();
-                    }
-                }
             }
             else if (cursorEvent.Item3)
             {

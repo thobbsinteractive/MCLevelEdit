@@ -102,11 +102,11 @@ namespace MCLevelEdit.Model.Domain.Validation
 
             if (entity is not null)
             {
-                if (!entity.IsSwitch())
+                if (!entity.IsSwitch() && !entity.IsCanyonOrRidge() && !entity.IsPathOrWall())
                 {
                     var duplicateCoordEntities = entities.Where(e => e.Id != entity.Id && e.Position.Equals(entity.Position)).ToList();
 
-                    if (duplicateCoordEntities?.Count > 0 && !duplicateCoordEntities.All(e => e.IsSwitch()))
+                    if (duplicateCoordEntities?.Count > 0 && !duplicateCoordEntities.All(e => e.IsSwitch() && !e.IsCanyonOrRidge() && !e.IsPathOrWall()))
                     {
                         return new ValidationResult(entity.Id, Result.Fail, $"{entity} has duplicate coordinates with another Entity {duplicateCoordEntities.FirstOrDefault().Id}");
                     }
