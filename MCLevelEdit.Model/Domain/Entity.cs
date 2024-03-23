@@ -31,6 +31,7 @@ public class Entity
     public bool IsRidge() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.RidgeNode;
     public bool IsPathOrWall() => IsPath() || IsWall();
     public bool IsCanyonOrRidge() => IsCanyon() || IsRidge();
+    public bool IsPathEntity() => IsPathOrWall() || IsCanyonOrRidge();
     public bool IsSwitch() => 
         this?.EntityType.TypeId == TypeId.Switch && 
         (this?.EntityType.Model.Id == (int)Switch.DeathInside || 
@@ -41,6 +42,9 @@ public class Entity
          this?.EntityType.Model.Id == (int)Switch.HiddenOutsideRe);
     public bool IsTeleport() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Teleport;
     public bool IsSpawn() => this?.EntityType.TypeId == TypeId.Spawn;
+    public bool IsFireballSpell() => this?.EntityType.TypeId == TypeId.Spell && this?.EntityType.Model.Id == (int)Spell.Fireball;
+    public bool IsPossessionSpell() => this?.EntityType.TypeId == TypeId.Spell && this?.EntityType.Model.Id == (int)Spell.Possession;
+    public bool IsCastleSpell() => this?.EntityType.TypeId == TypeId.Spell && this?.EntityType.Model.Id == (int)Spell.Castle;
 
     public override string ToString()
     {

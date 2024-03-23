@@ -140,6 +140,10 @@ public class Map
         foreach (var wizardResult in wizardValidation)
             ValidationResults.Add(wizardResult);
 
+        var spellValidation = MapRules.HasBasicSpells(this);
+        foreach (var spellResult in spellValidation)
+            ValidationResults.Add(spellResult);
+
         foreach (Entity entity in this.Entities)
         {
             ValidationResults.Add(EntityRules.HasSwitch(entity, Entities));

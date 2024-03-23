@@ -43,6 +43,35 @@ namespace MCLevelEdit.Model.Domain.Validation
             return ValidationResults;
         }
 
+        public static IList<ValidationResult> HasBasicSpells(Map map)
+        {
+            var ValidationResults = new List<ValidationResult>();
+
+            if (map is not null && map.Entities is not null)
+            {
+                var fireballSpell = map.Entities.Where(e => e.IsFireballSpell()).FirstOrDefault();
+                var possessionSpell = map.Entities.Where(e => e.IsPossessionSpell()).FirstOrDefault();
+                var castleSpell = map.Entities.Where(e => e.IsCastleSpell()).FirstOrDefault();
+
+                if (fireballSpell is not null)
+                    ValidationResults.Add(new ValidationResult(fireballSpell.Id, Result.Pass, "Fireball Spell is present"));
+                else
+                    ValidationResults.Add(new ValidationResult(0, Result.Fail, "Fireball Spell is required to complete the level"));
+
+                if (possessionSpell is not null)
+                    ValidationResults.Add(new ValidationResult(possessionSpell.Id, Result.Pass, "Possession Spell is present"));
+                else
+                    ValidationResults.Add(new ValidationResult(0, Result.Fail, "Possession Spell is required to complete the level"));
+
+                if (castleSpell is not null)
+                    ValidationResults.Add(new ValidationResult(castleSpell.Id, Result.Pass, "Castle Spell is present"));
+                else
+                    ValidationResults.Add(new ValidationResult(0, Result.Warning, "It is a good idea to have the Castle Spell to help complete the level"));
+            }
+
+            return ValidationResults;
+        }
+
         public static IList<ValidationResult> HasValidWizardParamters(Map map)
         {
             var ValidationResults = new List<ValidationResult>();
