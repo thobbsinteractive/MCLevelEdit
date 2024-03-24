@@ -34,6 +34,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private Layer _selectedLayer = Layer.Game;
     private bool _showSwitchConnections = false;
     private EntityViewModel? _selectedEntityViewModel = null;
+    private Point? _pathOrigin = null;
 
     private Dictionary<int, List<Shape>> _entityShapes = new Dictionary<int, List<Shape>>();
 
@@ -44,6 +45,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private Line _horizontalSelectionRight;
     private Line _verticalSelectionTop;
     private Line _verticalSelectionBottom;
+
+    private bool _pathToolSelected;
 
     public WriteableBitmap Preview 
     {
@@ -122,6 +125,16 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void OnCursorClicked(Point position, bool left, bool right)
     {
+        if (right)
+        {
+            _pathOrigin = null;
+        }
+
+        if (left && _pathToolSelected)
+        {
+            _pathOrigin = _cursorPosition;
+        }
+
         (Point, bool, bool) cursorEvent = (position, left, right);
         _eventAggregator.RaiseEvent("OnCursorClicked", this, new PubSubEventArgs<object>(cursorEvent));
     }
@@ -238,7 +251,14 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
         set
         {
+            RemoveEntityShapes(-99);
             _cursorPosition = GetCursorPointFromCanvasPoint(value);
+
+            if (_pathOrigin is not null)
+            {
+                DrawPathLine((Point)_pathOrigin, _cursorPosition);
+            }
+
             this.RaisePropertyChanged(nameof(CursorPosition));
             this.RaisePropertyChanged(nameof(CursorPositionStr));
         }
@@ -278,6 +298,12 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             ShowSwitchConnections = !ShowSwitchConnections;
         });
+        _eventAggregator.RegisterEvent("PathToolSelected", (sender, args) =>
+        {
+            var modelId = (int?)args?.Item;
+            _pathToolSelected = modelId > 0;
+            _pathOrigin = null;
+        });
     }
 
     private void AddEntityHandler(object sender, PubSubEventArgs<object> args)
@@ -307,6 +333,31 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 }
                 OnEntitySelected(entityViewModel);
             }
+        }
+    }
+
+    private void DrawPathLine(Point origin, Point end)
+    {
+        if (_cvEntity is not null)
+        {
+            RemoveEntityShapes(-99);
+            List<Shape> shapes = new List<Shape>();
+
+            
+            var brush = new SolidColorBrush(Color.FromRgb(255,0,0), 1);
+
+            var line = new Line()
+            {
+                StartPoint = new Point((origin.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), origin.Y * Globals.SQUARE_SIZE),
+                EndPoint = new Point(end.X * Globals.SQUARE_SIZE, (end.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+            _cvEntity.Children.Add(line);
+            shapes.Add(line);
+
+            _entityShapes.Add(-99, shapes);
         }
     }
 

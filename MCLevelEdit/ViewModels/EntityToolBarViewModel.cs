@@ -203,84 +203,83 @@ public class EntityToolBarViewModel : ViewModelBase
 
         CursorSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
             CursorSelected = true;
             ClearSelection();
         });
 
         CreaturesSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             CreaturesSelected = true;
             OnEntityTypeSelected(TypeId.Creature);
         });
 
         ScenarySelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             ScenerySelected = true;
             OnEntityTypeSelected(TypeId.Scenery);
         });
 
         EffectsSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             EffectsSelected = true;
             OnEntityTypeSelected(TypeId.Effect);
         });
 
         SpellsSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             SpellsSelected = true;
             OnEntityTypeSelected(TypeId.Spell);
         });
 
         SwitchesSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             SwitchesSelected = true;
             OnEntityTypeSelected(TypeId.Switch);
         });
 
         WeathersSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             WeathersSelected = true;
             OnEntityTypeSelected(TypeId.Weather);
         });
 
         SpawnsSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             SpawnsSelected = true;
             OnEntityTypeSelected(TypeId.Spawn);
         });
 
         WallSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             WallSelected = true;
             OnPathTypeClicked((int)Effect.Wall);
         });
 
         PathSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             PathSelected = true;
             OnPathTypeClicked((int)Effect.Path);
         });
 
         CanyonSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             CanyonSelected = true;
             OnPathTypeClicked((int)Effect.Canyon);
         });
 
         RidgeSelectedCommand = ReactiveCommand.Create(() =>
         {
-            ToggleButtons(false);
+            ClearSelection();
             RidgeSelected = true;
             OnPathTypeClicked((int)Effect.RidgeNode);
         });
@@ -302,7 +301,6 @@ public class EntityToolBarViewModel : ViewModelBase
         PathSelected = enable;
         CanyonSelected = enable;
         RidgeSelected = enable;
-        //EntityModelType.SelectedIndex = 0;
     }
 
     private void CursorClickedHandler(object sender, PubSubEventArgs<object> arg)
@@ -344,8 +342,9 @@ public class EntityToolBarViewModel : ViewModelBase
     private void ClearSelection()
     {
         AddEntityViewModel = null;
-        _previousPathNodeViewModel = null;
         ToggleButtons(false);
+        _previousPathNodeViewModel = null;
+        _eventAggregator.RaiseEvent("PathToolSelected", this, new PubSubEventArgs<object>(0));
         CursorSelected = true;
     }
 
@@ -382,5 +381,7 @@ public class EntityToolBarViewModel : ViewModelBase
             Parent = 0,
             Child = 0
         };
+        AddEntityViewModel.ModelIdx = modelId;
+        _eventAggregator.RaiseEvent("PathToolSelected", this, new PubSubEventArgs<object>(modelId));
     }
 }

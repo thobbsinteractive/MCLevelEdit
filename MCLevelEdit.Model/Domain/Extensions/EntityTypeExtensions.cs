@@ -26,22 +26,25 @@ public static class EntityTypeExtensions
 
     public static EntityType GetEntityTypeFromTypeIdAndModelId(this TypeId typeId, int modelId)
     {
-        switch (typeId)
+        if (modelId > -1)
         {
-            case TypeId.Scenery:
-                return EntityTypes.I.Sceneries[modelId];
-            case TypeId.Spawn:
-                return EntityTypes.I.Spawns[modelId];
-            case TypeId.Creature:
-                return EntityTypes.I.Creatures[modelId];
-            case TypeId.Weather:
-                return EntityTypes.I.Weathers[modelId];
-            case TypeId.Effect:
-                return EntityTypes.I.Effects[modelId];
-            case TypeId.Switch:
-                return EntityTypes.I.Switches[modelId];
-            case TypeId.Spell:
-                return EntityTypes.I.Spells[modelId];
+            switch (typeId)
+            {
+                case TypeId.Scenery:
+                    return EntityTypes.I.Sceneries[modelId];
+                case TypeId.Spawn:
+                    return EntityTypes.I.Spawns[modelId];
+                case TypeId.Creature:
+                    return EntityTypes.I.Creatures[modelId];
+                case TypeId.Weather:
+                    return EntityTypes.I.Weathers[modelId];
+                case TypeId.Effect:
+                    return EntityTypes.I.Effects[modelId];
+                case TypeId.Switch:
+                    return EntityTypes.I.Switches[modelId];
+                case TypeId.Spell:
+                    return EntityTypes.I.Spells[modelId];
+            }
         }
         return null;
     }
