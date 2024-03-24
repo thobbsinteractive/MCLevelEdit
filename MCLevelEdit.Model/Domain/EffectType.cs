@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace MCLevelEdit.Model.Domain;
+﻿namespace MCLevelEdit.Model.Domain;
 
 public enum Effect
 {
