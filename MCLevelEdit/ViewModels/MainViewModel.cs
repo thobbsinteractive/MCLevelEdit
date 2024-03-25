@@ -16,6 +16,7 @@ using MsBox.Avalonia.Enums;
 using ReactiveUI;
 using Splat;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -186,6 +187,11 @@ public class MainViewModel : ViewModelBase
             });
         });
 
+        ShowManualCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            LaunchManual();
+        });
+
         ResetViewCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             _eventAggregator.RaiseEvent("ResetView", this, new PubSubEventArgs<object>(null));
@@ -213,6 +219,20 @@ public class MainViewModel : ViewModelBase
         });
 
         MainWindow.I.Title = GetTitle("NewLevel.DAT");
+    }
+
+    private void LaunchManual()
+    {
+        try
+        {
+            string url = @"https://github.com/thobbsinteractive/MCLevelEdit/wiki";
+            Console.WriteLine($"Trying to launch '{url}'...");
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private async Task RunLevel()
