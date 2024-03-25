@@ -66,6 +66,7 @@ public class MainViewModel : ViewModelBase
     public ICommand DisplayFailCommand { get; }
     public ICommand DisplayWarningsCommand { get; }
     public ICommand DisplayAboutCommand { get; }
+    public ICommand ShowManualCommand { get; }
     public ICommand ResetViewCommand { get; }
     public ICommand ShowConnectionsCommand { get; }
     public ICommand ShadedCommand { get; }
