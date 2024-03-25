@@ -363,7 +363,6 @@ public class EntityToolBarViewModel : ViewModelBase
             Parent = 0,
             Child = 0
         };
-        AddEntityViewModel.ModelIdx = 0;
     }
 
     public void OnPathTypeClicked(int modelId)
@@ -372,7 +371,7 @@ public class EntityToolBarViewModel : ViewModelBase
         {
             Id = 0,
             Type = (int)TypeId.Effect,
-            ModelIdx = modelId,
+            Model = modelId,
             X = 128,
             Y = 128,
             DisId = 0,
@@ -381,7 +380,6 @@ public class EntityToolBarViewModel : ViewModelBase
             Parent = 0,
             Child = 0
         };
-        AddEntityViewModel.ModelIdx = modelId;
         _eventAggregator.RaiseEvent("PathToolSelected", this, new PubSubEventArgs<object>(modelId));
     }
 }
