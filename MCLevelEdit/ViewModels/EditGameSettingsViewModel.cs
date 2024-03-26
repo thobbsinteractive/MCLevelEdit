@@ -53,6 +53,7 @@ namespace MCLevelEdit.ViewModels
 
         public ICommand SaveCommand { get; }
         public ICommand RestoreCommand { get; }
+        public ICommand BackupCommand { get; }
 
         public string LevelPathsString => _levelPaths is not null ? string.Join(",", _levelPaths) : string.Empty;
         public bool CanRun => _levelPaths?.Length > 0;
@@ -194,6 +195,14 @@ namespace MCLevelEdit.ViewModels
             SaveCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 return SaveLevelPaths();
+            });
+
+            BackupCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                if (await CheckGameLevelPaths())
+                {
+                    BackupLevels();
+                }
             });
 
             RestoreCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -390,6 +399,47 @@ namespace MCLevelEdit.ViewModels
             return false;
         }
 
+        private async Task<bool> CheckGameLevelPaths()
+        {
+            if (Directory.Exists(GameLevelsPath))
+            {
+                if (!string.IsNullOrWhiteSpace(GameLevelsBackupPath))
+                {
+                    if (!GameIsClassic)
+                    {
+                        if (Directory.Exists(GameCloudLevelsPath))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"LEVELS GOG cloud directory not found! Please re-check!");
+                            var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS GOG cloud directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
+                            await box.ShowAsync();
+                        }
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Game Levels Backup directory not set! Please re-check!");
+                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Game Levels Backup directory not set! Please re-check!", ButtonEnum.Ok, Icon.Error);
+                    await box.ShowAsync();
+                }
+            }
+            else
+            {
+                Console.WriteLine($"LEVELS directory not found! Please re-check!");
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
+                await box.ShowAsync();
+            }
+
+            return false;
+        }
+
         private async Task<bool> SaveLevelPaths()
         {
             var settings = new Settings()
@@ -416,7 +466,7 @@ namespace MCLevelEdit.ViewModels
             if (!await _gameService.BackupLevelFiles(this.GameLevelsPath, this.GameLevelsBackupPath))
             {
                 Console.WriteLine($"Error backing up Levels!");
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error backing up Levels! Do you want to continue?", ButtonEnum.OkCancel, Icon.Warning);
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error backing up Levels! Please check and validate your paths", ButtonEnum.Ok, Icon.Warning);
                 var result = await box.ShowAsync();
                 return result == ButtonResult.Ok;
             }
