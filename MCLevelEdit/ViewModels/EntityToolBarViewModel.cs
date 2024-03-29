@@ -200,11 +200,12 @@ public class EntityToolBarViewModel : ViewModelBase
     public EntityToolBarViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
         _eventAggregator.RegisterEvent("OnCursorClicked", CursorClickedHandler);
+        CursorSelected = true;
 
         CursorSelectedCommand = ReactiveCommand.Create(() =>
         {
-            CursorSelected = true;
             ClearSelection();
+            CursorSelected = true;
         });
 
         CreaturesSelectedCommand = ReactiveCommand.Create(() =>
@@ -291,7 +292,6 @@ public class EntityToolBarViewModel : ViewModelBase
         CursorSelected = enable;
         CreaturesSelected = enable;
         ScenerySelected = enable;
-        CursorSelected = enable;
         EffectsSelected = enable;
         SpellsSelected = enable;
         SwitchesSelected = enable;
@@ -335,6 +335,7 @@ public class EntityToolBarViewModel : ViewModelBase
             else if (cursorEvent.Item3)
             {
                 ClearSelection();
+                CursorSelected = true;
             }
         }
     }
@@ -345,7 +346,6 @@ public class EntityToolBarViewModel : ViewModelBase
         ToggleButtons(false);
         _previousPathNodeViewModel = null;
         _eventAggregator.RaiseEvent("PathToolSelected", this, new PubSubEventArgs<object>(0));
-        CursorSelected = true;
     }
 
     private void OnEntityTypeSelected(TypeId typeId)
