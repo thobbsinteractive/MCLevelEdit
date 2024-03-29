@@ -17,7 +17,7 @@
           BorderThickness="0,1"
           Padding="5">
       <Grid Name="grdEntities"
-            ColumnDefinitions="50,50,50,50,50,50,50,50,50,50,50,50,50"
+            ColumnDefinitions="50,50,50,50,50,50,50,50,50,50,50,50,50,50,50"
             RowDefinitions="50,40">
         <ToggleButton Name="btnCursor"
                       Grid.Row="0"
@@ -113,6 +113,14 @@
                       Command="{Binding RidgeSelectedCommand}"
                       IsChecked="{Binding RidgeSelected}">
           <Image Source="/Assets/ridge-32.png"/>
+        </ToggleButton>
+        <ToggleButton Name="btnConnectSwitches"
+                      Grid.Row="0"
+                      Grid.Column="14"
+                      ToolTip.Tip="Connect Entities to Switches"
+                      Command="{Binding ConnectSwitchesSelectedCommand}"
+                      IsChecked="{Binding ConnectSwitchesSelected}">
+          <Image Source="/Assets/connection-32.png"/>
         </ToggleButton>
         <ComboBox Name="cboEntityModelType"
                   Grid.Row="1"

@@ -24,6 +24,7 @@ public class EntityToolBarViewModel : ViewModelBase
     private bool _pathSelected = false;
     private bool _canyonSelected = false;
     private bool _ridgeSelected = false;
+    private bool _connectSwitchesSelected = false;
 
     private EntityViewModel _addEntityViewModel;
     private EntityViewModel? _previousPathNodeViewModel = null;
@@ -184,6 +185,18 @@ public class EntityToolBarViewModel : ViewModelBase
         }
     }
 
+    public bool ConnectSwitchesSelected
+    {
+        get
+        {
+            return _connectSwitchesSelected;
+        }
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _connectSwitchesSelected, value);
+        }
+    }
+
     public ICommand CursorSelectedCommand { get; }
     public ICommand CreaturesSelectedCommand { get; }
     public ICommand ScenarySelectedCommand { get; }
@@ -196,6 +209,7 @@ public class EntityToolBarViewModel : ViewModelBase
     public ICommand PathSelectedCommand { get; }
     public ICommand CanyonSelectedCommand { get; }
     public ICommand RidgeSelectedCommand { get; }
+    public ICommand ConnectSwitchesSelectedCommand { get; }
 
     public EntityToolBarViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
@@ -285,6 +299,13 @@ public class EntityToolBarViewModel : ViewModelBase
             OnPathTypeClicked((int)Effect.RidgeNode);
         });
 
+        ConnectSwitchesSelectedCommand = ReactiveCommand.Create(() =>
+        {
+            ClearSelection();
+            ConnectSwitchesSelected = true;
+            OnConnectToSwitchesClicked(true);
+        });
+
     }
 
     private void ToggleButtons(bool enable)
@@ -301,6 +322,7 @@ public class EntityToolBarViewModel : ViewModelBase
         PathSelected = enable;
         CanyonSelected = enable;
         RidgeSelected = enable;
+        ConnectSwitchesSelected = enable;
     }
 
     private void CursorClickedHandler(object sender, PubSubEventArgs<object> arg)
@@ -346,6 +368,7 @@ public class EntityToolBarViewModel : ViewModelBase
         ToggleButtons(false);
         _previousPathNodeViewModel = null;
         _eventAggregator.RaiseEvent("PathToolSelected", this, new PubSubEventArgs<object>(0));
+        _eventAggregator.RaiseEvent("ConnectToSwitchesSelected", this, new PubSubEventArgs<object>(false));
     }
 
     private void OnEntityTypeSelected(TypeId typeId)
@@ -381,5 +404,10 @@ public class EntityToolBarViewModel : ViewModelBase
             Child = 0
         };
         _eventAggregator.RaiseEvent("PathToolSelected", this, new PubSubEventArgs<object>(modelId));
+    }
+
+    public void OnConnectToSwitchesClicked(bool selected)
+    {
+        _eventAggregator.RaiseEvent("ConnectToSwitchesSelected", this, new PubSubEventArgs<object>(selected));
     }
 }

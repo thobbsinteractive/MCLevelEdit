@@ -15,6 +15,7 @@
 
   
   <ItemGroup>
+    <None Remove="Assets\connection-32.png" />
     <None Remove="Assets\Spells\accelerate-white.png" />
     <None Remove="Assets\Spells\accelerate.png" />
     <None Remove="Assets\Spells\beyondsight-white.png" />
