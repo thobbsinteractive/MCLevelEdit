@@ -1,9 +1,6 @@
 ﻿using Avalonia.Input;
 using Avalonia.ReactiveUI;
-using MCLevelEdit.Application.Services;
 using MCLevelEdit.ViewModels;
-using MsBox.Avalonia.Enums;
-using MsBox.Avalonia;
 using ReactiveUI;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +45,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        var keys = new Key[] { Key.Delete, Key.Up, Key.Down, Key.Left, Key.Right };
+        var keys = new Key[] { Key.Delete, Key.Up, Key.Down, Key.Left, Key.Right, Key.F1, Key.F5 };
 
         if (MainViewModel != null && keys.Contains(e.Key))
         {

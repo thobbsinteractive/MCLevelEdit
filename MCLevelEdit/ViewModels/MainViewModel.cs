@@ -253,6 +253,15 @@ public class MainViewModel : ViewModelBase
 
     public void OnKeyPressed(Key key)
     {
+        if (key == Key.F1)
+        {
+            LaunchManual();
+        }
+        if (key  == Key.F5) 
+        {
+            RunLevel();
+        }
+
         _eventAggregator.RaiseEvent("KeyPressed", this, new PubSubEventArgs<object>(key));
     }
 
