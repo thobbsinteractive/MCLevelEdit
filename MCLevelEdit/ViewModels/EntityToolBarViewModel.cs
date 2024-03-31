@@ -329,7 +329,9 @@ public class EntityToolBarViewModel : ViewModelBase
                         _previousPathNodeViewModel.Parent = (ushort)id;
                         this.UpdateEntity(_previousPathNodeViewModel);
                     }
-                    _previousPathNodeViewModel = addEntityViewModel.Copy();
+
+                    if (addEntityViewModel.IsPathOrWallOrCanyonOrRidge())
+                        _previousPathNodeViewModel = addEntityViewModel.Copy();
                 }
             }
             else if (cursorEvent.Item3)
