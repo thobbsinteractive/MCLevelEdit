@@ -43,5 +43,13 @@
                              Grid.Column="0"
                              DataContext="{Binding EditWorldViewModel}"/>
     </Panel>
+    <Panel Name="pEditSwitch"
+           IsEnabled="{Binding ShowEditSwitch, FallbackValue=false}"
+           IsVisible="{Binding ShowEditSwitch, FallbackValue=false}">
+      <views:EditSwitchView Name="vmEditSwitch"
+                             Grid.Row="0"
+                             Grid.Column="0"
+                             DataContext="{Binding EditEntityViewModel}"/>
+    </Panel>
   </Grid>
 </UserControl>

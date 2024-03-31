@@ -86,4 +86,10 @@
     <ProjectReference Include="..\MCLevelEdit.Infrastructure\MCLevelEdit.Infrastructure.csproj" />
     <ProjectReference Include="..\MCLevelEdit.Model\MCLevelEdit.Model.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\EditSwitchView.axaml.cs">
+      <DependentUpon>EditSwitchView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
