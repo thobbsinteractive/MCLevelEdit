@@ -10,7 +10,7 @@
              x:DataType="vm:EditEntityViewModel">
   <Grid Margin="5"
         ColumnDefinitions="1*,2*"
-        RowDefinitions="40,30,30,30,30,30,40,90,40,40,*,40">
+        RowDefinitions="40,30,30,30,30,30,30,40,90,40,40,*,40">
     <Grid.Resources>
       <c:TypeIdConverter x:Key="typeIdConverter"/>
       <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
@@ -28,68 +28,82 @@
     <Label Grid.Column="0"
            Grid.Row="1"
            HorizontalAlignment="Left">
+      Model:
+    </Label>
+    <ComboBox Name="cboEntityModelType"
+              Grid.Row="1"
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Stretch"
+              SelectedIndex="{Binding EntityView.ModelIdx}"
+              DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+              ItemsSource="{Binding EntityView.ModelTypes}">
+    </ComboBox>
+    <Label Grid.Column="0"
+           Grid.Row="2"
+           HorizontalAlignment="Left">
       PosX:
     </Label>
     <TextBox x:Name="txtPosX"
-             Grid.Row="1"
+             Grid.Row="2"
              Grid.Column="1"
              Text="{Binding EntityView.X, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
-           Grid.Row="2"
+           Grid.Row="3"
            HorizontalAlignment="Left">
       PosY:
     </Label>
     <TextBox x:Name="txtPosY"
-         Grid.Row="2"
+         Grid.Row="3"
          Grid.Column="1"
          Text="{Binding EntityView.Y, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
-           Grid.Row="3"
+           Grid.Row="4"
            HorizontalAlignment="Left">
       DisId:
     </Label>
     <TextBox x:Name="txtDisId"
-        Grid.Row="3"
+        Grid.Row="4"
         Grid.Column="1"
         Text="{Binding EntityView.DisId, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
-           Grid.Row="4"
+           Grid.Row="5"
            HorizontalAlignment="Left">
       Switch Size:
     </Label>
     <TextBox x:Name="txtSwitchSize"
-             Grid.Row="4"
+             Grid.Row="5"
              Grid.Column="1"
              Text="{Binding EntityView.SwitchSize, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
-           Grid.Row="5"
+           Grid.Row="6"
            HorizontalAlignment="Left">
       Switch Id:
     </Label>
     <TextBox x:Name="txtSwitchId"
-             Grid.Row="5"
+             Grid.Row="6"
              Grid.Column="1"
              Text="{Binding EntityView.SwitchId, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
-           Grid.Row="6"
+           Grid.Row="7"
            Grid.ColumnSpan="2"
            FontWeight="Bold"
            HorizontalAlignment="Left">
       Triggered by
     </Label>
     <TextBox x:Name="txtTriggedBy"
-             Grid.Row="7"
+             Grid.Row="8"
              Grid.Column="0"
              Grid.ColumnSpan="2"
              Text="">
     </TextBox>
     <StackPanel x:Name="pnlSelectedButtons"
-                Grid.Row="8"
+                Grid.Row="9"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
@@ -101,7 +115,7 @@
       </Button>
     </StackPanel>
     <Label Grid.Column="0"
-           Grid.Row="9"
+           Grid.Row="10"
            Grid.ColumnSpan="2"
            FontWeight="Bold"
            HorizontalAlignment="Left">
@@ -109,10 +123,10 @@
     </Label>
     <DataGrid x:Name="dgTriggered"
               Grid.Column="0"
-              Grid.Row="10"
+              Grid.Row="11"
               Grid.ColumnSpan="2"/>
     <StackPanel x:Name="pnlTriggeredButtons"
-                Grid.Row="11"
+                Grid.Row="12"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
