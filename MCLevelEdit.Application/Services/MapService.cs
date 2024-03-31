@@ -53,7 +53,9 @@ public class MapService : IMapService, IEnableLogger
             }
             MapRepository.Map.ValidateEntities();
 
-            return await _filePort.SaveMapAsync(MapRepository.Map, filePath);
+            var result = await _filePort.SaveMapAsync(MapRepository.Map, filePath);
+            _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
+            return result;
         }
         catch (Exception ex)
         {
