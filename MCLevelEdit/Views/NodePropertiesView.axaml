@@ -49,7 +49,7 @@
       <views:EditSwitchView Name="vmEditSwitch"
                              Grid.Row="0"
                              Grid.Column="0"
-                             DataContext="{Binding EditEntityViewModel}"/>
+                             DataContext="{Binding EditSwitchViewModel}"/>
     </Panel>
   </Grid>
 </UserControl>

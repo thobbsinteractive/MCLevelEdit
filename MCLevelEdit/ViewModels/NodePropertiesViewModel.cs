@@ -17,6 +17,7 @@ namespace MCLevelEdit.ViewModels
         private EditWizardViewModel _editWizardViewModel;
         private EditWorldViewModel _editWorldViewModel;
         private EditEntityViewModel _editEntityViewModel;
+        private EditSwitchViewModel _editSwitchViewModel;
 
         public EditWizardsViewModel EditWizardsViewModel
         {
@@ -40,6 +41,12 @@ namespace MCLevelEdit.ViewModels
         {
             get => _editEntityViewModel;
             set => this.RaiseAndSetIfChanged(ref _editEntityViewModel, value);
+        }
+
+        public EditSwitchViewModel EditSwitchViewModel
+        {
+            get => _editSwitchViewModel;
+            set => this.RaiseAndSetIfChanged(ref _editSwitchViewModel, value);
         }
 
         public bool ShowEditWizard
@@ -115,7 +122,7 @@ namespace MCLevelEdit.ViewModels
                         {
                             if (entityViewModel.IsSwitch())
                             {
-                                EditEntityViewModel = new EditEntityViewModel(_eventAggregator, _mapService, _terrainService, entityViewModel);
+                                EditSwitchViewModel = new EditSwitchViewModel(_eventAggregator, _mapService, _terrainService, entityViewModel, _mapService.GetEntitiesBySwitchId(entityViewModel.SwitchId).ToEntityViewModels());
                                 ShowEditSwitch = true;
                             }
                             else

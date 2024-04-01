@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
              xmlns:c="clr-namespace:MCLevelEdit.Converter"
-             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EditEntityViewModel;assembly=MCLevelEdit"
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EditSwitchViewModel;assembly=MCLevelEdit"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="600"
              x:Class="MCLevelEdit.Views.EditSwitchView"
-             x:DataType="vm:EditEntityViewModel">
+             x:DataType="vm:EditSwitchViewModel">
   <Grid Margin="5"
         ColumnDefinitions="1*,2*"
         RowDefinitions="40,30,30,30,30,30,30,40,90,40,40,*,40">
