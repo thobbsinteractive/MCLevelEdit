@@ -37,6 +37,11 @@ public class EntityViewModel : ObservableObject
         }
     }
 
+    public string TypeName
+    {
+        get { return Enum.GetName(typeof(TypeId), Type); }
+    }
+
     public int Model
     {
         get 
@@ -67,6 +72,11 @@ public class EntityViewModel : ObservableObject
     {
         get { return _modelIdx; }
         set { SetProperty(ref _modelIdx, value); }
+    }
+
+    public string ModelName
+    {
+        get { return ModelTypes[Model].Value; }
     }
 
     public byte X

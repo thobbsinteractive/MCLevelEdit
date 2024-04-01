@@ -124,7 +124,37 @@
     <DataGrid x:Name="dgTriggered"
               Grid.Column="0"
               Grid.Row="11"
-              Grid.ColumnSpan="2"/>
+              Grid.ColumnSpan="2"
+              ItemsSource="{Binding ConnectedEntityViews}"
+              IsReadOnly="True"
+              GridLinesVisibility="All"
+              BorderThickness="1" BorderBrush="Gray">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Num"
+                            Width="1*"
+                            Binding="{Binding Id}"/>
+        <DataGridTemplateColumn Header="Type"
+                                Width="2*" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Label Name="txtEntityType"
+                     Content="{Binding TypeName}">
+              </Label>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Name"
+                                Width="2*" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Label Name="txtModelType"
+                     Content="{Binding ModelName}">
+              </Label>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
     <StackPanel x:Name="pnlTriggeredButtons"
                 Grid.Row="12"
                 Grid.Column="0"
