@@ -515,7 +515,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             {
                 brush = new SolidColorBrush(entityViewModel.Colour, 0.5);
 
-                var connectedEntities = _mapService.GetEntitiesBySwitchId(entityViewModel.SwitchId)?.ToEntityViewModels();
+                var connectedEntities = _mapService.GetEntitiesBySwitchId(entityViewModel.SwitchId, entityViewModel.Id)?.ToEntityViewModels();
 
                 if (connectedEntities?.Any() ?? false)
                 {

@@ -131,11 +131,11 @@ public class MapService : IMapService, IEnableLogger
         return MapRepository.Map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();
     }
 
-    public List<Entity> GetEntitiesBySwitchId(ushort switchId)
+    public List<Entity> GetEntitiesBySwitchId(ushort switchId, int excludeId = 0)
     {
-        if (switchId > 0)
+        if (switchId > 0 && MapRepository.Map.Entities.Count > 0)
         {
-            return MapRepository.Map.Entities.Where(e => e.SwitchId == switchId).ToList();
+            return MapRepository.Map.Entities.Where(e => e.Id != excludeId && e.SwitchId == switchId).ToList();
         }
         else
             return new List<Entity>();

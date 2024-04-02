@@ -1,5 +1,4 @@
-﻿using Avalonia.Media.Imaging;
-using MagicCarpet2Terrain.Model;
+﻿using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Enums;
 
@@ -15,7 +14,7 @@ public interface IMapService
     Map GetMap();
     Entity? GetEntity(ushort id);
     List<Entity> GetEntitiesByCoords(int x, int y);
-    List<Entity> GetEntitiesBySwitchId(ushort switchId);
+    List<Entity> GetEntitiesBySwitchId(ushort switchId, int excludeId = 0);
     List<Entity> GetEntitiesByTypeId(TypeId typeId);
     int AddEntity(Entity entity);
     bool UpdateEntity(Entity entity);
