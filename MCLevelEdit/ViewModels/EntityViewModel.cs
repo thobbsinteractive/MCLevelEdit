@@ -174,14 +174,7 @@ public class EntityViewModel : ObservableObject
     public bool IsRidge() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.RidgeNode;
     public bool IsPathOrWall() => IsPath() || IsWall();
     public bool IsPathOrWallOrCanyonOrRidge() => IsPath() || IsWall() || IsCanyon() || IsRidge();
-    public bool IsSwitch() =>
-        this?.Type == (int)TypeId.Switch &&
-        (this?.Model == (int)Switch.DeathInside ||
-         this?.Model == (int)Switch.DeathOutside ||
-         this?.Model == (int)Switch.HiddenInside ||
-         this?.Model == (int)Switch.HiddenOutside ||
-         this?.Model == (int)Switch.HiddenInsideRe ||
-         this?.Model == (int)Switch.HiddenOutsideRe);
+    public bool IsSwitch() => this?.Type == (int)TypeId.Switch;
     public bool IsTeleport() => this?.Type == (int)TypeId.Effect && this?.Model == (int)Effect.Teleport;
     public bool IsSpawn() => this?.Type == (int)TypeId.Spawn;
 

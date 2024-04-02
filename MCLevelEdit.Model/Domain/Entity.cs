@@ -32,14 +32,7 @@ public class Entity
     public bool IsPathOrWall() => IsPath() || IsWall();
     public bool IsCanyonOrRidge() => IsCanyon() || IsRidge();
     public bool IsPathEntity() => IsPathOrWall() || IsCanyonOrRidge();
-    public bool IsSwitch() => 
-        this?.EntityType.TypeId == TypeId.Switch && 
-        (this?.EntityType.Model.Id == (int)Switch.DeathInside || 
-         this?.EntityType.Model.Id == (int)Switch.DeathOutside ||
-         this?.EntityType.Model.Id == (int)Switch.HiddenInside ||
-         this?.EntityType.Model.Id == (int)Switch.HiddenOutside ||
-         this?.EntityType.Model.Id == (int)Switch.HiddenInsideRe ||
-         this?.EntityType.Model.Id == (int)Switch.HiddenOutsideRe);
+    public bool IsSwitch() => this?.EntityType.TypeId == TypeId.Switch;
     public bool IsTeleport() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Teleport;
     public bool IsSpawn() => this?.EntityType.TypeId == TypeId.Spawn;
     public bool IsFireballSpell() => this?.EntityType.TypeId == TypeId.Spell && this?.EntityType.Model.Id == (int)Spell.Fireball;
