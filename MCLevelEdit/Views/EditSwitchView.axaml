@@ -130,11 +130,11 @@
               GridLinesVisibility="All"
               BorderThickness="1" BorderBrush="Gray">
       <DataGrid.Columns>
-        <DataGridTextColumn Header="Num"
-                            Width="1*"
+        <DataGridTextColumn Header="Id"
+                            Width="65"
                             Binding="{Binding Id}"/>
         <DataGridTemplateColumn Header="Type"
-                                Width="2*" >
+                                Width="1*" >
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <Label Name="txtEntityType"
@@ -144,7 +144,7 @@
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
         <DataGridTemplateColumn Header="Name"
-                                Width="2*" >
+                                Width="1*" >
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <Label Name="txtModelType"
