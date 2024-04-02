@@ -76,7 +76,7 @@ public class EntityViewModel : ObservableObject
 
     public string ModelName
     {
-        get { return ModelTypes[Model].Value; }
+        get { return ModelTypes?.Where(m => m.Key == Model)?.Select(m => m.Value).FirstOrDefault() ?? string.Empty; }
     }
 
     public byte X
