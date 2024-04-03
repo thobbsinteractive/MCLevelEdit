@@ -135,7 +135,7 @@ public class MapService : IMapService, IEnableLogger
     {
         if (switchId > 0 && MapRepository.Map.Entities.Count > 0)
         {
-            return MapRepository.Map.Entities.Where(e => e.Id != excludeId && e.SwitchId == switchId).ToList();
+            return MapRepository.Map.Entities.Where(e => e.Id != excludeId && e.SwitchId == switchId && e.DisId < ushort.MaxValue).ToList();
         }
         else
             return new List<Entity>();
