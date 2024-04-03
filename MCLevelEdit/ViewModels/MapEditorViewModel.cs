@@ -41,6 +41,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private Canvas _cvEntity;
 
     private List<Shape> _selectionCursorShapes = new List<Shape>();
+    private List<Shape> _selectedSwitchConnectionShapes = new List<Shape>();
 
     private bool _pathToolSelected;
 
@@ -139,6 +140,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     {
         _selectedEntityViewModel = entity;
 
+        RefreshSelectedSwitch(entity);
         DrawSelectionCursorForEntity(entity);
     }
 
@@ -470,6 +472,16 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
     }
 
+    private void RefreshSelectedSwitch(EntityViewModel? entityViewModel)
+    {
+        _cvEntity.Children.RemoveAll(_selectedSwitchConnectionShapes);
+
+        if (entityViewModel is not null && entityViewModel.IsSwitch() && entityViewModel.SwitchId > 0)
+        {
+            DrawConnections(entityViewModel, _selectedSwitchConnectionShapes, Color.FromRgb(255,255,0));
+        }
+    }
+
     private void AddEntityToView(EntityViewModel entityViewModel)
     {
         if (_cvEntity is not null && entityViewModel is not null)
@@ -507,28 +519,9 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 shapes.Add(circle);
             }
 
-            if (_showSwitchConnections && entityViewModel.Type == (int)TypeId.Switch && entityViewModel.SwitchId > 0)
+            if (_showSwitchConnections && entityViewModel.IsSwitch() && entityViewModel.SwitchId > 0)
             {
-                brush = new SolidColorBrush(entityViewModel.Colour, 0.5);
-
-                var connectedEntities = _mapService.GetEntitiesBySwitchId(entityViewModel.SwitchId, entityViewModel.Id)?.ToEntityViewModels();
-
-                if (connectedEntities?.Any() ?? false)
-                {
-                    foreach (var connectedEntity in connectedEntities)
-                    {
-                        var line = new Line()
-                        {
-                            StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), entityViewModel.Y * Globals.SQUARE_SIZE),
-                            EndPoint = new Point(connectedEntity.X * Globals.SQUARE_SIZE, (connectedEntity.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                            Stroke = brush,
-                            StrokeThickness = 1,
-                            ZIndex = 98
-                        };
-                        _cvEntity.Children.Add(line);
-                        shapes.Add(line);
-                    }
-                }
+                DrawConnections(entityViewModel, shapes, entityViewModel.Colour);
             }
 
             DrawCanyonOrRidge(entityViewModel, shapes);
@@ -537,6 +530,29 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             DrawCastle(entityViewModel, shapes, rect, brush);
 
             _entityShapes.Add(entityViewModel.Id, shapes);
+        }
+    }
+
+    private void DrawConnections(EntityViewModel entityViewModel, List<Shape> shapes, Color color)
+    {
+        SolidColorBrush brush = new SolidColorBrush(color, 0.5);
+        var connectedEntities = _mapService.GetEntitiesBySwitchId(entityViewModel.SwitchId, entityViewModel.Id)?.ToEntityViewModels();
+
+        if (connectedEntities?.Any() ?? false)
+        {
+            foreach (var connectedEntity in connectedEntities)
+            {
+                var line = new Line()
+                {
+                    StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                    EndPoint = new Point((connectedEntity.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (connectedEntity.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                    Stroke = brush,
+                    StrokeThickness = 1,
+                    ZIndex = 98
+                };
+                _cvEntity.Children.Add(line);
+                shapes.Add(line);
+            }
         }
     }
 
