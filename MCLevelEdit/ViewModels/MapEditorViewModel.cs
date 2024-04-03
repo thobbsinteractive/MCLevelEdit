@@ -39,12 +39,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private Dictionary<int, List<Shape>> _entityShapes = new Dictionary<int, List<Shape>>();
 
     private Canvas _cvEntity;
-    private Rectangle _rectSelection;
-    private Rectangle _outerRectSelection;
-    private Line _horizontalSelectionLeft;
-    private Line _horizontalSelectionRight;
-    private Line _verticalSelectionTop;
-    private Line _verticalSelectionBottom;
+
+    private List<Shape> _selectionCursorShapes = new List<Shape>();
 
     private bool _pathToolSelected;
 
@@ -143,104 +139,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     {
         _selectedEntityViewModel = entity;
 
-        if (_rectSelection is not null)
-            _cvEntity.Children.Remove(_rectSelection);
-
-        if (_outerRectSelection is not null)
-            _cvEntity.Children.Remove(_outerRectSelection);
-
-        if (_horizontalSelectionLeft is not null)
-            _cvEntity.Children.Remove(_horizontalSelectionLeft);
-
-        if (_horizontalSelectionRight is not null)
-            _cvEntity.Children.Remove(_horizontalSelectionRight);
-
-        if (_verticalSelectionTop is not null)
-            _cvEntity.Children.Remove(_verticalSelectionTop);
-
-        if (_verticalSelectionBottom is not null)
-            _cvEntity.Children.Remove(_verticalSelectionBottom);
-
-        if (entity is not null)
-        {
-            var rect = new Rect(entity.X * Globals.SQUARE_SIZE - 3, entity.Y * Globals.SQUARE_SIZE - 3, Globals.SQUARE_SIZE + 3, Globals.SQUARE_SIZE + 3);
-            var brush = new SolidColorBrush(Color.FromRgb(255, 255, 255), 1);
-            var transBrush = new SolidColorBrush(Color.FromRgb(255, 255, 255), 0.5);
-
-            _rectSelection = new Rectangle()
-            {
-                Width = 14,
-                Height = 14,
-                Stroke = brush,
-                StrokeThickness = 2,
-                ZIndex = 200
-            };
-
-            _outerRectSelection = new Rectangle()
-            {
-                Width = 36,
-                Height = 36,
-                Stroke = transBrush,
-                StrokeThickness = 2,
-                ZIndex = 200
-            };
-
-            _horizontalSelectionLeft = new Line()
-            {
-                StartPoint = new Point((-entity.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), 7),
-                EndPoint = new Point(0, 7),
-                Stroke = brush,
-                StrokeThickness = 2,
-                ZIndex = 200
-            };
-
-            _horizontalSelectionRight = new Line()
-            {
-                StartPoint = new Point(14, 7),
-                EndPoint = new Point((256 * Globals.SQUARE_SIZE) - (entity.X * Globals.SQUARE_SIZE), 7),
-                Stroke = brush,
-                StrokeThickness = 2,
-                ZIndex = 200
-            };
-
-            _verticalSelectionTop = new Line()
-            {
-                StartPoint = new Point(7, (-entity.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                EndPoint = new Point(7, 0),
-                Stroke = brush,
-                StrokeThickness = 2,
-                ZIndex = 200
-            };
-
-            _verticalSelectionBottom = new Line()
-            {
-                StartPoint = new Point(7, 14),
-                EndPoint = new Point(7, (256 * Globals.SQUARE_SIZE) - (entity.Y * Globals.SQUARE_SIZE)),
-                Stroke = brush,
-                StrokeThickness = 2,
-                ZIndex = 200
-            };
-
-            Canvas.SetLeft(_rectSelection, rect.X);
-            Canvas.SetTop(_rectSelection, rect.Y);
-            Canvas.SetLeft(_outerRectSelection, rect.X - 11);
-            Canvas.SetTop(_outerRectSelection, rect.Y - 11);
-            Canvas.SetLeft(_horizontalSelectionLeft, rect.X);
-            Canvas.SetTop(_horizontalSelectionLeft, rect.Y);
-            Canvas.SetLeft(_horizontalSelectionRight, rect.X);
-            Canvas.SetTop(_horizontalSelectionRight, rect.Y);
-            Canvas.SetLeft(_verticalSelectionTop, rect.X);
-            Canvas.SetTop(_verticalSelectionTop, rect.Y);
-            Canvas.SetLeft(_verticalSelectionBottom, rect.X);
-            Canvas.SetTop(_verticalSelectionBottom, rect.Y);
-
-            _cvEntity.Children.Add(_rectSelection);
-            _cvEntity.Children.Add(_outerRectSelection);
-            _cvEntity.Children.Add(_horizontalSelectionLeft);
-            _cvEntity.Children.Add(_horizontalSelectionRight);
-            _cvEntity.Children.Add(_verticalSelectionTop);
-            _cvEntity.Children.Add(_verticalSelectionBottom);
-        }
+        DrawSelectionCursorForEntity(entity);
     }
 
     public Point CursorPosition
@@ -333,6 +232,103 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 }
                 OnEntitySelected(entityViewModel);
             }
+        }
+    }
+
+    private void DrawSelectionCursorForEntity(EntityViewModel? entity)
+    {
+
+        _cvEntity.Children.RemoveAll(_selectionCursorShapes);
+        _selectionCursorShapes.Clear();
+
+        if (entity is not null)
+        {
+            Rectangle _rectSelection;
+            Rectangle _outerRectSelection;
+            Line _horizontalSelectionLeft;
+            Line _horizontalSelectionRight;
+            Line _verticalSelectionTop;
+            Line _verticalSelectionBottom;
+
+            var rect = new Rect(entity.X * Globals.SQUARE_SIZE - 3, entity.Y * Globals.SQUARE_SIZE - 3, Globals.SQUARE_SIZE + 3, Globals.SQUARE_SIZE + 3);
+            var brush = new SolidColorBrush(Color.FromRgb(255, 255, 255), 1);
+            var transBrush = new SolidColorBrush(Color.FromRgb(255, 255, 255), 0.5);
+
+            _rectSelection = new Rectangle()
+            {
+                Width = 14,
+                Height = 14,
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            _outerRectSelection = new Rectangle()
+            {
+                Width = 36,
+                Height = 36,
+                Stroke = transBrush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            _horizontalSelectionLeft = new Line()
+            {
+                StartPoint = new Point((-entity.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), 7),
+                EndPoint = new Point(0, 7),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            _horizontalSelectionRight = new Line()
+            {
+                StartPoint = new Point(14, 7),
+                EndPoint = new Point((256 * Globals.SQUARE_SIZE) - (entity.X * Globals.SQUARE_SIZE), 7),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            _verticalSelectionTop = new Line()
+            {
+                StartPoint = new Point(7, (-entity.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                EndPoint = new Point(7, 0),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            _verticalSelectionBottom = new Line()
+            {
+                StartPoint = new Point(7, 14),
+                EndPoint = new Point(7, (256 * Globals.SQUARE_SIZE) - (entity.Y * Globals.SQUARE_SIZE)),
+                Stroke = brush,
+                StrokeThickness = 2,
+                ZIndex = 200
+            };
+
+            Canvas.SetLeft(_rectSelection, rect.X);
+            Canvas.SetTop(_rectSelection, rect.Y);
+            Canvas.SetLeft(_outerRectSelection, rect.X - 11);
+            Canvas.SetTop(_outerRectSelection, rect.Y - 11);
+            Canvas.SetLeft(_horizontalSelectionLeft, rect.X);
+            Canvas.SetTop(_horizontalSelectionLeft, rect.Y);
+            Canvas.SetLeft(_horizontalSelectionRight, rect.X);
+            Canvas.SetTop(_horizontalSelectionRight, rect.Y);
+            Canvas.SetLeft(_verticalSelectionTop, rect.X);
+            Canvas.SetTop(_verticalSelectionTop, rect.Y);
+            Canvas.SetLeft(_verticalSelectionBottom, rect.X);
+            Canvas.SetTop(_verticalSelectionBottom, rect.Y);
+
+            _selectionCursorShapes.Add(_rectSelection);
+            _selectionCursorShapes.Add(_outerRectSelection);
+            _selectionCursorShapes.Add(_horizontalSelectionLeft);
+            _selectionCursorShapes.Add(_horizontalSelectionRight);
+            _selectionCursorShapes.Add(_verticalSelectionTop);
+            _selectionCursorShapes.Add(_verticalSelectionBottom);
+
+            _cvEntity.Children.AddRange(_selectionCursorShapes);
         }
     }
 
