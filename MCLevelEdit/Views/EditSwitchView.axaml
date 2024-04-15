@@ -160,11 +160,12 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
-      <Button x:Name="btnAddSelectedTriggered">
-        Add Selected
+      <Button x:Name="btnAddTriggered"
+              Command="{Binding AddTriggeredEntityCommand}">
+        Add Entity
       </Button>
       <Button x:Name="btnPickTriggered">
-        Pick
+        Pick Entity
       </Button>
     </StackPanel>
   </Grid>

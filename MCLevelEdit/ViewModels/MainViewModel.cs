@@ -16,6 +16,7 @@ using MsBox.Avalonia.Enums;
 using ReactiveUI;
 using Splat;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -79,6 +80,7 @@ public class MainViewModel : ViewModelBase
     public MapEditorViewModel MapEditorViewModel { get; }
     public NodePropertiesViewModel NodePropertiesViewModel { get; }
     public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowEntitiesDialog { get; }
+    public Interaction<IList<EntityViewModel>, IList<EntityViewModel>?> ShowSelectEntitiesDialog { get; }
     public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
     public Interaction<AboutWindowViewModel, AboutWindowViewModel?> ShowAboutDialog { get; }
@@ -96,6 +98,7 @@ public class MainViewModel : ViewModelBase
 
         ShowGameSettingsDialog = new Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?>();
         ShowEntitiesDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
+        ShowSelectEntitiesDialog = new Interaction<IList<EntityViewModel>, IList<EntityViewModel>?>();
         ShowValidationResultsDialog = new Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?>();
         ShowAboutDialog = new Interaction<AboutWindowViewModel, AboutWindowViewModel?>();
 
@@ -268,6 +271,11 @@ public class MainViewModel : ViewModelBase
     public async Task OnEditButtonClickedAsync()
     {
         var result = await ShowEntitiesDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
+    }
+
+    public async Task<IList<EntityViewModel>?> OnSelectEntitiesButtonClickedAsync(IList<EntityViewModel> selectedEntities)
+    {
+        return await ShowSelectEntitiesDialog.Handle(selectedEntities);
     }
 
     private async Task ExportImageMap(Layer layer)

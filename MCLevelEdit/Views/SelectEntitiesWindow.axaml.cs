@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace MCLevelEdit.Views;
 
-public partial class EditSwitchView : UserControl
+public partial class SelectEntitiesWindow : Window
 {
-    public EditSwitchView()
+    public SelectEntitiesWindow()
     {
         InitializeComponent();
     }

@@ -3,6 +3,7 @@ using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using ReactiveUI;
 using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels
 {
@@ -10,6 +11,8 @@ namespace MCLevelEdit.ViewModels
     {
         private EntityViewModel _entityView;
         private IList<EntityViewModel> _connectedEntityViews = new List<EntityViewModel>();
+
+        public ICommand AddTriggeredEntityCommand { get; }
 
         public EntityViewModel EntityView
         {
@@ -28,6 +31,11 @@ namespace MCLevelEdit.ViewModels
             EntityView = entityView;
             EntityView.PropertyChanged += EntityView_PropertyChanged;
             ConnectedEntityViews = connectedEntityViews;
+
+            AddTriggeredEntityCommand = ReactiveCommand.Create(() =>
+            {
+                
+            });
         }
 
         public EditSwitchViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService, TypeId typeId) : base(eventAggregator, mapService, terrainService)

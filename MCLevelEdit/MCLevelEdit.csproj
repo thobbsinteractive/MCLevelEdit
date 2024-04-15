@@ -91,5 +91,11 @@
     <Compile Update="Views\EditSwitchView.axaml.cs">
       <DependentUpon>EditSwitchView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\SelectEntitiesWindow.axaml.cs">
+      <DependentUpon>SelectEntitiesWindow.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SelectEntitiesTableView.axaml.cs">
+      <DependentUpon>SelectEntitiesTableView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
