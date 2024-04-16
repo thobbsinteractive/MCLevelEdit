@@ -10,7 +10,7 @@ public enum Effect
     Splash = 5,
     Fire = 6,
     //Freeze = 7, 
-    //MiniVolcano = 8,
+    MiniVolcano = 8,
     Volcano = 9, 
     MiniCrater = 10,
     Crater = 11,
@@ -51,7 +51,7 @@ public enum Effect
     //Castle = 46,
     //CastleAdjust = 47,
     //CastleRepair = 48,
-    //RollingRock = 49,
+    RollingRock = 49,
     RidgeNode = 50,
     Unknown51 = 51,
     CrabEgg = 52
