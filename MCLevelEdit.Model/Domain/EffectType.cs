@@ -26,7 +26,7 @@ public enum Effect
     //StealMana = 21,
     //Unknown22 = 22,
     Lightning = 23,
-    //RainOfFire = 24,
+    RainOfFire = 24,
     StealMana2 = 25,
     DuelRubberBand = 26,
     WallSection = 27,
