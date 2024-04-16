@@ -126,6 +126,11 @@ public class MapService : IMapService, IEnableLogger
         return true;
     }
 
+    public List<Entity> GetEntities()
+    {
+        return MapRepository.Map.Entities.ToList();
+    }
+
     public List<Entity> GetEntitiesByCoords(int x, int y)
     {
         return MapRepository.Map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();

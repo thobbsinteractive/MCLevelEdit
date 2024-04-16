@@ -166,7 +166,7 @@ public class MapTreeViewModel : ReactiveObject
 
         worldNode.SubNodes.Clear();
 
-        var squareEntities = map?.Entities?.Where(e => (_entityFilter > 0 ? (int)e.EntityType.TypeId == _entityFilter : true))?.OrderBy(e => e.Id)?.ToEntityViewModels();
+        var squareEntities = map?.Entities.Where(e => (_entityFilter > 0 ? (int)e.EntityType.TypeId == _entityFilter : true))?.OrderBy(e => e.Id)?.ToEntityViewModels();
         if (squareEntities?.Any() ?? false)
         {
             foreach (var entity in squareEntities)

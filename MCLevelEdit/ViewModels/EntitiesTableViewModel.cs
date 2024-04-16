@@ -90,8 +90,7 @@ namespace MCLevelEdit.ViewModels
         public void RefreshData()
         {
             Entities.Clear();
-            var map = _mapService.GetMap();
-            Entities.AddRange(map.Entities.Where(e => (_entityFilter > 0 ? (int)e.EntityType.TypeId == _entityFilter : true)).ToEntityViewModels());
+            Entities.AddRange(_mapService.GetEntities().Where(e => (_entityFilter > 0 ? (int)e.EntityType.TypeId == _entityFilter : true)).ToEntityViewModels());
         }
 
         private void UpdateEntities()

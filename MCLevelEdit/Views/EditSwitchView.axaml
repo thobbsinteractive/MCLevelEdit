@@ -10,7 +10,7 @@
              x:DataType="vm:EditSwitchViewModel">
   <Grid Margin="5"
         ColumnDefinitions="1*,2*"
-        RowDefinitions="40,30,30,30,30,30,30,40,90,40,40,*,40">
+        RowDefinitions="40,30,30,30,30,30,30,40,*,50">
     <Grid.Resources>
       <c:TypeIdConverter x:Key="typeIdConverter"/>
       <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
@@ -94,36 +94,11 @@
            Grid.ColumnSpan="2"
            FontWeight="Bold"
            HorizontalAlignment="Left">
-      Triggered by
-    </Label>
-    <TextBox x:Name="txtTriggedBy"
-             Grid.Row="8"
-             Grid.Column="0"
-             Grid.ColumnSpan="2"
-             Text="">
-    </TextBox>
-    <StackPanel x:Name="pnlSelectedButtons"
-                Grid.Row="9"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Orientation="Horizontal">
-      <Button x:Name="btnAddSelectedTrigger">
-        Add Selected
-      </Button>
-      <Button x:Name="btnPickTrigger">
-        Pick
-      </Button>
-    </StackPanel>
-    <Label Grid.Column="0"
-           Grid.Row="10"
-           Grid.ColumnSpan="2"
-           FontWeight="Bold"
-           HorizontalAlignment="Left">
       Triggers
     </Label>
     <DataGrid x:Name="dgTriggered"
               Grid.Column="0"
-              Grid.Row="11"
+              Grid.Row="8"
               Grid.ColumnSpan="2"
               ItemsSource="{Binding ConnectedEntityViews}"
               IsReadOnly="True"
@@ -156,16 +131,16 @@
       </DataGrid.Columns>
     </DataGrid>
     <StackPanel x:Name="pnlTriggeredButtons"
-                Grid.Row="12"
+                Grid.Row="9"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
-      <Button x:Name="btnAddTriggered"
-              Command="{Binding AddTriggeredEntityCommand}">
-        Add Entity
+      <Button x:Name="btnSelectTriggered"
+              Command="{Binding SelectTriggeredEntityCommand}">
+        Select Triggered
       </Button>
       <Button x:Name="btnPickTriggered">
-        Pick Entity
+        Pick from Map
       </Button>
     </StackPanel>
   </Grid>

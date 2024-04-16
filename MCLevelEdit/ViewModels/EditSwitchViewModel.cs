@@ -1,6 +1,8 @@
 ﻿using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.ViewModels.Mappers;
+using MCLevelEdit.Views;
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -12,7 +14,7 @@ namespace MCLevelEdit.ViewModels
         private EntityViewModel _entityView;
         private IList<EntityViewModel> _connectedEntityViews = new List<EntityViewModel>();
 
-        public ICommand AddTriggeredEntityCommand { get; }
+        public ICommand SelectTriggeredEntityCommand { get; }
 
         public EntityViewModel EntityView
         {
@@ -32,9 +34,9 @@ namespace MCLevelEdit.ViewModels
             EntityView.PropertyChanged += EntityView_PropertyChanged;
             ConnectedEntityViews = connectedEntityViews;
 
-            AddTriggeredEntityCommand = ReactiveCommand.Create(() =>
+            SelectTriggeredEntityCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                
+                await MainWindow.I?.MainViewModel.OnSelectEntitiesButtonClickedAsync(_mapService.GetEntities().ToEntityViewModels());
             });
         }
 

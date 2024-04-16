@@ -13,6 +13,7 @@ public interface IMapService
     Task<bool> RecalculateTerrain(GenerationParameters generationParameters);
     Map GetMap();
     Entity? GetEntity(ushort id);
+    List<Entity> GetEntities();
     List<Entity> GetEntitiesByCoords(int x, int y);
     List<Entity> GetEntitiesBySwitchId(ushort switchId, int excludeId = 0);
     List<Entity> GetEntitiesByTypeId(TypeId typeId);
