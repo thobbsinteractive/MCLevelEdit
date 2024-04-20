@@ -122,7 +122,7 @@ namespace MCLevelEdit.ViewModels
                         {
                             if (entityViewModel.IsSwitch())
                             {
-                                EditSwitchViewModel = new EditSwitchViewModel(_eventAggregator, _mapService, _terrainService, entityViewModel, _mapService.GetEntitiesBySwitchId(entityViewModel.SwitchId, entityViewModel.Id).ToEntityViewModels());
+                                EditSwitchViewModel = new EditSwitchViewModel(_eventAggregator, _mapService, _terrainService, entityViewModel);
                                 ShowEditSwitch = true;
                             }
                             else

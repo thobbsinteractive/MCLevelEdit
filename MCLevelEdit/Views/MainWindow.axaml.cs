@@ -65,7 +65,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         interaction.SetOutput(result);
     }
 
-    private async Task DoShowSelectEntitiesDialogAsync(InteractionContext<IList<EntityViewModel>, IList<EntityViewModel>?> interaction)
+    private async Task DoShowSelectEntitiesDialogAsync(InteractionContext<SelectEntitiesTableViewModel, IList<EntityViewModel>?> interaction)
     {
         var dialog = new SelectEntitiesWindow();
         dialog.DataContext = interaction.Input;

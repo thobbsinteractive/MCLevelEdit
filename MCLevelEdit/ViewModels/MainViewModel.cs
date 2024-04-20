@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
+using MCLevelEdit.Abstractions;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
@@ -80,7 +81,7 @@ public class MainViewModel : ViewModelBase
     public MapEditorViewModel MapEditorViewModel { get; }
     public NodePropertiesViewModel NodePropertiesViewModel { get; }
     public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowEntitiesDialog { get; }
-    public Interaction<IList<EntityViewModel>, IList<EntityViewModel>?> ShowSelectEntitiesDialog { get; }
+    public Interaction<SelectEntitiesTableViewModel, IList<EntityViewModel>?> ShowSelectEntitiesDialog { get; }
     public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
     public Interaction<AboutWindowViewModel, AboutWindowViewModel?> ShowAboutDialog { get; }
@@ -98,7 +99,7 @@ public class MainViewModel : ViewModelBase
 
         ShowGameSettingsDialog = new Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?>();
         ShowEntitiesDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
-        ShowSelectEntitiesDialog = new Interaction<IList<EntityViewModel>, IList<EntityViewModel>?>();
+        ShowSelectEntitiesDialog = new Interaction<SelectEntitiesTableViewModel, IList<EntityViewModel>?>();
         ShowValidationResultsDialog = new Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?>();
         ShowAboutDialog = new Interaction<AboutWindowViewModel, AboutWindowViewModel?>();
 
@@ -273,9 +274,11 @@ public class MainViewModel : ViewModelBase
         var result = await ShowEntitiesDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
     }
 
-    public async Task<IList<EntityViewModel>?> OnSelectEntitiesButtonClickedAsync(IList<EntityViewModel> selectedEntities)
+    public async Task<IList<EntityViewModel>?> OnSelectEntitiesButtonClickedAsync(IList<EntityViewModel> selectedEntityViewModels)
     {
-        return await ShowSelectEntitiesDialog.Handle(selectedEntities);
+        var vms = new SelectEntitiesTableViewModel(_eventAggregator, _mapService, selectedEntityViewModels);
+        await ShowSelectEntitiesDialog.Handle(vms);
+        return vms.SelectedEntities;
     }
 
     private async Task ExportImageMap(Layer layer)

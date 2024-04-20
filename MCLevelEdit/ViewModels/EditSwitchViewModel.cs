@@ -1,10 +1,13 @@
-﻿using MCLevelEdit.Application.Model;
+﻿using DynamicData;
+using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using MCLevelEdit.Views;
 using ReactiveUI;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels
@@ -28,16 +31,41 @@ namespace MCLevelEdit.ViewModels
             set => this.RaiseAndSetIfChanged(ref _connectedEntityViews, value);
         }
 
-        public EditSwitchViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService, EntityViewModel entityView, IList<EntityViewModel> connectedEntityViews) : base(eventAggregator, mapService, terrainService)
+        public EditSwitchViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService, EntityViewModel entityView) : base(eventAggregator, mapService, terrainService)
         {
             EntityView = entityView;
             EntityView.PropertyChanged += EntityView_PropertyChanged;
-            ConnectedEntityViews = connectedEntityViews;
+            RefreshConnectedEntities();
 
             SelectTriggeredEntityCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                await MainWindow.I?.MainViewModel.OnSelectEntitiesButtonClickedAsync(_mapService.GetEntities().ToEntityViewModels());
+                await SelectConnectedEntities(entityView);
             });
+        }
+
+        private void RefreshConnectedEntities()
+        {
+            ConnectedEntityViews = _mapService.GetEntitiesBySwitchId(EntityView.SwitchId, EntityView.Id).ToEntityViewModels();
+        }
+
+        private async Task SelectConnectedEntities(EntityViewModel entityView)
+        {
+            foreach (var view in _connectedEntityViews)
+            {
+                view.SwitchId = 0;
+                view.DisId = 0;
+            }
+            var newConnectedEntityViews = await MainWindow.I?.MainViewModel.OnSelectEntitiesButtonClickedAsync(_connectedEntityViews);
+            foreach (var view in newConnectedEntityViews)
+            {
+                view.SwitchId = entityView.SwitchId;
+                view.DisId = entityView.SwitchId;
+            }
+            foreach (var view in _connectedEntityViews.Union(newConnectedEntityViews))
+            {
+                UpdateEntity(view);
+            }
+            RefreshConnectedEntities();
         }
 
         public EditSwitchViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService, TypeId typeId) : base(eventAggregator, mapService, terrainService)

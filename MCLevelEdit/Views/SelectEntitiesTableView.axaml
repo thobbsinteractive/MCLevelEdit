@@ -5,12 +5,12 @@
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
              xmlns:c="clr-namespace:MCLevelEdit.Converter"
              xmlns:m="clr-namespace:MCLevelEdit.DataModel"
-             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EntitiesTableViewModel;assembly=MCLevelEdit"  
-             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.SelectEntitiesTableViewModel;assembly=MCLevelEdit"  
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="600"
              x:Class="MCLevelEdit.Views.SelectEntitiesTableView"
-             x:DataType="vm:EntitiesTableViewModel">
+             x:DataType="vm:SelectEntitiesTableViewModel">
   <Grid ColumnDefinitions="*"
-        RowDefinitions="40,*,50">
+        RowDefinitions="40,*">
     <Grid.Resources>
       <c:TypeIdConverter x:Key="typeIdConverter"/>
       <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
@@ -26,13 +26,24 @@
               ItemsSource="{Binding TypeIds}"/>
     <DataGrid Grid.Row="1"
               Grid.Column="0"
-              Margin="10,10,10,0"
+              Margin="10,10,10,10"
               x:Name="dgEntities"
               ItemsSource="{Binding Entities}"
               IsReadOnly="True"
               GridLinesVisibility="All"
               BorderThickness="1" BorderBrush="Gray">
       <DataGrid.Columns>
+        <DataGridTemplateColumn Header=""
+                        Width="40" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <CheckBox Name="chkSelected"
+                        IsChecked="{Binding IsSelected}"
+                        HorizontalAlignment="Center">
+              </CheckBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
         <DataGridTextColumn Header="Id"
                             Width="65"
                             Binding="{Binding Id}"/>
@@ -58,16 +69,5 @@
         </DataGridTemplateColumn>
       </DataGrid.Columns>
     </DataGrid>
-    <StackPanel Grid.Row="2"
-                Grid.Column="0"
-                Margin="10,0"
-                Orientation="Horizontal">
-      <Button HorizontalAlignment="Stretch"
-              HorizontalContentAlignment="Center"
-              Command="{Binding AddNewEntityCommand}"
-              Name="btnAdd">
-        Select Entity(s)
-      </Button>
-    </StackPanel>
   </Grid>
 </UserControl>

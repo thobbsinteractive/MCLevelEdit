@@ -150,6 +150,23 @@ public class EntityViewModel : ObservableObject
         }
     }
 
+    public EntityViewModel() { }
+
+    public EntityViewModel(int id, int type, int model, int modelIdx, byte x, byte y, ushort disId, ushort switchSize, ushort switchId, ushort parent, ushort child)
+    {
+        Id = id;
+        Type = type;
+        Model = model;
+        ModelIdx = modelIdx;
+        X = x;
+        Y = y;
+        DisId = disId;
+        SwitchSize = switchSize;
+        SwitchId = switchId;
+        Parent = parent;
+        Child = child;
+    }
+
     public EntityViewModel Copy()
     {
         return new EntityViewModel()
