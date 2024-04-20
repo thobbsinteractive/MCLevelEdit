@@ -65,6 +65,7 @@ namespace MCLevelEdit.ViewModels
             {
                 UpdateEntity(view);
             }
+            UpdateEntity(entityView);
             RefreshConnectedEntities();
         }
 
