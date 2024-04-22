@@ -28,7 +28,7 @@
               Grid.Column="0"
               Margin="10,10,10,10"
               x:Name="dgEntities"
-              ItemsSource="{Binding Entities}"
+              ItemsSource="{Binding DisplayedEntities}"
               IsReadOnly="True"
               GridLinesVisibility="All"
               BorderThickness="1" BorderBrush="Gray">

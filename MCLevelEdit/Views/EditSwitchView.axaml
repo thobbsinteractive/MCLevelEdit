@@ -135,12 +135,12 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Orientation="Horizontal">
-      <Button x:Name="btnSelectTriggered"
-              Command="{Binding SelectTriggeredEntityCommand}">
-        Select Triggered
-      </Button>
       <Button x:Name="btnPickTriggered">
         Pick from Map
+      </Button>
+      <Button x:Name="btnSelectTriggered"
+              Command="{Binding SelectTriggeredEntityCommand}">
+        Select from Table
       </Button>
     </StackPanel>
   </Grid>
