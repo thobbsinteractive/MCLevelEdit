@@ -44,6 +44,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private List<Shape> _selectedSwitchConnectionShapes = new List<Shape>();
 
     private bool _pathToolSelected;
+    private bool _isInEntitySelectionMode;
 
     public WriteableBitmap Preview 
     {
@@ -83,7 +84,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void OnDeleteSelectedEntity()
     {
-        if (_selectedEntityViewModel != null)
+        if (!_isInEntitySelectionMode && _selectedEntityViewModel != null)
         {
             DeleteEntity(_selectedEntityViewModel);
             OnEntitySelected(null);
@@ -92,7 +93,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void OnMoveSelectedEntity(int moveX, int moveY)
     {
-        if (_selectedEntityViewModel != null)
+        if (!_isInEntitySelectionMode && _selectedEntityViewModel != null)
         {
             _selectedEntityViewModel.X += (byte)moveX;
             _selectedEntityViewModel.Y += (byte)moveY;
@@ -103,7 +104,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void OnCursorDragged(Point origin, Point dest)
     {
-        if (_selectedEntityViewModel != null)
+        if (!_isInEntitySelectionMode && _selectedEntityViewModel != null)
         {
             var newlocation = GetCursorPointFromCanvasPoint(dest);
 
@@ -122,18 +123,25 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void OnCursorClicked(Point position, bool left, bool right)
     {
-        if (right)
-        {
-            _pathOrigin = null;
-        }
-
-        if (left && _pathToolSelected)
-        {
-            _pathOrigin = _cursorPosition;
-        }
-
         (Point, bool, bool) cursorEvent = (position, left, right);
-        _eventAggregator.RaiseEvent("OnCursorClicked", this, new PubSubEventArgs<object>(cursorEvent));
+        if (!_isInEntitySelectionMode)
+        {
+            if (right)
+            {
+                _pathOrigin = null;
+            }
+
+            if (left && _pathToolSelected)
+            {
+                _pathOrigin = _cursorPosition;
+            }
+
+            _eventAggregator.RaiseEvent("OnCursorClicked", this, new PubSubEventArgs<object>(cursorEvent));
+        }
+        else
+        {
+            _eventAggregator.RaiseEvent("OnCursorSelectionClicked", this, new PubSubEventArgs<object>(cursorEvent));
+        }
     }
 
     public void OnEntitySelected(EntityViewModel? entity)
@@ -199,11 +207,18 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             ShowSwitchConnections = !ShowSwitchConnections;
         });
-        _eventAggregator.RegisterEvent("PathToolSelected", (sender, args) =>
+        _eventAggregator.RegisterEvent("OnToolSelected", (sender, args) =>
         {
             var modelId = (int?)args?.Item;
             _pathToolSelected = modelId > 0;
             _pathOrigin = null;
+            _isInEntitySelectionMode = false;
+        });
+        _eventAggregator.RegisterEvent("OnEntitySelectionModeChanged", (sender, args) =>
+        {
+            _pathToolSelected = false;
+            _pathOrigin = null;
+            _isInEntitySelectionMode = (bool?)args?.Item ?? false;
         });
     }
 
@@ -397,6 +412,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     public void NodeSelectedHandler(object sender, PubSubEventArgs<object> arg)
     {
         bool deselect = true;
+        _isInEntitySelectionMode = false;
 
         if (arg.Item is not null)
         {
@@ -806,6 +822,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void RefreshEntitiesHandler(object sender, PubSubEventArgs<object> args)
     {
+        _isInEntitySelectionMode = false;
         RefreshEntities();
     }
 

@@ -347,7 +347,7 @@ public class EntityToolBarViewModel : ViewModelBase
         AddEntityViewModel = null;
         ToggleButtons(false);
         _previousPathNodeViewModel = null;
-        _eventAggregator.RaiseEvent("PathToolSelected", this, new PubSubEventArgs<object>(0));
+        _eventAggregator.RaiseEvent("OnToolSelected", this, new PubSubEventArgs<object>(0));
     }
 
     private void OnEntityTypeSelected(TypeId typeId)
@@ -382,6 +382,6 @@ public class EntityToolBarViewModel : ViewModelBase
             Parent = 0,
             Child = 0
         };
-        _eventAggregator.RaiseEvent("PathToolSelected", this, new PubSubEventArgs<object>(modelId));
+        _eventAggregator.RaiseEvent("OnToolSelected", this, new PubSubEventArgs<object>(modelId));
     }
 }
