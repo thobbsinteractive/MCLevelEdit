@@ -34,6 +34,12 @@ public class ViewModelBase : ReactiveObject
         if (entityView.Type == (int)TypeId.Spell)
             entityView.SwitchId = 1;
 
+        if (entityView.Type == (int)TypeId.Switch)
+        {
+            entityView.SwitchId = (ushort)(_mapService.GetMaxSwitchId() + 1);
+            entityView.SwitchSize = 3;
+        }
+
         if (entityView.IsBuilding())
         {
             entityView.DisId = ushort.MaxValue;

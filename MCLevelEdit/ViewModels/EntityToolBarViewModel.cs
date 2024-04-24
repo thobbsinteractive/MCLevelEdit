@@ -3,7 +3,6 @@ using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Extensions;
-using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Linq;
 using System.Windows.Input;

@@ -16,6 +16,7 @@ public interface IMapService
     List<Entity> GetEntities();
     List<Entity> GetEntitiesByCoords(int x, int y);
     List<Entity> GetEntitiesBySwitchId(ushort switchId, int excludeId = 0);
+    ushort GetMaxSwitchId();
     List<Entity> GetEntitiesByTypeId(TypeId typeId);
     int AddEntity(Entity entity);
     bool UpdateEntity(Entity entity);

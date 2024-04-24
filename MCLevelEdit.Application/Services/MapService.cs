@@ -146,6 +146,12 @@ public class MapService : IMapService, IEnableLogger
             return new List<Entity>();
     }
 
+    public ushort GetMaxSwitchId()
+    {
+        var switches = MapRepository.Map.Entities.Where(e => e.EntityType.TypeId == TypeId.Switch);
+        return switches.Any() ? switches.Max(e => e.SwitchId): (ushort)1;
+    }
+
     public List<Entity> GetEntitiesByTypeId(TypeId typeId)
     {
         if (typeId > 0)
