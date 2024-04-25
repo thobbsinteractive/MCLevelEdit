@@ -5,7 +5,7 @@
     <LangVersion>latest</LangVersion>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyVersion>0.9.0.0</AssemblyVersion>
+    <AssemblyVersion>0.9.1.0</AssemblyVersion>
   </PropertyGroup>
 
   
