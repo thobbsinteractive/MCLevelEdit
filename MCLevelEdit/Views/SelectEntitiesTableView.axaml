@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:c="clr-namespace:MCLevelEdit.Converter"
+             xmlns:m="clr-namespace:MCLevelEdit.DataModel"
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.SelectEntitiesTableViewModel;assembly=MCLevelEdit"  
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="600"
+             x:Class="MCLevelEdit.Views.SelectEntitiesTableView"
+             x:DataType="vm:SelectEntitiesTableViewModel">
+  <Grid ColumnDefinitions="*"
+        RowDefinitions="40,*">
+    <Grid.Resources>
+      <c:TypeIdConverter x:Key="typeIdConverter"/>
+      <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
+      <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
+      <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
+    </Grid.Resources>
+    <ComboBox Name="cboEntityType"
+              Grid.Row="0"
+              Grid.Column="0"
+              Margin="10,10,10,0"
+              Width="250"
+              DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+              ItemsSource="{Binding TypeIds}"/>
+    <DataGrid Grid.Row="1"
+              Grid.Column="0"
+              Margin="10,10,10,10"
+              x:Name="dgEntities"
+              ItemsSource="{Binding DisplayedEntities}"
+              IsReadOnly="True"
+              GridLinesVisibility="All"
+              BorderThickness="1" BorderBrush="Gray">
+      <DataGrid.Columns>
+        <DataGridTemplateColumn Header=""
+                        Width="40" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <CheckBox Name="chkSelected"
+                        IsChecked="{Binding IsSelected}"
+                        HorizontalAlignment="Center">
+              </CheckBox>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Id"
+                            Width="65"
+                            Binding="{Binding Id}"/>
+        <DataGridTemplateColumn Header="Type"
+                                Width="1*" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Label Name="txtEntityType"
+                     Content="{Binding TypeName}">
+              </Label>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Name"
+                                Width="1*" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Label Name="txtModelType"
+                     Content="{Binding ModelName}">
+              </Label>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

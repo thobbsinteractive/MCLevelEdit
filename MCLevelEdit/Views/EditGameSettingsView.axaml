@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="350"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="350"
              x:Class="MCLevelEdit.Views.EditGameSettingsView"
              x:DataType="vm:EditGameSettingsViewModel">
   <Grid Name="gdEditGameSettings"
@@ -134,7 +134,7 @@
           Grid.Column="0"
           Grid.ColumnSpan="5"
           Grid.Row="7"
-          ColumnDefinitions="115,*,*,*,90"
+          ColumnDefinitions="115,180,180,*,90"
           RowDefinitions="40">
       <Button Name="btnSave"
               Grid.Column="0"
@@ -144,8 +144,17 @@
               ToolTip.Tip="Save the current settings"
               Content="Save Settings"
               Command="{Binding SaveCommand}"/>
-      <Button Name="btnRestore"
+      <Button Name="btnBackup"
               Grid.Column="1"
+              Grid.Row="0"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Left"
+              Width="175"
+              ToolTip.Tip="Backup the Magic original levels"
+              Content="Backup Original Levels"
+              Command="{Binding BackupCommand}"/>
+      <Button Name="btnRestore"
+              Grid.Column="2"
               Grid.Row="0"
               VerticalAlignment="Center"
               HorizontalAlignment="Left"

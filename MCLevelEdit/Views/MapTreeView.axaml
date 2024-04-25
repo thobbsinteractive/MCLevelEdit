@@ -41,10 +41,11 @@
                           Command="{Binding DeleteEntityCommand}"/>
               </ContextMenu>
             </Border.ContextMenu>
-            <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" 
+                        ToolTip.Tip="{Binding ToolTip}">
               <StackPanel Orientation="Horizontal">
                 <Image Source="{Binding Icon}" />
-                <TextBlock Text="{Binding Title}" Margin="5,7,0,0"/>
+                <TextBlock Text="{Binding Title}" Margin="5,7,0,10"/>
               </StackPanel>
               <TextBlock Text="{Binding Subtitle}" Margin="5,7,0,0" IsVisible="{Binding IsSubtitleSet}"/>
             </StackPanel>

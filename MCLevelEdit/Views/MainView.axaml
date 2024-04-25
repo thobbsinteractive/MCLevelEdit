@@ -17,16 +17,26 @@
         <MenuItem Header="_Save" Command="{Binding SaveFileCommand}"/>
         <MenuItem Header="Save _As" Command="{Binding SaveFileAsCommand}"/>
         <Separator/>
-        <MenuItem Header="_Export Height Map" Command="{Binding ExportHeightMapCommand}"/>
+        <MenuItem Header="_Export Heightmap" Command="{Binding ExportHeightMapCommand}"/>
         <MenuItem Header="_Export Terrain Render" Command="{Binding ExportTerrainRenderCommand}"/>
         <Separator/>
         <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
       </MenuItem>
+      <MenuItem Header="_View">
+        <MenuItem Header="_Reset View" Command="{Binding ResetViewCommand}"/>
+        <MenuItem Header="Show _Connections" Command="{Binding ShowConnectionsCommand}"/>
+        <Separator/>
+        <MenuItem Header="Show _Shaded" Command="{Binding ShadedCommand}"/>
+        <MenuItem Header="Show _Heightmap" Command="{Binding HeightMapCommand}"/>
+      </MenuItem>
       <MenuItem Header="_Game">
         <MenuItem Header="_Game Settings" Command="{Binding EditGameSettingsCommand}"/>
+        <MenuItem Header="_Validate Level" Command="{Binding ValidateCommand}"/>
+        <MenuItem Header="_Run Current Level" Command="{Binding RunCommand}"/>
       </MenuItem>
       <MenuItem Header="_Help">
         <MenuItem Header="_About" Command="{Binding DisplayAboutCommand}"/>
+        <MenuItem Header="_Manual" Command="{Binding ShowManualCommand}" />
       </MenuItem>
     </Menu>
     <Grid Name="grdMain"

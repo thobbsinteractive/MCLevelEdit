@@ -132,12 +132,26 @@ public class Map
         ValidationResults = new List<ValidationResult>();
 
         ValidationResults.Add(MapRules.HasPlayerSpawn(this.Entities));
+        var spawnValidation = MapRules.HasCorrectNumberOfWizardSpawns(this);
+        foreach (var spawnResult in spawnValidation)
+            ValidationResults.Add(spawnResult);
 
-        foreach(Entity entity in this.Entities)
+        var wizardValidation = MapRules.HasValidWizardParamters(this);
+        foreach (var wizardResult in wizardValidation)
+            ValidationResults.Add(wizardResult);
+
+        var spellValidation = MapRules.HasBasicSpells(this);
+        foreach (var spellResult in spellValidation)
+            ValidationResults.Add(spellResult);
+
+        foreach (Entity entity in this.Entities)
         {
             ValidationResults.Add(EntityRules.HasSwitch(entity, Entities));
             ValidationResults.Add(EntityRules.BuildingHasSwidAndDisIdAndParent(entity));
-            ValidationResults.Add(EntityRules.WallAndPathCannotSameChildAndParent(entity));
+            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Wall));
+            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Path));
+            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Canyon));
+            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.RidgeNode));
             ValidationResults.Add(EntityRules.HasUniqueCoordinates(entity, Entities));
             ValidationResults.Add(EntityRules.CheckConnectedWalls(entity, Entities));
             ValidationResults.Add(EntityRules.TeleportDestinationCoordinatesAreDifferentToStart(entity));

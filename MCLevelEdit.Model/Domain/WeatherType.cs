@@ -1,4 +1,4 @@
-﻿using Avalonia.Media;
+﻿using System.Drawing;
 
 namespace MCLevelEdit.Model.Domain;
 
@@ -9,7 +9,7 @@ public enum Weather
 
 public class WeatherType : EntityType
 {
-    public WeatherType(Weather weather) : base(TypeId.Weather, Color.FromRgb(0, 0, 255), ((int)weather), weather.ToString()) { }
+    public WeatherType(Weather weather) : base(TypeId.Weather, ((int)weather), weather.ToString()) { }
 
     public override ModelType[] ModelTypes
     {

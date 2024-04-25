@@ -1,8 +1,8 @@
-﻿using Avalonia.Media;
+﻿using System.Drawing;
 
 namespace MCLevelEdit.Model.Domain;
 
-public enum Scenary
+public enum Scenery
 {
     Tree = 0,
     StandingStone = 1,
@@ -12,9 +12,9 @@ public enum Scenary
     Dome2 = 5
 }
 
-public class ScenaryType : EntityType
+public class SceneryType : EntityType
 {
-    public ScenaryType(Scenary scenary) : base(TypeId.Scenary, Color.FromRgb(0,255,0), ((int)scenary), scenary.ToString()) { }
+    public SceneryType(Scenery scenery) : base(TypeId.Scenery, ((int)scenery), scenery.ToString()) { }
 
     public override ModelType[] ModelTypes
     {
@@ -22,9 +22,9 @@ public class ScenaryType : EntityType
         {
             if (_modelTypes is null)
             {
-                _modelTypes = Enum.GetValues(typeof(Scenary))
+                _modelTypes = Enum.GetValues(typeof(Scenery))
                     .Cast<int>()
-                    .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Scenary), x) })
+                    .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Scenery), x) })
                     .ToArray();
             }
 
