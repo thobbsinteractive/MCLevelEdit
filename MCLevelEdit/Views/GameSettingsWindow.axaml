@@ -9,6 +9,6 @@
         Title="Game Settings"
         WindowStartupLocation="CenterScreen"
         MinHeight="300"
-        MinWidth="600">
+        MinWidth="700">
   <views:EditGameSettingsView />
 </Window>

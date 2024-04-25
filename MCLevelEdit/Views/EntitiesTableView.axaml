@@ -10,14 +10,21 @@
              x:Class="MCLevelEdit.Views.EntitiesTableView"
              x:DataType="vm:EntitiesTableViewModel">
   <Grid ColumnDefinitions="*"
-        RowDefinitions="*,50">
+        RowDefinitions="40,*,50">
     <Grid.Resources>
       <c:TypeIdConverter x:Key="typeIdConverter"/>
       <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
       <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
       <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
     </Grid.Resources>
-    <DataGrid Grid.Row="0"
+    <ComboBox Name="cboEntityType"
+              Grid.Row="0"
+              Grid.Column="0"
+              Margin="10,10,10,0"
+              Width="250"
+              DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+              ItemsSource="{Binding TypeIds}"/>
+    <DataGrid Grid.Row="1"
               Grid.Column="0"
               Margin="10,10,10,0"
               x:Name="dgEntities"
@@ -135,7 +142,7 @@
         </DataGridTemplateColumn>
       </DataGrid.Columns>
     </DataGrid>
-    <StackPanel Grid.Row="1"
+    <StackPanel Grid.Row="2"
                 Grid.Column="0"
                 Margin="10,0"
                 Orientation="Horizontal">

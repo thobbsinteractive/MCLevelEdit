@@ -12,10 +12,12 @@ namespace MCLevelEdit.ViewModels
         private bool _showEditWizard;
         private bool _showEditTerrain;
         private bool _showEditEntity;
+        private bool _showEditSwitch;
         private EditWizardsViewModel _editWizardsViewModel;
         private EditWizardViewModel _editWizardViewModel;
         private EditWorldViewModel _editWorldViewModel;
         private EditEntityViewModel _editEntityViewModel;
+        private EditSwitchViewModel _editSwitchViewModel;
 
         public EditWizardsViewModel EditWizardsViewModel
         {
@@ -39,6 +41,12 @@ namespace MCLevelEdit.ViewModels
         {
             get => _editEntityViewModel;
             set => this.RaiseAndSetIfChanged(ref _editEntityViewModel, value);
+        }
+
+        public EditSwitchViewModel EditSwitchViewModel
+        {
+            get => _editSwitchViewModel;
+            set => this.RaiseAndSetIfChanged(ref _editSwitchViewModel, value);
         }
 
         public bool ShowEditWizard
@@ -65,6 +73,12 @@ namespace MCLevelEdit.ViewModels
             set => this.RaiseAndSetIfChanged(ref _showEditEntity, value);
         }
 
+        public bool ShowEditSwitch
+        {
+            get => _showEditSwitch;
+            set => this.RaiseAndSetIfChanged(ref _showEditSwitch, value);
+        }
+
         public NodePropertiesViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
         {
             EditWorldViewModel = new EditWorldViewModel(eventAggregator, mapService);
@@ -77,6 +91,7 @@ namespace MCLevelEdit.ViewModels
             ShowEditEntity = false;
             ShowEditWizard = false;
             ShowEditWizards = false;
+            ShowEditSwitch = false;
             var wizards = _mapService.GetActiveWizards();
 
             if (arg.Item is not null)
@@ -99,15 +114,22 @@ namespace MCLevelEdit.ViewModels
                 }
                 else if(node.GetType() == typeof(EntityNode))
                 {
-                    ShowEditEntity = true;
                     ushort id = 0;
                     if (ushort.TryParse(node.Name, out id))
                     {
-                        var entity = _mapService.GetEntity(id);
-                        if (entity is not null)
+                        var entityViewModel = _mapService.GetEntity(id)?.ToEntityViewModel();
+                        if (entityViewModel is not null)
                         {
-                            EditEntityViewModel = new EditEntityViewModel(_eventAggregator, _mapService, _terrainService, entity.ToEntityViewModel());
-                            ShowEditEntity = true;
+                            if (entityViewModel.IsSwitch())
+                            {
+                                EditSwitchViewModel = new EditSwitchViewModel(_eventAggregator, _mapService, _terrainService, entityViewModel);
+                                ShowEditSwitch = true;
+                            }
+                            else
+                            {
+                                EditEntityViewModel = new EditEntityViewModel(_eventAggregator, _mapService, _terrainService, entityViewModel);
+                                ShowEditEntity = true;
+                            }
                         }
                     }
                 }

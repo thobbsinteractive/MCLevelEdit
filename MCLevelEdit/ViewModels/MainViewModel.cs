@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
+using MCLevelEdit.Abstractions;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
@@ -16,6 +17,8 @@ using MsBox.Avalonia.Enums;
 using ReactiveUI;
 using Splat;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -66,12 +69,19 @@ public class MainViewModel : ViewModelBase
     public ICommand DisplayFailCommand { get; }
     public ICommand DisplayWarningsCommand { get; }
     public ICommand DisplayAboutCommand { get; }
+    public ICommand ShowManualCommand { get; }
+    public ICommand ResetViewCommand { get; }
+    public ICommand ShowConnectionsCommand { get; }
+    public ICommand ShadedCommand { get; }
+    public ICommand HeightMapCommand { get; }
+    public ICommand ValidateCommand { get; }
 
     public EntityToolBarViewModel EntityToolBarViewModel { get; }
     public MapTreeViewModel MapTreeViewModel { get; }
     public MapEditorViewModel MapEditorViewModel { get; }
     public NodePropertiesViewModel NodePropertiesViewModel { get; }
     public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowEntitiesDialog { get; }
+    public Interaction<SelectEntitiesTableViewModel, IList<EntityViewModel>?> ShowSelectEntitiesDialog { get; }
     public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
     public Interaction<AboutWindowViewModel, AboutWindowViewModel?> ShowAboutDialog { get; }
@@ -89,6 +99,7 @@ public class MainViewModel : ViewModelBase
 
         ShowGameSettingsDialog = new Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?>();
         ShowEntitiesDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
+        ShowSelectEntitiesDialog = new Interaction<SelectEntitiesTableViewModel, IList<EntityViewModel>?>();
         ShowValidationResultsDialog = new Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?>();
         ShowAboutDialog = new Interaction<AboutWindowViewModel, AboutWindowViewModel?>();
 
@@ -132,35 +143,27 @@ public class MainViewModel : ViewModelBase
 
         ExportHeightMapCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await ExportImageMap(Model.Enums.Layer.Height);
+            await ExportImageMap(Layer.Height);
         });
 
         ExportTerrainRenderCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await ExportImageMap(Model.Enums.Layer.Game);
+            await ExportImageMap(Layer.Game);
         });
 
         RunCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            if (await SaveFile(false) && !string.IsNullOrWhiteSpace(_settingsPort.CurrentLevelFilePath) && File.Exists(_settingsPort.CurrentLevelFilePath))
-            {
-                var settings = _settingsPort.LoadSettings();
-                if (settings == null || string.IsNullOrWhiteSpace(settings.GameExeLocation))
-                {
-                    await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
-                }
-                else
-                {
-                    await _gameService.RunLevelFromSettings(new string[] { _settingsPort.CurrentLevelFilePath });
-                }
-            }
+            await RunLevel();
         });
 
-        ExitCommand = ReactiveCommand.CreateFromTask(() =>
+        ExitCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
+            if (await PromptSaveAndOrContinue())
             {
-                desktopApp.Shutdown();
+                if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
+                {
+                    desktopApp.Shutdown();
+                }
             }
             return Task.CompletedTask;
         });
@@ -188,11 +191,81 @@ public class MainViewModel : ViewModelBase
             });
         });
 
+        ShowManualCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            LaunchManual();
+        });
+
+        ResetViewCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            _eventAggregator.RaiseEvent("ResetView", this, new PubSubEventArgs<object>(null));
+        });
+
+        ShowConnectionsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            eventAggregator.RaiseEvent("ShowConnections", this, new PubSubEventArgs<object>(null));
+        });
+
+        ShadedCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            eventAggregator.RaiseEvent("SwitchLayer", this, new PubSubEventArgs<object>(Layer.Game));
+        });
+
+        HeightMapCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            eventAggregator.RaiseEvent("SwitchLayer", this, new PubSubEventArgs<object>(Layer.Height));
+        });
+
+        ValidateCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            await _mapService.ValidateMapAsync();
+            RefreshData();
+        });
+
         MainWindow.I.Title = GetTitle("NewLevel.DAT");
+    }
+
+    private void LaunchManual()
+    {
+        try
+        {
+            string url = @"https://github.com/thobbsinteractive/MCLevelEdit/wiki";
+            Console.WriteLine($"Trying to launch '{url}'...");
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async Task RunLevel()
+    {
+        if (await SaveFile(false) && !string.IsNullOrWhiteSpace(_settingsPort.CurrentLevelFilePath) && File.Exists(_settingsPort.CurrentLevelFilePath))
+        {
+            var settings = _settingsPort.LoadSettings();
+            if (settings == null || string.IsNullOrWhiteSpace(settings.GameExeLocation))
+            {
+                await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
+            }
+            else
+            {
+                await _gameService.RunLevelFromSettings(new string[] { _settingsPort.CurrentLevelFilePath });
+            }
+        }
     }
 
     public void OnKeyPressed(Key key)
     {
+        if (key == Key.F1)
+        {
+            LaunchManual();
+        }
+        if (key  == Key.F5) 
+        {
+            RunLevel();
+        }
+
         _eventAggregator.RaiseEvent("KeyPressed", this, new PubSubEventArgs<object>(key));
     }
 
@@ -201,7 +274,14 @@ public class MainViewModel : ViewModelBase
         var result = await ShowEntitiesDialog.Handle(Locator.Current.GetService<EntitiesTableViewModel>());
     }
 
-    private async Task ExportImageMap(Model.Enums.Layer layer)
+    public async Task<IList<EntityViewModel>?> OnSelectEntitiesButtonClickedAsync(IList<EntityViewModel> selectedEntityViewModels)
+    {
+        var vms = new SelectEntitiesTableViewModel(_eventAggregator, _mapService, selectedEntityViewModels);
+        await ShowSelectEntitiesDialog.Handle(vms);
+        return vms.SelectedEntities;
+    }
+
+    private async Task ExportImageMap(Layer layer)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow.I);
 
@@ -214,7 +294,7 @@ public class MainViewModel : ViewModelBase
         // Start async operation to open the dialog.
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Export Height Map",
+            Title = "Export Heightmap",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             DefaultExtension = suggestedExtension,
@@ -237,7 +317,7 @@ public class MainViewModel : ViewModelBase
             }
             catch (Exception ex)
             {
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the height map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to save the heightmap file {filePath}!", ButtonEnum.Ok, Icon.Error);
                 await box.ShowAsync();
             }
 
@@ -245,7 +325,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private async Task<bool> PromptSaveAndOrContinue()
+    public async Task<bool> PromptSaveAndOrContinue()
     {
         var box = MessageBoxManager.GetMessageBoxStandard("Question", $"Do you want to Save your changes?", ButtonEnum.YesNoCancel, Icon.Question);
         var result = await box.ShowAsync();

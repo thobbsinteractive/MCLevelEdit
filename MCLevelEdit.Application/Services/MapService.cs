@@ -1,6 +1,4 @@
-﻿using Avalonia.Media.Imaging;
-using MagicCarpet2Terrain.Model;
-using MCLevelEdit.Application.Extensions;
+﻿using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
@@ -55,7 +53,9 @@ public class MapService : IMapService, IEnableLogger
             }
             MapRepository.Map.ValidateEntities();
 
-            return await _filePort.SaveMapAsync(MapRepository.Map, filePath);
+            var result = await _filePort.SaveMapAsync(MapRepository.Map, filePath);
+            _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
+            return result;
         }
         catch (Exception ex)
         {
@@ -64,33 +64,21 @@ public class MapService : IMapService, IEnableLogger
         }
     }
 
-    public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, IList<Entity> entities)
+    public async Task<bool> ValidateMapAsync()
     {
-        return Task.Run(() =>
+        try
         {
-            for (int i = 0; i < entities.Count; i++)
+            await Task.Run(() =>
             {
-                DrawEntity(entities[i], bitmap);
-            }
-
-            //var result = SaveBitmap(bitmap).Result;
-
-            return bitmap;
-        });
-    }
-
-    public void DrawEntity(Entity entity, WriteableBitmap bitmap)
-    {
-        using (var fb = bitmap.Lock())
-        {
-            for (int sx = 0; sx < Globals.SQUARE_SIZE; sx++)
-            {
-                for (int sy = 0; sy < Globals.SQUARE_SIZE; sy++)
-                {
-                    fb.SetPixel((entity.Position.X * Globals.SQUARE_SIZE) + sx, (entity.Position.Y * Globals.SQUARE_SIZE) + sy, entity.EntityType.Colour);
-                }
-            }
+                MapRepository.Map.ValidateEntities();
+            });
         }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error validating level:\n{ex.Message}");
+            return false;
+        }
+        return true;
     }
 
     public Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE)
@@ -138,16 +126,37 @@ public class MapService : IMapService, IEnableLogger
         return true;
     }
 
+    public List<Entity> GetEntities()
+    {
+        return MapRepository.Map.Entities.ToList();
+    }
+
     public List<Entity> GetEntitiesByCoords(int x, int y)
     {
         return MapRepository.Map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();
     }
 
-    public List<Entity> GetEntitiesBySwitchId(ushort switchId)
+    public List<Entity> GetEntitiesBySwitchId(ushort switchId, int excludeId = 0)
     {
-        if (switchId > 0)
+        if (switchId > 0 && MapRepository.Map.Entities.Count > 0)
         {
-            return MapRepository.Map.Entities.Where(e => e.SwitchId == switchId).ToList();
+            return MapRepository.Map.Entities.Where(e => e.Id != excludeId && e.SwitchId == switchId && e.DisId < ushort.MaxValue).ToList();
+        }
+        else
+            return new List<Entity>();
+    }
+
+    public ushort GetMaxSwitchId()
+    {
+        var switches = MapRepository.Map.Entities.Where(e => e.EntityType.TypeId == TypeId.Switch);
+        return switches.Any() ? switches.Max(e => e.SwitchId): (ushort)1;
+    }
+
+    public List<Entity> GetEntitiesByTypeId(TypeId typeId)
+    {
+        if (typeId > 0)
+        {
+            return MapRepository.Map.Entities.Where(e => e.EntityType.TypeId == typeId).ToList();
         }
         else
             return new List<Entity>();
@@ -235,12 +244,21 @@ public class MapService : IMapService, IEnableLogger
 
     public uint CalculateMana()
     {
-        uint total = 0;
+        //Player starts with 1000 mana
+        uint total = 1000;
 
         if (MapRepository.Map?.Entities.Count() > 0)
         {
+            var modelCountsDic = new Dictionary<string, int>();
+
             foreach (var entity in MapRepository.Map.Entities)
             {
+                string key = $"Id {entity.EntityType.Model.Id}: {entity.EntityType.Model.Name}";
+                if (!modelCountsDic.ContainsKey(key))
+                    modelCountsDic.Add(key, 1);
+                else
+                    modelCountsDic[key]++;
+
                 if (entity.EntityType.TypeId == TypeId.Creature)
                 {
                     total += entity.EntityType.Model.Mana;
@@ -248,9 +266,29 @@ public class MapService : IMapService, IEnableLogger
 
                 if (entity.EntityType.TypeId == TypeId.Effect)
                 {
-                    if (((Effect)entity.EntityType.Model.Id) == Effect.ManaBall || (Effect)entity.EntityType.Model.Id == Effect.VillagerBuilding)
+                    if ((Effect)entity.EntityType.Model.Id == Effect.ManaBall || (Effect)entity.EntityType.Model.Id == Effect.VillagerBuilding)
                         total += 512;
                 }
+            }
+        }
+
+        var activeWizards = MapRepository.Map.Wizards.Where(w => w.IsActive && w.Name != "Player");
+
+        if (activeWizards?.Count() > 1)
+        {
+            foreach (var wizard in  activeWizards)
+            {
+                var wizardTotal = 1000u;
+                if (wizard.CastleLevel > 0)
+                {
+                    var castleTotal = 5000u;
+                    for (int i = 1; i < wizard.CastleLevel; i++)
+                    {
+                        castleTotal += castleTotal;
+                    }
+                    wizardTotal += castleTotal;
+                }
+                total += wizardTotal;
             }
         }
 

@@ -4,15 +4,24 @@ using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels
 {
     public class EntitiesTableViewModel : ViewModelBase
     {
-        private bool _IsSelected;
-        private IList<EntityViewModel>? _selectedEntityViewModels;
+        protected bool _IsSelected;
+        protected IList<EntityViewModel>? _selectedEntityViewModels;
+        protected int _entityFilter;
+
+        public new List<KeyValuePair<int, string>> TypeIds { get; } =
+            Enum.GetValues(typeof(TypeId))
+            .Cast<int>()
+            .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
+            .ToList();
 
         public IAvaloniaList<EntityViewModel> Entities { get; } = new AvaloniaList<EntityViewModel>();
         public ICommand AddNewEntityCommand { get; }
@@ -32,7 +41,7 @@ namespace MCLevelEdit.ViewModels
             {
                 var entityViewModel = new EntityViewModel()
                 {
-                    Type = (int)TypeId.Scenary,
+                    Type = (int)TypeId.Scenery,
                     X = 0,
                     Y = 0,
                     DisId = 0,
@@ -55,12 +64,22 @@ namespace MCLevelEdit.ViewModels
                 }
                 RefreshData();
             });
+
+            TypeIds.Insert(0, new KeyValuePair<int, string>(0, ""));
+            _entityFilter = 0;
         }
 
         public void OnSelectedItemsChanged(object sender, IList<EntityViewModel>? entityViewModels)
         {
             IsSelected = entityViewModels?.Count > 0;
             _selectedEntityViewModels = entityViewModels;
+        }
+
+        public void OnCboEntityTypeSelectionChanged(int index)
+        {
+            _entityFilter = index;
+            OnSelectedItemsChanged(this, null);
+            RefreshData();
         }
 
         public void OnUnload()
@@ -71,8 +90,7 @@ namespace MCLevelEdit.ViewModels
         public void RefreshData()
         {
             Entities.Clear();
-            var map = _mapService.GetMap();
-            Entities.AddRange(map.Entities.ToEntityViewModels());
+            Entities.AddRange(_mapService.GetEntities().Where(e => (_entityFilter > 0 ? (int)e.EntityType.TypeId == _entityFilter : true)).ToEntityViewModels());
         }
 
         private void UpdateEntities()

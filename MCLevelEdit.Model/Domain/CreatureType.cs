@@ -1,4 +1,4 @@
-﻿using Avalonia.Media;
+﻿using System.Drawing;
 
 namespace MCLevelEdit.Model.Domain;
 
@@ -28,11 +28,11 @@ public class CreatureType : EntityType
     private static Dictionary<Creature, uint> ManaCost = new Dictionary<Creature, uint>()
     {
         { Creature.Dragon, 4500 },
-        { Creature.Vulture, 4500 },
-        { Creature.Bee, 4500 },
+        { Creature.Vulture, 1000 },
+        { Creature.Bee, 1500 },
         { Creature.Worm, 4500 },
-        { Creature.Archer, 4500 },
-        { Creature.Crab, 12000 },
+        { Creature.Archer, 500 },
+        { Creature.Crab, 500 },
         { Creature.Kraken, 4500 },
         { Creature.TrollOrApe, 1500 },
         { Creature.Griffin, 5000 },
@@ -42,7 +42,7 @@ public class CreatureType : EntityType
         { Creature.Wyvern, 50000 },
     };
 
-    public CreatureType(Creature creature) : base(TypeId.Creature, Color.FromRgb(255, 0, 0),((int)creature), creature.ToString(), (ManaCost.ContainsKey(creature) ? ManaCost[creature] : 0)) { }
+    public CreatureType(Creature creature) : base(TypeId.Creature,((int)creature), creature.ToString(), (ManaCost.ContainsKey(creature) ? ManaCost[creature] : 0)) { }
 
     public override ModelType[] ModelTypes
     {

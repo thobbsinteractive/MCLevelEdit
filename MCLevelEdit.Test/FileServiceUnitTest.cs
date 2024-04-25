@@ -1,4 +1,5 @@
 using MCLevelEdit.Infrastructure.Adapters;
+using NUnit.Framework.Legacy;
 
 namespace MCLevelEdit.Test
 {
@@ -18,8 +19,8 @@ namespace MCLevelEdit.Test
             var fullPath = Path.Combine(Directory.GetCurrentDirectory(), path);
             var map = service.LoadMap(fullPath);
 
-            Assert.IsNotNull(map);
-            Assert.IsTrue(map.Entities?.Any());
+            ClassicAssert.IsNotNull(map);
+            Assert.That((bool)map.Entities?.Any());
         }
 
         [TestCase(@"Resources\data_01ea15.dat")]
@@ -34,14 +35,14 @@ namespace MCLevelEdit.Test
 
             var map = service.LoadMap(fullPath);
 
-            Assert.IsNotNull(map);
-            Assert.IsTrue(map.Entities?.Any());
+            ClassicAssert.IsNotNull(map);
+            Assert.That((bool)map.Entities?.Any());
 
             bool result = service.SaveMap(map, testPath);
             var levfileAfter = File.ReadAllBytes(testPath);
 
-            Assert.IsTrue(result);
-            Assert.IsTrue(ByteArrayCompare(levfileBefore, levfileAfter));
+            Assert.That(result);
+            Assert.That(ByteArrayCompare(levfileBefore, levfileAfter));
         }
 
         private bool ByteArrayCompare(byte[] a1, byte[] a2)
