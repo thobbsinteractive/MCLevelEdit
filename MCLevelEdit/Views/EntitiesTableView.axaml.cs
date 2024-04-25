@@ -13,7 +13,14 @@ namespace MCLevelEdit.Views
             InitializeComponent();
 
             this.dgEntities.SelectionChanged += DgEntities_SelectionChanged;
+            this.cboEntityType.SelectionChanged += CboEntityType_SelectionChanged;
             this.Unloaded += EntitiesTableView_Unloaded; 
+        }
+
+        private void CboEntityType_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            int index = ((KeyValuePair<int, string>)this?.cboEntityType?.SelectedItem).Key;
+            VmEntitiesTable?.OnCboEntityTypeSelectionChanged(index);
         }
 
         private void EntitiesTableView_Unloaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

@@ -50,6 +50,13 @@ namespace MagicCarpet2Terrain
 
         private int MaxMapSize = 256;
 
+        public Task<Terrain> CalculateTerrainAsync(GenerationParameters genParams, byte stage = 18)
+        {
+            return Task.Run(() => {
+                return CalculateTerrain(genParams, stage);
+            });
+        }
+
         public Terrain CalculateTerrain(GenerationParameters genParams, byte stage = 18)
         {
             MaxMapSize = genParams.MapSize;
@@ -856,7 +863,7 @@ namespace MagicCarpet2Terrain
             byte maxHeight;
             byte minHeight;
             UAxis2D index = new UAxis2D();
-            for (int i = 0; i < 256 * 256; i++)
+            for (int i = 0; i < MaxMapSize * MaxMapSize; i++)
             {
                 index.Word = (ushort)i;
                 if (mapHeightmap_11B4E0[index.Word] > maxHeightCut)
@@ -1529,13 +1536,6 @@ namespace MagicCarpet2Terrain
                     mapShading_12B4E0[index.Word] = tempIndex.X;
                 }
             }
-        }
-
-        public Task<Terrain> CalculateTerrainAsync(GenerationParameters genParams, byte stage = 18)
-        {
-            return Task.Run(() => {
-                return CalculateTerrain(genParams, stage);
-            });
         }
     }
 }

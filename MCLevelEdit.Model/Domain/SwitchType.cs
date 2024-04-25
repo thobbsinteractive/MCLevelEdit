@@ -1,6 +1,4 @@
-﻿using Avalonia.Media;
-
-namespace MCLevelEdit.Model.Domain;
+﻿namespace MCLevelEdit.Model.Domain;
 
 public enum Switch
 {
@@ -26,12 +24,12 @@ public enum Switch
     Kraken = 19,
     TrollApe = 20,
     Griffin = 21,
-    Unknown1 = 22,
-    Unknown2 = 23,
+    Skeletons = 22,
+    Emu = 23,
     Genie = 24,
-    Unknown3 = 25,
-    Unknown4 = 26,
-    Unknown5 = 27,
+    Builder = 25,
+    Townie = 26,
+    Trader = 27,
     Unknown6 = 28,
     Wyvern = 29,
     CreatureAll = 30,
@@ -40,7 +38,7 @@ public enum Switch
 
 public class SwitchType : EntityType
 {
-    public SwitchType(Switch gameSwitch) : base(TypeId.Switch, Color.FromRgb(255, 255, 255), ((int)gameSwitch), gameSwitch.ToString()) { }
+    public SwitchType(Switch gameSwitch) : base(TypeId.Switch, ((int)gameSwitch), gameSwitch.ToString()) { }
 
     public override ModelType[] ModelTypes
     {

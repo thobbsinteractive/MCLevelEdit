@@ -32,9 +32,9 @@ public class EntityTypes
         }
 
         Sceneries = new Dictionary<int, EntityType>();
-        foreach (Scenary scenary in (Scenary[])Enum.GetValues(typeof(Scenary)))
+        foreach (Scenery scenery in (Scenery[])Enum.GetValues(typeof(Scenery)))
         {
-            Sceneries.Add((int)scenary, new ScenaryType(scenary));
+            Sceneries.Add((int)scenery, new SceneryType(scenery));
         }
 
         Creatures = new Dictionary<int, EntityType>();

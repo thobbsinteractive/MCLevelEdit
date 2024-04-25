@@ -1,0 +1,149 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:c="clr-namespace:MCLevelEdit.Converter"
+             xmlns:local="clr-namespace:MCLevelEdit.ViewModels.EditSwitchViewModel;assembly=MCLevelEdit"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="600"
+             x:Class="MCLevelEdit.Views.EditSwitchView"
+             x:DataType="vm:EditSwitchViewModel">
+  <Grid Margin="5"
+        ColumnDefinitions="1*,2*"
+        RowDefinitions="40,30,30,30,30,30,30,40,*,50">
+    <Grid.Resources>
+      <c:TypeIdConverter x:Key="typeIdConverter"/>
+      <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
+      <c:KeyValuePairToIdConverter x:Key="keyValuePairToIdConverter"/>
+      <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
+      <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
+    </Grid.Resources>
+    <Label Grid.Column="0"
+           Grid.Row="0"
+           Grid.ColumnSpan="2"
+           FontWeight="Bold"
+           HorizontalAlignment="Left">
+      Entity Properties
+    </Label>
+    <Label Grid.Column="0"
+           Grid.Row="1"
+           HorizontalAlignment="Left">
+      Model:
+    </Label>
+    <ComboBox Name="cboEntityModelType"
+              Grid.Row="1"
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Stretch"
+              SelectedIndex="{Binding EntityView.ModelIdx}"
+              DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+              ItemsSource="{Binding EntityView.ModelTypes}">
+    </ComboBox>
+    <Label Grid.Column="0"
+           Grid.Row="2"
+           HorizontalAlignment="Left">
+      PosX:
+    </Label>
+    <TextBox x:Name="txtPosX"
+             Grid.Row="2"
+             Grid.Column="1"
+             Text="{Binding EntityView.X, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="3"
+           HorizontalAlignment="Left">
+      PosY:
+    </Label>
+    <TextBox x:Name="txtPosY"
+         Grid.Row="3"
+         Grid.Column="1"
+         Text="{Binding EntityView.Y, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="4"
+           HorizontalAlignment="Left">
+      DisId:
+    </Label>
+    <TextBox x:Name="txtDisId"
+        Grid.Row="4"
+        Grid.Column="1"
+        Text="{Binding EntityView.DisId, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="5"
+           HorizontalAlignment="Left">
+      Switch Size:
+    </Label>
+    <TextBox x:Name="txtSwitchSize"
+             Grid.Row="5"
+             Grid.Column="1"
+             Text="{Binding EntityView.SwitchSize, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="6"
+           HorizontalAlignment="Left">
+      Switch Id:
+    </Label>
+    <TextBox x:Name="txtSwitchId"
+             Grid.Row="6"
+             Grid.Column="1"
+             Text="{Binding EntityView.SwitchId, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="7"
+           Grid.ColumnSpan="2"
+           FontWeight="Bold"
+           HorizontalAlignment="Left">
+      Triggers
+    </Label>
+    <DataGrid x:Name="dgTriggered"
+              Grid.Column="0"
+              Grid.Row="8"
+              Grid.ColumnSpan="2"
+              ItemsSource="{Binding ConnectedEntityViews}"
+              IsReadOnly="True"
+              GridLinesVisibility="All"
+              BorderThickness="1" BorderBrush="Gray">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Id"
+                            Width="65"
+                            Binding="{Binding Id}"/>
+        <DataGridTemplateColumn Header="Type"
+                                Width="1*" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Label Name="txtEntityType"
+                     Content="{Binding TypeName}">
+              </Label>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Name"
+                                Width="1*" >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Label Name="txtModelType"
+                     Content="{Binding ModelName}">
+              </Label>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+    <StackPanel x:Name="pnlTriggeredButtons"
+                Grid.Row="9"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal">
+      <ToggleButton x:Name="btnPickTriggered"
+                    IsChecked="{Binding SelectingConnectedEntities}"
+                    Command="{Binding PickItemsFromMapCommand}">
+        Pick from Map
+      </ToggleButton>
+      <Button x:Name="btnSelectTriggered"
+              Command="{Binding SelectTriggeredEntityCommand}">
+        Select from Table
+      </Button>
+    </StackPanel>
+  </Grid>
+</UserControl>

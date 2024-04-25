@@ -7,9 +7,9 @@ namespace MCLevelEdit.Model.Domain.Validation
         public static ValidationResult HasSwitch(Entity entity, IList<Entity> entities)
         {
 
-            if (entity is not null && entities is not null && entities.Any())
+            if (entity is not null && (entities?.Any() ?? false))
             {
-                if (entity.SwitchId > 0 && entity.SwitchId != ushort.MaxValue && entity.EntityType.TypeId != TypeId.Switch) 
+                if (entity.SwitchId > 0 && entity.DisId != ushort.MaxValue && entity.SwitchId != ushort.MaxValue && entity.EntityType.TypeId != TypeId.Switch) 
                 {
                     var sw = entities.Where(e => e.EntityType.TypeId == TypeId.Switch && e.SwitchId == entity.SwitchId).FirstOrDefault();
 
@@ -69,26 +69,26 @@ namespace MCLevelEdit.Model.Domain.Validation
             }
         }
 
-        public static ValidationResult WallAndPathCannotSameChildAndParent(Entity entity)
+        public static ValidationResult PathEntityCannotSameChildAndParent(Entity entity, int entityTypeId)
         {
 
             if (entity is not null)
             {
-                if (entity.EntityType.TypeId == TypeId.Effect && (entity.EntityType.Model.Id == (int)Effect.Wall || entity.EntityType.Model.Id == (int)Effect.Path))
+                if (entity.EntityType.TypeId == TypeId.Effect && entity.EntityType.Model.Id == entityTypeId)
                 {
                     if (entity.Id == entity.Child)
                     {
-                        return new ValidationResult(entity.Id, Result.Fail, $"{entity} Wall CANNOT have same Id as its Child Id!");
+                        return new ValidationResult(entity.Id, Result.Fail, $"{entity} CANNOT have same Id as its Child Id!");
                     }
                     if (entity.Id == entity.Parent)
                     {
-                        return new ValidationResult(entity.Id, Result.Fail, $"{entity} Wall CANNOT have same Id as its Parent Id!");
+                        return new ValidationResult(entity.Id, Result.Fail, $"{entity} CANNOT have same Id as its Parent Id!");
                     }
-                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(WallAndPathCannotSameChildAndParent)}");
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(PathEntityCannotSameChildAndParent)}");
                 }
                 else
                 {
-                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(WallAndPathCannotSameChildAndParent)}");
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(PathEntityCannotSameChildAndParent)}");
                 }
             }
             else
@@ -102,13 +102,13 @@ namespace MCLevelEdit.Model.Domain.Validation
 
             if (entity is not null)
             {
-                if (!entity.IsSwitch())
+                if (!entity.IsSwitch() && !entity.IsCanyonOrRidge() && !entity.IsWall())
                 {
                     var duplicateCoordEntities = entities.Where(e => e.Id != entity.Id && e.Position.Equals(entity.Position)).ToList();
 
                     if (duplicateCoordEntities?.Count > 0 && !duplicateCoordEntities.All(e => e.IsSwitch()))
                     {
-                        return new ValidationResult(entity.Id, Result.Fail, $"{entity} has duplicate coordinates with another Entity {duplicateCoordEntities.FirstOrDefault().Id}");
+                        return new ValidationResult(entity.Id, Result.Warning, $"{entity} has duplicate coordinates with another Entity {duplicateCoordEntities.FirstOrDefault().Id}");
                     }
                     else
                     {
@@ -117,7 +117,7 @@ namespace MCLevelEdit.Model.Domain.Validation
                 }
                 else
                 {
-                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} is Switch");
+                    return new ValidationResult(entity.Id, Result.Pass, $"{entity} is Switch, Wall, Path or Canyon node");
                 }
             }
             else
@@ -152,12 +152,12 @@ namespace MCLevelEdit.Model.Domain.Validation
             {
                 if (entity.Parent == 0)
                 {
-                    return CheckNextWallChild(entity, entities);
+                    return CheckNextPathEntityChild(entity, entities);
 
                 }
                 else if (entity.Child == 0)
                 {
-                    return CheckNextWallParent(entity, entities);
+                    return CheckNextPathEntityParent(entity, entities);
                 }
                 else
                 {
@@ -170,11 +170,11 @@ namespace MCLevelEdit.Model.Domain.Validation
             }
         }
 
-        private static ValidationResult CheckNextWallChild(Entity entity, IList<Entity> entities)
+        private static ValidationResult CheckNextPathEntityChild(Entity entity, IList<Entity> entities)
         {
-            var nextWalls = entities.Where(e => entity.IsWall() && entity.Child > 0 && entity.Child == e.Id);
+            var nextWalls = entities?.Where(e => entity.IsWall() && entity.Child > 0 && entity.Child == e.Id);
 
-            if (nextWalls.Any())
+            if (nextWalls?.Any() ?? false)
             {
                 foreach (var wall in nextWalls)
                 {
@@ -182,17 +182,17 @@ namespace MCLevelEdit.Model.Domain.Validation
                         return new ValidationResult(wall.Id, Result.Fail, $"{wall} does not have the correct Parent Id, should be: {entity.Id}");
 
                     if (wall.Child > 0)
-                        return CheckNextWallChild(wall, entities);
+                        return CheckNextPathEntityChild(wall, entities);
                 }
             }
             return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(CheckConnectedWalls)}");
         }
 
-        private static ValidationResult CheckNextWallParent(Entity entity, IList<Entity> entities)
+        private static ValidationResult CheckNextPathEntityParent(Entity entity, IList<Entity> entities)
         {
-            var nextWalls = entities.Where(e => entity.IsWall() && entity.Parent > 0 && entity.Parent == e.Id);
+            var nextWalls = entities?.Where(e => entity.IsWall() && entity.Parent > 0 && entity.Parent == e.Id);
 
-            if (nextWalls.Any())
+            if (nextWalls?.Any() ?? false)
             {
                 foreach (var wall in nextWalls)
                 {
@@ -200,7 +200,7 @@ namespace MCLevelEdit.Model.Domain.Validation
                         return new ValidationResult(wall.Id, Result.Fail, $"{wall} does not have the correct Child Id, should be: {entity.Id}");
 
                     if (wall.Parent > 0)
-                        return CheckNextWallParent(wall, entities);
+                        return CheckNextPathEntityParent(wall, entities);
                 }
             }
             return new ValidationResult(entity.Id, Result.Pass, $"{entity} {nameof(CheckConnectedWalls)}");
