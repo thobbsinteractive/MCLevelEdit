@@ -8,6 +8,7 @@ using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using ReactiveUI;
+using Splat;
 using System;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,7 @@ using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels
 {
-    public class EditGameSettingsViewModel : ReactiveObject
+    public class EditGameSettingsViewModel : ReactiveObject, IEnableLogger
     {
         protected readonly EventAggregator<object> _eventAggregator;
         protected readonly ISettingsPort _settingsPort;
@@ -351,14 +352,14 @@ namespace MCLevelEdit.ViewModels
                 }
                 else
                 {
-                    Console.WriteLine($"Game Exe/lnk not found! Please re-check!");
+                    this.Log().Error($"Game Exe/lnk not found! Please re-check!");
                     var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Game Exe/lnk not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
                     await box.ShowAsync();
                 }
             }
             else
             {
-                Console.WriteLine($"No Level selected to run! Please re-check!");
+                this.Log().Error($"No Level selected to run! Please re-check!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"No Level selected to run! Please re-check!", ButtonEnum.Ok, Icon.Error);
                 await box.ShowAsync();
             }
@@ -379,7 +380,7 @@ namespace MCLevelEdit.ViewModels
                         }
                         else
                         {
-                            Console.WriteLine($"LEVELS GOG cloud directory not found! Please re-check!");
+                            this.Log().Error($"LEVELS GOG cloud directory not found! Please re-check!");
                             var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS GOG cloud directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
                             await box.ShowAsync();
                         }
@@ -391,14 +392,14 @@ namespace MCLevelEdit.ViewModels
                 }
                 else
                 {
-                    Console.WriteLine($"Game Levels Backup directory not set! Please re-check!");
+                    this.Log().Error($"Game Levels Backup directory not set! Please re-check!");
                     var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Game Levels Backup directory not set! Please re-check!", ButtonEnum.Ok, Icon.Error);
                     await box.ShowAsync();
                 }
             }
             else
             {
-                Console.WriteLine($"LEVELS directory not found! Please re-check!");
+                this.Log().Error($"LEVELS directory not found! Please re-check!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
                 await box.ShowAsync();
             }
@@ -419,7 +420,7 @@ namespace MCLevelEdit.ViewModels
 
             if (!_settingsPort.SaveSettings(settings))
             {
-                Console.WriteLine($"Error saving settings!");
+                this.Log().Error($"Error saving settings!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error saving settings! Do you want to continue?", ButtonEnum.OkCancel, Icon.Warning);
                 var result = await box.ShowAsync();
                 return result == ButtonResult.Ok;
@@ -431,7 +432,7 @@ namespace MCLevelEdit.ViewModels
         {
             if (!await _gameService.BackupLevelFiles(this.GameLevelsPath, this.GameLevelsBackupPath))
             {
-                Console.WriteLine($"Error backing up Levels!");
+                this.Log().Error($"Error backing up Levels!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error backing up Levels! Please check and validate your paths", ButtonEnum.Ok, Icon.Warning);
                 var result = await box.ShowAsync();
                 return result == ButtonResult.Ok;
@@ -450,7 +451,7 @@ namespace MCLevelEdit.ViewModels
 
             if (!await _gameService.RestoringLevelFiles(this.GameLevelsBackupPath, paths))
             {
-                Console.WriteLine($"Error restoring you game files Levels!");
+                this.Log().Error($"Error restoring you game files Levels!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error restoring you game files Levels!", ButtonEnum.Ok, Icon.Error);
                 await box.ShowAsync();
                 return false;

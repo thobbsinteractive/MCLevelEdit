@@ -230,12 +230,12 @@ public class MainViewModel : ViewModelBase
         try
         {
             string url = @"https://github.com/thobbsinteractive/MCLevelEdit/wiki";
-            Console.WriteLine($"Trying to launch '{url}'...");
+            this.Log().Info($"Trying to launch '{url}'...");
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            this.Log().Error($"Exception launching: {ex.Message}");
         }
     }
 
