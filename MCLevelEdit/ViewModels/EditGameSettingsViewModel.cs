@@ -9,7 +9,6 @@ using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using ReactiveUI;
 using Splat;
-using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
