@@ -81,21 +81,37 @@ public class MapService : IMapService, IEnableLogger
         return true;
     }
 
-    public Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE)
+    public async Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE)
     {
-        MapRepository.Map = new Map();
-        _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
-        _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
-        if (randomTerrain)
-            MapRepository.Map.Terrain.GenerationParameters =  _terrainService.GetRandomGeneratorParamters();
+        try
+        {
+            MapRepository.Map = new Map();
+            _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
+            _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
+            if (randomTerrain)
+                MapRepository.Map.Terrain.GenerationParameters = _terrainService.GetRandomGeneratorParamters();
 
-        return RecalculateTerrain(MapRepository.Map.Terrain.GenerationParameters);
+            return await RecalculateTerrain(MapRepository.Map.Terrain.GenerationParameters);
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error Creating level:\n{ex.Message}");
+            return false;
+        }
     }
 
     public async Task<bool> RecalculateTerrain(GenerationParameters generationParameters)
     {
-        MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(generationParameters);
-        _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+        try
+        {
+            MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(generationParameters);
+            _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error Recalculating level:\n{ex.Message}");
+            return false;
+        }
         return true;
     }
 
@@ -201,45 +217,52 @@ public class MapService : IMapService, IEnableLogger
 
     public bool UpdateWizard(Wizard wizard)
     {
-        var wizardToUpdate = MapRepository.Map.Wizards.Where(w => w.Name.Equals(wizard.Name)).FirstOrDefault();
-
-        if (wizardToUpdate != null)
+        try
         {
-            wizardToUpdate.Agression = wizard.Agression;
-            wizardToUpdate.Perception = wizard.Perception;
-            wizardToUpdate.Reflexes = wizard.Reflexes;
-            wizardToUpdate.CastleLevel = wizard.CastleLevel;
+            var wizardToUpdate = MapRepository.Map.Wizards.Where(w => w.Name.Equals(wizard.Name)).FirstOrDefault();
 
-            if (wizardToUpdate.Spells != null)
+            if (wizardToUpdate != null)
             {
-                wizardToUpdate.Spells.Fireball = wizard.Spells.Fireball;
-                wizardToUpdate.Spells.Shield = wizard.Spells.Shield;
-                wizardToUpdate.Spells.Accelerate = wizard.Spells.Accelerate;
-                wizardToUpdate.Spells.Possess = wizard.Spells.Possess;
-                wizardToUpdate.Spells.Heal = wizard.Spells.Heal;
-                wizardToUpdate.Spells.BeyondSight = wizard.Spells.BeyondSight;
-                wizardToUpdate.Spells.Earthquake = wizard.Spells.Earthquake;
-                wizardToUpdate.Spells.Meteor = wizard.Spells.Meteor;
-                wizardToUpdate.Spells.Volcano = wizard.Spells.Volcano;
-                wizardToUpdate.Spells.Crater = wizard.Spells.Crater;
-                wizardToUpdate.Spells.Teleport = wizard.Spells.Teleport;
-                wizardToUpdate.Spells.Duel = wizard.Spells.Duel;
-                wizardToUpdate.Spells.Invisible = wizard.Spells.Invisible;
-                wizardToUpdate.Spells.StealMana = wizard.Spells.StealMana;
-                wizardToUpdate.Spells.Rebound = wizard.Spells.Rebound;
-                wizardToUpdate.Spells.LightningBolt = wizard.Spells.LightningBolt;
-                wizardToUpdate.Spells.Castle = wizard.Spells.Castle;
-                wizardToUpdate.Spells.UndeadArmy = wizard.Spells.UndeadArmy;
-                wizardToUpdate.Spells.LightningStorm = wizard.Spells.LightningStorm;
-                wizardToUpdate.Spells.ManaMagnet = wizard.Spells.ManaMagnet;
-                wizardToUpdate.Spells.WallofFire = wizard.Spells.WallofFire;
-                wizardToUpdate.Spells.ReverseAcceleration = wizard.Spells.ReverseAcceleration;
-                wizardToUpdate.Spells.GlobalDeath = wizard.Spells.GlobalDeath;
-                wizardToUpdate.Spells.RapidFireball = wizard.Spells.RapidFireball;
-            }
-        }
+                wizardToUpdate.Agression = wizard.Agression;
+                wizardToUpdate.Perception = wizard.Perception;
+                wizardToUpdate.Reflexes = wizard.Reflexes;
+                wizardToUpdate.CastleLevel = wizard.CastleLevel;
 
-        return true;
+                if (wizardToUpdate.Spells != null)
+                {
+                    wizardToUpdate.Spells.Fireball = wizard.Spells.Fireball;
+                    wizardToUpdate.Spells.Shield = wizard.Spells.Shield;
+                    wizardToUpdate.Spells.Accelerate = wizard.Spells.Accelerate;
+                    wizardToUpdate.Spells.Possess = wizard.Spells.Possess;
+                    wizardToUpdate.Spells.Heal = wizard.Spells.Heal;
+                    wizardToUpdate.Spells.BeyondSight = wizard.Spells.BeyondSight;
+                    wizardToUpdate.Spells.Earthquake = wizard.Spells.Earthquake;
+                    wizardToUpdate.Spells.Meteor = wizard.Spells.Meteor;
+                    wizardToUpdate.Spells.Volcano = wizard.Spells.Volcano;
+                    wizardToUpdate.Spells.Crater = wizard.Spells.Crater;
+                    wizardToUpdate.Spells.Teleport = wizard.Spells.Teleport;
+                    wizardToUpdate.Spells.Duel = wizard.Spells.Duel;
+                    wizardToUpdate.Spells.Invisible = wizard.Spells.Invisible;
+                    wizardToUpdate.Spells.StealMana = wizard.Spells.StealMana;
+                    wizardToUpdate.Spells.Rebound = wizard.Spells.Rebound;
+                    wizardToUpdate.Spells.LightningBolt = wizard.Spells.LightningBolt;
+                    wizardToUpdate.Spells.Castle = wizard.Spells.Castle;
+                    wizardToUpdate.Spells.UndeadArmy = wizard.Spells.UndeadArmy;
+                    wizardToUpdate.Spells.LightningStorm = wizard.Spells.LightningStorm;
+                    wizardToUpdate.Spells.ManaMagnet = wizard.Spells.ManaMagnet;
+                    wizardToUpdate.Spells.WallofFire = wizard.Spells.WallofFire;
+                    wizardToUpdate.Spells.ReverseAcceleration = wizard.Spells.ReverseAcceleration;
+                    wizardToUpdate.Spells.GlobalDeath = wizard.Spells.GlobalDeath;
+                    wizardToUpdate.Spells.RapidFireball = wizard.Spells.RapidFireball;
+                }
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error Updating Wizards:\n{ex.Message}");
+            return false;
+        }
     }
 
     public uint CalculateMana()
