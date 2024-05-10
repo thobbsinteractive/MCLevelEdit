@@ -5,7 +5,6 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
-using MCLevelEdit.Abstractions;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
@@ -30,8 +29,6 @@ namespace MCLevelEdit.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    private const string DOCS_DIRECTORY = "MCLevelEdit";
-
     private int _failCount = 0;
     private int _warningCount = 0;
 
@@ -358,7 +355,7 @@ public class MainViewModel : ViewModelBase
         {
             string suggestedExtension = "DAT";
             string suggestedFileName = !string.IsNullOrWhiteSpace(map.FilePath) ? Path.GetFileNameWithoutExtension(map.FilePath) : "NewLevel";
-            IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DOCS_DIRECTORY));
+            IStorageFolder storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Globals.APP_DIRECTORY));
             
             if (storageFolder != null && !Directory.Exists(storageFolder.Path.LocalPath))
             {

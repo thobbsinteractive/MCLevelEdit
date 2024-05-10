@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Logging;
 using Avalonia.ReactiveUI;
+using MCLevelEdit.Model.Domain;
 using Serilog;
 using Splat;
 using Splat.Serilog;
@@ -11,8 +12,6 @@ namespace MCLevelEdit.Desktop;
 
 class Program
 {
-    public const string DOCS_DIRECTORY = "MCLevelEdit";
-
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -49,7 +48,7 @@ class Program
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp(LogLevel logLevel)
     {
-        string path = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DOCS_DIRECTORY),"log.txt");
+        string path = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Globals.APP_DIRECTORY),"log.txt");
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Is((Serilog.Events.LogEventLevel)logLevel)
             .WriteTo.File(path, rollOnFileSizeLimit: true)
