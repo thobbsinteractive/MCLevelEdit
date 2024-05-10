@@ -2,7 +2,7 @@
 A C# Level Editor for the Bullfrog Productions game Magic Carpet. 30 years late, but better late than never. It is written in Avalonia and C#. Currently this only works for the original Magic Carpet (but ironically uses the MC2 terrain generation algorithem). In the future versions, Hidden worlds should be possible.
 
 Without Moburma's research and his original repo https://github.com/Moburma/MCLevelEdit this could not have been written. The Level Packager and Loading and Saving code is converted from Moburma's.
-
+### Join us on discord: https://discord.gg/WH9mxNaS
 ![Example Screenshot](MCLevelEdit.png)
 
 ## Download the latest Beta Here! ##
@@ -33,12 +33,12 @@ White - Switch (hidden switches)<br/>
 ## MILLSTONE 1
 - [ ] Currently the Mana Calculation is wrong. More investigation is needed with the existing levels.
 - [ ] Implement click and drag of Entities to move them on the map
-- [ ] Double Click on error/warning to select entity with said Error/Warning
-- [ ] Add filter drop downs to the Tree and the Edit Entities views.
+- [x] Double Click on error/warning to select entity with said Error/Warning
+- [x] Add filter drop downs to the Tree and the Edit Entities views.
 
 ## MILLSTONE 2
 - [ ] Add custom tools for creating Walls/Paths and Teleports.
-- [ ] Add validation rules for Walls/Paths and Teleports.
+- [x] Add validation rules for Walls/Paths and Teleports.
 - [ ] Adding decompression and extraction of levels to the PagkageAdapter so you can directly open from the Editor
 
 ## MILLSTONE 3
