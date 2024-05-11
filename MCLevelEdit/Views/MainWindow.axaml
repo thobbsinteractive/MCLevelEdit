@@ -5,7 +5,7 @@
         xmlns:views="clr-namespace:MCLevelEdit.Views"
         mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="850"
         x:Class="MCLevelEdit.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/editor.ico"
         Title="MCLevelEdit"
         MinWidth="1400"
         MinHeight="820"

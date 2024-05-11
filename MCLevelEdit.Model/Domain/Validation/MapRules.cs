@@ -56,7 +56,7 @@ namespace MCLevelEdit.Model.Domain.Validation
                 if (fireballSpell is not null)
                     ValidationResults.Add(new ValidationResult(fireballSpell.Id, Result.Pass, "Fireball Spell is present"));
                 else
-                    ValidationResults.Add(new ValidationResult(0, Result.Fail, "Fireball Spell is required to complete the level"));
+                    ValidationResults.Add(new ValidationResult(0, Result.Warning, "Fireball Spell (or somekind of offensive spell) is recommended to complete the level"));
 
                 if (possessionSpell is not null)
                     ValidationResults.Add(new ValidationResult(possessionSpell.Id, Result.Pass, "Possession Spell is present"));
@@ -66,7 +66,7 @@ namespace MCLevelEdit.Model.Domain.Validation
                 if (castleSpell is not null)
                     ValidationResults.Add(new ValidationResult(castleSpell.Id, Result.Pass, "Castle Spell is present"));
                 else
-                    ValidationResults.Add(new ValidationResult(0, Result.Warning, "It is a good idea to have the Castle Spell to help complete the level"));
+                    ValidationResults.Add(new ValidationResult(0, Result.Fail, "The Castle Spell is required to complete the level"));
             }
 
             return ValidationResults;

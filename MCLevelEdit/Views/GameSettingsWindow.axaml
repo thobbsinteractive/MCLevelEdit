@@ -5,7 +5,7 @@
         xmlns:views="clr-namespace:MCLevelEdit.Views"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
         x:Class="MCLevelEdit.Views.GameSettingsWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/editor.ico"
         Title="Game Settings"
         WindowStartupLocation="CenterScreen"
         MinHeight="300"

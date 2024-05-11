@@ -3,12 +3,13 @@ using MagicCarpetLevelPackager.Abstractions;
 using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
+using Splat;
 using System.ComponentModel;
 using System.Diagnostics;
 
 namespace MCLevelEdit.Application.Services
 {
-    public class GameService : IGameService
+    public class GameService : IGameService, IEnableLogger
     {
         private readonly IPackagePort _packagePort;
         private readonly ISettingsPort _settingsPort;
@@ -21,27 +22,35 @@ namespace MCLevelEdit.Application.Services
 
         public Task<bool> PackageLevelAsync(string[] levelFilePaths, string[] gameLevelsPaths)
         {
-            return Task.Run(async () =>
+            try
             {
-                bool success = false;
-                foreach (string gameLevelPath in gameLevelsPaths)
+                return Task.Run(async () =>
                 {
-                    if (Directory.Exists(gameLevelPath))
+                    bool success = false;
+                    foreach (string gameLevelPath in gameLevelsPaths)
                     {
-                        success = await _packagePort.PackageFilesAsync(levelFilePaths, gameLevelPath);
-                        if (!success)
-                            return false;
+                        if (Directory.Exists(gameLevelPath))
+                        {
+                            success = await _packagePort.PackageFilesAsync(levelFilePaths, gameLevelPath);
+                            if (!success)
+                                return false;
+                        }
                     }
-                }
-                return success;
-            });
+                    return success;
+                });
+            }
+            catch (Exception ex)
+            {
+                this.Log().Error(ex, $"Error Packing Level:\n{ex.Message}");
+                return Task.FromResult(false);
+            }
         }
 
         public bool RunGame(string gamePath, string args)
         {
             try
             {
-                Console.WriteLine($"Trying to launch '{gamePath}'...");
+                this.Log().Info($"Trying to launch '{gamePath}'...");
 
                 new Process
                 {
@@ -56,7 +65,7 @@ namespace MCLevelEdit.Application.Services
             }
             catch (Win32Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                this.Log().Error(ex, $"Error running level:\n{ex.Message}");
                 return false;
             }
         }
@@ -90,9 +99,10 @@ namespace MCLevelEdit.Application.Services
 
                         return RunGame(gameExeLocation, gameArgs);
                     }
-                } catch (Exception ex)
+                } 
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Error running game: " + ex.Message);
+                    this.Log().Error(ex, $"Error runing level from settings:\n{ex.Message}");
                 }
             }
             return false;
@@ -108,7 +118,7 @@ namespace MCLevelEdit.Application.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error backing up files: " + ex.Message);
+                    this.Log().Error(ex, $"Error backing up files:\n{ex.Message}");
                 }
             }
             return false;
@@ -131,7 +141,7 @@ namespace MCLevelEdit.Application.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error restoring up files: " + ex.Message);
+                    this.Log().Error(ex, $"Error restoring up files:\n{ex.Message}");
                 }
             }
             return false;

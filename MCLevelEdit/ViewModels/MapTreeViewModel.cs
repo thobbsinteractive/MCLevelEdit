@@ -227,7 +227,6 @@ public class MapTreeViewModel : ReactiveObject
             entityNode.Y = entityViewModel.Y;
             entityNode.Icon = GetIconFromEntity(entityViewModel);
             entityNode.Title = GetEntityNodeTitle(entityViewModel);
-            entityNode.Subtitle = GetEntityNodeSubTitle(entityViewModel);
         }
 
         if (_entityFilter > 0 && (int)entityViewModel.Type != _entityFilter)
