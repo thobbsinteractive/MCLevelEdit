@@ -5,7 +5,7 @@
         xmlns:views="clr-namespace:MCLevelEdit.Views"
         mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="600"
         x:Class="MCLevelEdit.Views.SelectEntitiesWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/editor.ico"
         Title="Select Entities"
         WindowStartupLocation="CenterScreen"
         MinHeight="450"

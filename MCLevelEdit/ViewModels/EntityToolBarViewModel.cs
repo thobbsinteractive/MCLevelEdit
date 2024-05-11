@@ -39,6 +39,21 @@ public class EntityToolBarViewModel : ViewModelBase
         }
     }
 
+    public int ModelIdx
+    {
+        get
+        {
+             return AddEntityViewModel?.ModelIdx ?? -1;
+        }
+        set
+        {
+            if (AddEntityViewModel != null)
+            {
+                AddEntityViewModel.ModelIdx = value;
+            }
+        }
+    }
+
     public bool CursorSelected
     {
         get
@@ -364,6 +379,7 @@ public class EntityToolBarViewModel : ViewModelBase
             Parent = 0,
             Child = 0
         };
+        this.RaisePropertyChanged(nameof(ModelIdx));
     }
 
     public void OnPathTypeClicked(int modelId)
@@ -381,6 +397,7 @@ public class EntityToolBarViewModel : ViewModelBase
             Parent = 0,
             Child = 0
         };
+        this.RaisePropertyChanged(nameof(ModelIdx));
         _eventAggregator.RaiseEvent("OnToolSelected", this, new PubSubEventArgs<object>(modelId));
     }
 }
