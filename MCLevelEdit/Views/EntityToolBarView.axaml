@@ -120,7 +120,7 @@
                   Grid.ColumnSpan="7"
                   VerticalAlignment="Center"
                   HorizontalAlignment="Stretch"
-                  SelectedIndex="{Binding AddEntityViewModel.ModelIdx}"
+                  SelectedIndex="{Binding ModelIdx}"
                   DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
                   ItemsSource="{Binding AddEntityViewModel.ModelTypes}"/>
       </Grid>
