@@ -122,24 +122,56 @@ public class MapService : IMapService, IEnableLogger
 
     public Entity? GetEntity(ushort id)
     {
-        return MapRepository.Map.Entities.FirstOrDefault(e => e.Id == id);
+        try
+        {
+            return MapRepository.Map.Entities.FirstOrDefault(e => e.Id == id);
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error Getting entity {id}:\n{ex.Message}");
+            return default;
+        }
     }
 
     public int AddEntity(Entity entity)
     {
-        return MapRepository.Map.AddEntity(entity);
+        try
+        {
+            return MapRepository.Map.AddEntity(entity);
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error Adding:\n{ex.Message}");
+            return default;
+        }
     }
 
     public bool UpdateEntity(Entity entity)
     {
-        MapRepository.Map.UpdateEntity(entity);
-        return true;
+        try
+        {
+            MapRepository.Map.UpdateEntity(entity);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error Updating entity {entity?.Id}:\n{ex.Message}");
+            return default;
+        }
     }
 
     public bool DeleteEntity(Entity entity)
     {
-        MapRepository.Map.DeleteEntity(entity);
-        return true;
+        try
+        {
+            MapRepository.Map.DeleteEntity(entity);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error Deleting entity {entity?.Id}:\n{ex.Message}");
+            return default;
+        }
     }
 
     public List<Entity> GetEntities()
@@ -267,55 +299,63 @@ public class MapService : IMapService, IEnableLogger
 
     public uint CalculateMana()
     {
-        //Player starts with 1000 mana
-        uint total = 1000;
-
-        if (MapRepository.Map?.Entities.Count() > 0)
+        try
         {
-            var modelCountsDic = new Dictionary<string, int>();
+            //Player starts with 1000 mana
+            uint total = 1000;
 
-            foreach (var entity in MapRepository.Map.Entities)
+            if (MapRepository.Map?.Entities.Count() > 0)
             {
-                string key = $"Id {entity.EntityType.Model.Id}: {entity.EntityType.Model.Name}";
-                if (!modelCountsDic.ContainsKey(key))
-                    modelCountsDic.Add(key, 1);
-                else
-                    modelCountsDic[key]++;
+                var modelCountsDic = new Dictionary<string, int>();
 
-                if (entity.EntityType.TypeId == TypeId.Creature)
+                foreach (var entity in MapRepository.Map.Entities)
                 {
-                    total += entity.EntityType.Model.Mana;
-                }
+                    string key = $"Id {entity.EntityType.Model.Id}: {entity.EntityType.Model.Name}";
+                    if (!modelCountsDic.ContainsKey(key))
+                        modelCountsDic.Add(key, 1);
+                    else
+                        modelCountsDic[key]++;
 
-                if (entity.EntityType.TypeId == TypeId.Effect)
-                {
-                    if ((Effect)entity.EntityType.Model.Id == Effect.ManaBall || (Effect)entity.EntityType.Model.Id == Effect.VillagerBuilding)
-                        total += 512;
-                }
-            }
-        }
-
-        var activeWizards = MapRepository.Map.Wizards.Where(w => w.IsActive && w.Name != "Player");
-
-        if (activeWizards?.Count() > 1)
-        {
-            foreach (var wizard in  activeWizards)
-            {
-                var wizardTotal = 1000u;
-                if (wizard.CastleLevel > 0)
-                {
-                    var castleTotal = 5000u;
-                    for (int i = 1; i < wizard.CastleLevel; i++)
+                    if (entity.EntityType.TypeId == TypeId.Creature)
                     {
-                        castleTotal += castleTotal;
+                        total += entity.EntityType.Model.Mana;
                     }
-                    wizardTotal += castleTotal;
-                }
-                total += wizardTotal;
-            }
-        }
 
-        return total;
+                    if (entity.EntityType.TypeId == TypeId.Effect)
+                    {
+                        if ((Effect)entity.EntityType.Model.Id == Effect.ManaBall || (Effect)entity.EntityType.Model.Id == Effect.VillagerBuilding)
+                            total += 512;
+                    }
+                }
+            }
+
+            var activeWizards = MapRepository.Map.Wizards.Where(w => w.IsActive && w.Name != "Player");
+
+            if (activeWizards?.Count() > 1)
+            {
+                foreach (var wizard in activeWizards)
+                {
+                    var wizardTotal = 1000u;
+                    if (wizard.CastleLevel > 0)
+                    {
+                        var castleTotal = 5000u;
+                        for (int i = 1; i < wizard.CastleLevel; i++)
+                        {
+                            castleTotal += castleTotal;
+                        }
+                        wizardTotal += castleTotal;
+                    }
+                    total += wizardTotal;
+                }
+            }
+
+            return total;
+        }
+        catch (Exception ex)
+        {
+            this.Log().Error(ex, $"Error Calculating mana:\n{ex.Message}");
+            return default;
+        }
     }
 
     public void UpdateMana(uint manaTotal)
