@@ -31,11 +31,11 @@ jobs:
       
     - name: Restore NuGet packages
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: nuget restore ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit/MCLevelEdit.sln
+      run: nuget restore ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit.sln
 
     - name: Build ${{matrix.BUILD_CONFIGURATION}}
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: dotnet build /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit/MCLevelEdit.sln
+      run: dotnet build /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}/MCLevelEdit.sln
     
     - name: Run MagicCarpet2Terrain Unit Test
       if: ${{ matrix.BUILD_CONFIGURATION == 'Debug' }}

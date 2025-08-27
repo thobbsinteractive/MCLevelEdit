@@ -3,28 +3,28 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit", "MCLevelEdit.csproj", "{AD143B86-E3D3-4418-B27E-3DF190FBC7A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit", "MCLevelEdit\MCLevelEdit.csproj", "{AD143B86-E3D3-4418-B27E-3DF190FBC7A6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Desktop", "..\MCLevelEdit.Desktop\MCLevelEdit.Desktop.csproj", "{A9EBEC2A-CABA-4508-83CC-5BAA931FBA49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Desktop", "MCLevelEdit.Desktop\MCLevelEdit.Desktop.csproj", "{A9EBEC2A-CABA-4508-83CC-5BAA931FBA49}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Test", "..\MCLevelEdit.Test\MCLevelEdit.Test.csproj", "{EF0516AA-9365-467F-8429-FD548366A6CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Test", "MCLevelEdit.Test\MCLevelEdit.Test.csproj", "{EF0516AA-9365-467F-8429-FD548366A6CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Model", "..\MCLevelEdit.Model\MCLevelEdit.Model.csproj", "{A2E7B073-05A1-47BC-80D5-3040F1A4B14D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Model", "MCLevelEdit.Model\MCLevelEdit.Model.csproj", "{A2E7B073-05A1-47BC-80D5-3040F1A4B14D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Application", "..\MCLevelEdit.Application\MCLevelEdit.Application.csproj", "{33B71612-92F4-4054-A745-9955D073814A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Application", "MCLevelEdit.Application\MCLevelEdit.Application.csproj", "{33B71612-92F4-4054-A745-9955D073814A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Infrastructure", "..\MCLevelEdit.Infrastructure\MCLevelEdit.Infrastructure.csproj", "{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCLevelEdit.Infrastructure", "MCLevelEdit.Infrastructure\MCLevelEdit.Infrastructure.csproj", "{2BB522C2-A93D-4C2E-9B9E-14B6F9D757EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicCarpet2Terrain", "..\MagicCarpet2Terrain\MagicCarpet2Terrain.csproj", "{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicCarpet2Terrain", "MagicCarpet2Terrain\MagicCarpet2Terrain.csproj", "{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicCarpet2Terrain.Test", "..\MagicCarpet2Terrain.Test\MagicCarpet2Terrain.Test.csproj", "{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicCarpet2Terrain.Test", "MagicCarpet2Terrain.Test\MagicCarpet2Terrain.Test.csproj", "{1F2C9637-5FEE-4581-A9F1-0F03A7792D6D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5} = {D88FF8FC-ACC9-4A4F-8DE1-A3D4FBD370B5}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicCarpetLevelPackager", "..\MagicCarpetLevelPackager\MagicCarpetLevelPackager.csproj", "{0C74DA4C-88B8-4570-A25A-87AC51B7604E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicCarpetLevelPackager", "MagicCarpetLevelPackager\MagicCarpetLevelPackager.csproj", "{0C74DA4C-88B8-4570-A25A-87AC51B7604E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicCarpetLevelPackager.Test", "..\MagicCarpetLevelPackager.Test\MagicCarpetLevelPackager.Test.csproj", "{84F49D02-415A-4244-B9A4-9E1CB0B8B2B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicCarpetLevelPackager.Test", "MagicCarpetLevelPackager.Test\MagicCarpetLevelPackager.Test.csproj", "{84F49D02-415A-4244-B9A4-9E1CB0B8B2B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
