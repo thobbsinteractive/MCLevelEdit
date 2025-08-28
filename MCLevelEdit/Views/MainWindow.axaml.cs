@@ -2,6 +2,7 @@
 using Avalonia.ReactiveUI;
 using MCLevelEdit.ViewModels;
 using ReactiveUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,8 +56,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         }
     }
 
-    private async Task DoShowEditEntitiesDialogAsync(InteractionContext<EntitiesTableViewModel,
-                                    EntitiesTableViewModel?> interaction)
+    private async Task DoShowEditEntitiesDialogAsync(IInteractionContext<EntitiesTableViewModel, EntitiesTableViewModel?> interaction)
     {
         var dialog = new EntitiesWindow();
         dialog.DataContext = interaction.Input;
@@ -65,7 +65,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         interaction.SetOutput(result);
     }
 
-    private async Task DoShowSelectEntitiesDialogAsync(InteractionContext<SelectEntitiesTableViewModel, IList<EntityViewModel>?> interaction)
+    private async Task DoShowSelectEntitiesDialogAsync(IInteractionContext<SelectEntitiesTableViewModel, IList<EntityViewModel>?> interaction)
     {
         var dialog = new SelectEntitiesWindow();
         dialog.DataContext = interaction.Input;
@@ -74,7 +74,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         interaction.SetOutput(result);
     }
 
-    private async Task DoShowGameDialogAsync(InteractionContext<EditGameSettingsViewModel,
+    private async Task DoShowGameDialogAsync(IInteractionContext<EditGameSettingsViewModel,
                                 EditGameSettingsViewModel?> interaction)
     {
         var dialog = new GameSettingsWindow();
@@ -84,7 +84,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         interaction.SetOutput(result);
     }
 
-    private async Task DoShowValidationResultsDialogAsync(InteractionContext<ValidationResultsTableViewModel,
+    private async Task DoShowValidationResultsDialogAsync(IInteractionContext<ValidationResultsTableViewModel,
                             ValidationResultsTableViewModel?> interaction)
     {
         var dialog = new ValidationWindow();
@@ -94,7 +94,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         interaction.SetOutput(result);
     }
 
-    private async Task DoShowAboutDialogAsync(InteractionContext<AboutWindowViewModel, AboutWindowViewModel?> interaction)
+    private async Task DoShowAboutDialogAsync(IInteractionContext<AboutWindowViewModel, AboutWindowViewModel?> interaction)
     {
         var dialog = new AboutWindow();
         dialog.DataContext = interaction.Input;
