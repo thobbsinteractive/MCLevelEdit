@@ -2,6 +2,8 @@
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using ReactiveUI;
+using Serilog;
+using Serilog.Extensions.Logging;
 using Splat;
 using System;
 using System.IO;
@@ -75,7 +77,9 @@ namespace MCLevelEdit.ViewModels
             if (!File.Exists(inputPath))
                 throw new ArgumentException($"File not found {inputPath}", nameof(inputPath));
 
-            var rncProPack = new RncProPackDotNet.RncProPack();
+            var microsoftLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("rncProPack");
+
+            var rncProPack = new RncProPackDotNet.RncProPack(microsoftLogger);
             var vars = rncProPack.InitVars();
 
             if (vars.Method == 1)
@@ -102,7 +106,7 @@ namespace MCLevelEdit.ViewModels
             vars.Output = new byte[MAX_BUF_SIZE];
             vars.Temp = new byte[MAX_BUF_SIZE];
 
-            return rncProPack.DoSearch(ref vars, vars.FileSize, vars.PuseMode == 'e', OutputPath);
+            return rncProPack.DoSearch(ref vars, vars.FileSize, true, OutputPath);
         }
     }
 }
