@@ -25,6 +25,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         this.WhenActivated(action => action(ViewModel!.ShowEntitiesDialog.RegisterHandler(DoShowEditEntitiesDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowSelectEntitiesDialog.RegisterHandler(DoShowSelectEntitiesDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowGameSettingsDialog.RegisterHandler(DoShowGameDialogAsync)));
+        this.WhenActivated(action => action(ViewModel!.ShowUnpackLevelsDialog.RegisterHandler(DoShowUnpackLevelsDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowValidationResultsDialog.RegisterHandler(DoShowValidationResultsDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowAboutDialog.RegisterHandler(DoShowAboutDialogAsync)));
 
@@ -81,6 +82,15 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         dialog.DataContext = interaction.Input;
 
         var result = await dialog.ShowDialog<EditGameSettingsViewModel?>(this);
+        interaction.SetOutput(result);
+    }
+
+    private async Task DoShowUnpackLevelsDialogAsync(IInteractionContext<UnpackLevelsViewModel, UnpackLevelsViewModel?> interaction)
+    {
+        var dialog = new UnpackLevelsWindow();
+        dialog.DataContext = interaction.Input;
+
+        var result = await dialog.ShowDialog<UnpackLevelsViewModel?>(this);
         interaction.SetOutput(result);
     }
 

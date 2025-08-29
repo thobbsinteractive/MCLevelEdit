@@ -79,6 +79,7 @@
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.4" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
+    <PackageReference Include="RncProPackDotNet" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -88,6 +89,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\UnpackLevelsWindow.axaml.cs">
+      <DependentUpon>UnpackLevelsWindow.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\UnpackLevelsView.axaml.cs">
+      <DependentUpon>UnpackLevelsView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\EditSwitchView.axaml.cs">
       <DependentUpon>EditSwitchView.axaml</DependentUpon>
     </Compile>

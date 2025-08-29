@@ -21,6 +21,7 @@ namespace MCLevelEdit
             services.RegisterLazySingleton(() => new MainViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<ISettingsPort>(), resolver.GetService<IMapService>(), resolver.GetService<ITerrainService>(), resolver.GetService<IGameService>()));
             services.Register(() => new EntitiesTableViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<IMapService>(), resolver.GetService<ITerrainService>()));
             services.Register(() => new EditGameSettingsViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<ISettingsPort>(), resolver.GetService<IGameService>()));
+            services.Register(() => new UnpackLevelsViewModel(resolver.GetService<EventAggregator<object>>()));
         }
     }
 }
