@@ -332,8 +332,9 @@ public class MainViewModel : ViewModelBase
 
     public async Task<bool> PromptSaveAndOrContinue()
     {
+        var topLevel = TopLevel.GetTopLevel(MainWindow.I);
         var box = MessageBoxManager.GetMessageBoxStandard("Question", $"Do you want to Save your changes?", ButtonEnum.YesNoCancel, Icon.Question);
-        var result = await box.ShowAsync();
+        var result = await box.ShowAsPopupAsync(topLevel);
 
         if (result == ButtonResult.Yes)
         {
