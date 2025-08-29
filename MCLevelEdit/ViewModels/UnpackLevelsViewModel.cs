@@ -1,4 +1,7 @@
-﻿using MCLevelEdit.Application.Model;
+﻿using Avalonia.Controls;
+using Avalonia.Platform.Storage;
+using MCLevelEdit.Application.Model;
+using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using ReactiveUI;
@@ -7,6 +10,7 @@ using Serilog.Extensions.Logging;
 using Splat;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MCLevelEdit.ViewModels
@@ -16,7 +20,8 @@ namespace MCLevelEdit.ViewModels
         private bool _canUnpack = true;
         public ICommand UnpackLevelsCommand { get; }
         public ICommand SetDefaultsCommand { get; }
-
+        public ICommand SelectLevelsDatPathCommand { get; }
+        public ICommand SelectOutputFolderCommand { get; }
         public string LevelsDatPath { get; set; }
         public string OutputPath { get; set; }
 
@@ -65,6 +70,16 @@ namespace MCLevelEdit.ViewModels
                     CanUnpack = true;
                 }
             });
+
+            SelectLevelsDatPathCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                await SelectLevelDatFile();
+            });
+
+            SelectOutputFolderCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                await SelectOutputFolder();
+            });
         }
 
         public int UnpackFile(string inputPath, string outputFolder)
@@ -107,6 +122,43 @@ namespace MCLevelEdit.ViewModels
             vars.Temp = new byte[MAX_BUF_SIZE];
 
             return rncProPack.DoSearch(ref vars, vars.FileSize, true, OutputPath);
+        }
+
+        private async Task SelectLevelDatFile()
+        {
+            // Get top level from the current control. Alternatively, you can use Window reference instead.
+            var topLevel = TopLevel.GetTopLevel(UnpackLevelsWindow.I);
+
+            // Start async operation to open the dialog.
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Select Levels.Dat file to unpack",
+            });
+
+            if (files != null)
+            {
+                LevelsDatPath = files[0].Path.LocalPath;
+                this.RaisePropertyChanged(nameof(LevelsDatPath));
+            }
+        }
+
+        private async Task SelectOutputFolder()
+        {
+            // Get top level from the current control. Alternatively, you can use Window reference instead.
+            var topLevel = TopLevel.GetTopLevel(UnpackLevelsWindow.I);
+
+            // Start async operation to open the dialog.
+            var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = "Select File Extract Directory",
+                AllowMultiple = false
+            });
+
+            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
+            {
+                OutputPath = folder[0].Path.LocalPath;
+                this.RaisePropertyChanged(nameof(OutputPath));
+            }
         }
     }
 }
