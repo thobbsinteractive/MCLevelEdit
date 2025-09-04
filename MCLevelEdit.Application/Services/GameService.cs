@@ -3,6 +3,7 @@ using MagicCarpetLevelPackager.Abstractions;
 using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
+using RncProPackDotNet;
 using Serilog;
 using Serilog.Extensions.Logging;
 using Splat;
@@ -20,32 +21,6 @@ namespace MCLevelEdit.Application.Services
         {
             _settingsPort = settingsPort;
             _packagePort = new MagicCarpetPackageAdapter();
-        }
-
-        public Task<bool> PackageLevelAsync(string[] levelFilePaths, string[] gameLevelsPaths)
-        {
-            try
-            {
-                return Task.Run(async () =>
-                {
-                    bool success = false;
-                    foreach (string gameLevelPath in gameLevelsPaths)
-                    {
-                        if (Directory.Exists(gameLevelPath))
-                        {
-                            success = await _packagePort.PackageFilesAsync(levelFilePaths, gameLevelPath);
-                            if (!success)
-                                return false;
-                        }
-                    }
-                    return success;
-                });
-            }
-            catch (Exception ex)
-            {
-                this.Log().Error(ex, $"Error Packing Level:\n{ex.Message}");
-                return Task.FromResult(false);
-            }
         }
 
         public bool RunGame(string gamePath, string args)
@@ -91,16 +66,14 @@ namespace MCLevelEdit.Application.Services
                     {
                         FileUtils.DeleteExistingFiles(gameLevelsPath);
                     }
-
-                    if (await PackageLevelAsync(levelFilePaths, gameLevelsPaths))
+  
+                    foreach (var gameLevelsPath in gameLevelsPaths)
                     {
-                        foreach (var gameLevelsPath in gameLevelsPaths)
-                        {
-                            FileUtils.SetFilesToReadonly(gameLevelsPath);
-                        }
-
-                        return RunGame(gameExeLocation, gameArgs);
+                        var result = await PackageAsync(levelFilePaths, Path.Combine(gameLevelsPath, "LEVELS.DAT"));
+                        FileUtils.SetFilesToReadonly(gameLevelsPath);
                     }
+                    return RunGame(gameExeLocation, gameArgs);
+                    
                 } 
                 catch (Exception ex)
                 {
@@ -151,38 +124,69 @@ namespace MCLevelEdit.Application.Services
 
         public Task<int> UnpackAsync(string inputPath, string outputFolder)
         {
-            uint MAX_BUF_SIZE = 0x1E00000;
-            var microsoftLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("GameService");
-            var rncProPack = new RncProPackDotNet.RncProPack(microsoftLogger);
-            var vars = rncProPack.InitVars();
-
-            if (vars.Method == 1)
+            try
             {
-                if (vars.DictSize > 0x8000)
-                    vars.DictSize = 0x8000;
-                vars.MaxMatches = 0x1000;
+                uint MAX_BUF_SIZE = 0x1E00000;
+                var microsoftLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("GameService");
+                var rncProPack = new RncProPackDotNet.RncProPack(microsoftLogger);
+                var vars = rncProPack.InitVars();
+
+                if (vars.Method == 1)
+                {
+                    if (vars.DictSize > 0x8000)
+                        vars.DictSize = 0x8000;
+                    vars.MaxMatches = 0x1000;
+                }
+                else if (vars.Method == 2)
+                {
+                    if (vars.DictSize > 0x1000)
+                        vars.DictSize = 0x1000;
+                    vars.MaxMatches = 0xFF;
+                }
+
+                using (FileStream inFile = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+                {
+                    vars.FileSize = (uint)(inFile.Length - vars.ReadStartOffset);
+                    inFile.Seek(vars.ReadStartOffset, SeekOrigin.Begin);
+                    vars.Input = new byte[vars.FileSize];
+                    inFile.Read(vars.Input, 0, (int)vars.FileSize);
+                }
+
+                vars.Output = new byte[MAX_BUF_SIZE];
+                vars.Temp = new byte[MAX_BUF_SIZE];
+
+                return Task.Run(() =>
+                {
+                    return rncProPack.DoSearch(ref vars, vars.FileSize, true, outputFolder);
+                });
             }
-            else if (vars.Method == 2)
+            catch (Exception ex)
             {
-                if (vars.DictSize > 0x1000)
-                    vars.DictSize = 0x1000;
-                vars.MaxMatches = 0xFF;
+                this.Log().Error(ex, $"Error unpacking Levels:\n{ex.Message}");
+                return Task.FromResult(-1);
             }
+        }
 
-            using (FileStream inFile = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        public Task<int> PackageAsync(string[] filePaths, string outputPath)
+        {
+            try
             {
-                vars.FileSize = (uint)(inFile.Length - vars.ReadStartOffset);
-                inFile.Seek(vars.ReadStartOffset, SeekOrigin.Begin);
-                vars.Input = new byte[vars.FileSize];
-                inFile.Read(vars.Input, 0, (int)vars.FileSize);
+                var microsoftLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("GameService");
+                var rncProPack = new RncProPackDotNet.RncProPack(microsoftLogger);
+                var vars = rncProPack.InitVars();
+                vars.Output = new byte[0x1E00000];
+                vars.Temp = new byte[0x1E00000];
+
+                return Task.Run(() =>
+                {
+                    return rncProPack.DoPackAndPackageBullfrogFilesToDatandTab(ref vars, filePaths, 38812, true, outputPath);
+                });
             }
-
-            vars.Output = new byte[MAX_BUF_SIZE];
-            vars.Temp = new byte[MAX_BUF_SIZE];
-
-            return Task.Run<int>(() => {
-                return rncProPack.DoSearch(ref vars, vars.FileSize, true, outputFolder);
-            });
+            catch (Exception ex)
+            {
+                this.Log().Error(ex, $"Error Packing:\n{ex.Message}");
+                return Task.FromResult(-1);
+            }
         }
     }
 }
