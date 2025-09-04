@@ -7,4 +7,5 @@ public interface IGameService
     bool RunGame(string gamePath, string args);
     Task<bool> BackupLevelFiles(string gameLevelsPath, string gameLevelsBackupPath);
     Task<bool> RestoringLevelFiles(string gameLevelsBackupPath, string[] gameLevelsPaths);
+    Task<int> UnpackAsync(string inputPath, string outputFolder);
 }
