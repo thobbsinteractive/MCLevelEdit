@@ -23,9 +23,8 @@
            VerticalAlignment="Center"/>
     <TextBox Grid.Column="1"
              Grid.Row="1"
-             Grid.ColumnSpan="1"
              VerticalAlignment="Center"
-             HorizontalAlignment="Left"
+             HorizontalAlignment="Stretch"
              Text="{Binding LevelsDatPath}"/>
     <Button Name="btnSelectLevelsDatPath"
             Grid.Column="2"
@@ -40,9 +39,8 @@
        VerticalAlignment="Center"/>
     <TextBox Grid.Column="1"
              Grid.Row="2"
-             Grid.ColumnSpan="1"
              VerticalAlignment="Center"
-             HorizontalAlignment="Left"
+             HorizontalAlignment="Stretch"
              Text="{Binding OutputPath}"/>
     <Button Name="btnSelectOutputFolder"
             Grid.Column="2"

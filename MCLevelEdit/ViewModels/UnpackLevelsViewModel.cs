@@ -2,6 +2,7 @@
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -38,12 +39,12 @@ namespace MCLevelEdit.ViewModels
             _gameService = gameService;
 
             LevelsDatPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\LEVELS.DAT";
-            OutputPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\Extracted\";
+            OutputPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Globals.APP_DIRECTORY), "Extracted");
 
             SetDefaultsCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 LevelsDatPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\LEVELS.DAT";
-                OutputPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\Extracted\";
+                OutputPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Globals.APP_DIRECTORY), "Extracted");
                 this.RaisePropertyChanged(nameof(LevelsDatPath));
                 this.RaisePropertyChanged(nameof(OutputPath));
             });

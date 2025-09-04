@@ -3,6 +3,8 @@ using MagicCarpetLevelPackager.Abstractions;
 using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
+using Serilog;
+using Serilog.Extensions.Logging;
 using Splat;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -150,8 +152,7 @@ namespace MCLevelEdit.Application.Services
         public Task<int> UnpackAsync(string inputPath, string outputFolder)
         {
             uint MAX_BUF_SIZE = 0x1E00000;
-
-            var microsoftLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("rncProPack");
+            var microsoftLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("GameService");
             var rncProPack = new RncProPackDotNet.RncProPack(microsoftLogger);
             var vars = rncProPack.InitVars();
 
