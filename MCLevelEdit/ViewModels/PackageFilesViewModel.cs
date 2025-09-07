@@ -28,7 +28,6 @@ namespace MCLevelEdit.ViewModels
         public ICommand RemoveFileCommand { get; }
         public ICommand MoveUpCommand { get; }
         public ICommand MoveDownCommand { get; }
-
         public ICommand SelectOutputPathCommand { get; }
         public AvaloniaList<string> FilesList { get; init; }
         public string OutputPath { get; set; }
