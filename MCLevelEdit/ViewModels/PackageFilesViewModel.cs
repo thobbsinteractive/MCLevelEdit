@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
+using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Views;
@@ -21,12 +22,21 @@ namespace MCLevelEdit.ViewModels
     {
         private bool _canPack = true;
         private IGameService _gameService;
+        private int _selectedIndex = -1;
         public ICommand PackageCommand { get; }
         public ICommand SelectFilesCommand { get; }
+        public ICommand RemoveFileCommand { get; }
+        public ICommand MoveUpCommand { get; }
+        public ICommand MoveDownCommand { get; }
+
         public ICommand SelectOutputPathCommand { get; }
         public AvaloniaList<string> FilesList { get; init; }
         public string OutputPath { get; set; }
-
+        public int SelectedIndex
+        {
+            get => _selectedIndex;
+            set => this.RaiseAndSetIfChanged(ref _selectedIndex, value);
+        }
         public bool CanPack
         {
             get => _canPack;
@@ -46,19 +56,16 @@ namespace MCLevelEdit.ViewModels
                 {
                     CanPack = false;
 
-                    if (!Directory.Exists(OutputPath))
-                    {
-                        Directory.CreateDirectory(OutputPath);
-                    }
-
                     var errorCode = PackageFiles(FilesList.ToArray(), OutputPath);
                     if (errorCode != 0)
                         throw new Exception($"Unknown Error, code {errorCode}");
+
+                    FileUtils.SetFilesToReadonly(OutputPath, Path.GetFileName(OutputPath));
                 }
                 catch (Exception ex)
                 {
-                    this.Log().Error(ex, $"Error unpacking files!");
-                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error unpacking Levels! Please check and validate your paths: {ex.Message}", ButtonEnum.Ok, Icon.Warning);
+                    this.Log().Error(ex, $"Error packaging files!");
+                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error packaging files! Please check and validate your paths: {ex.Message}", ButtonEnum.Ok, Icon.Warning);
                     await box.ShowAsync();
                 }
                 finally
@@ -76,11 +83,26 @@ namespace MCLevelEdit.ViewModels
             {
                 await SelectOutputFile();
             });
+
+            RemoveFileCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                RemoveSelectedFile();
+            });
+
+            MoveUpCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                MoveSelectedFileUp();
+            });
+
+            MoveDownCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                MoveSelectedFileDown();
+            });
         }
 
         public int PackageFiles(string[] inputPaths, string outputPath)
         {
-            if (!Directory.Exists(outputPath))
+            if (!Directory.Exists(Path.GetDirectoryName(outputPath)))
                 throw new ArgumentException($"Output directory not found: {outputPath}", nameof(outputPath));
 
             return  _gameService.PackageAsync(inputPaths, outputPath).Result;
@@ -94,12 +116,15 @@ namespace MCLevelEdit.ViewModels
             // Start async operation to open the dialog.
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = "Select files to pack",
+                Title = "Select files to package",
+                AllowMultiple = true,
             });
 
             if (files != null)
             {
-                FilesList.AddRange(files.Select(f => f.Path.LocalPath));
+                var newFiles = files.Select(f => f.Path.LocalPath).Except(FilesList);
+                if (newFiles.Any())
+                    FilesList.AddRange(newFiles);
             }
         }
 
@@ -124,6 +149,34 @@ namespace MCLevelEdit.ViewModels
             {
                 OutputPath = file.Path.LocalPath;
                 this.RaisePropertyChanged(nameof(OutputPath));
+            }
+        }
+
+        private void RemoveSelectedFile()
+        {
+            if (SelectedIndex >= 0)
+            {
+                FilesList.RemoveAt(SelectedIndex);
+            }
+        }
+
+        private void MoveSelectedFileUp()
+        {
+            if (SelectedIndex > 0)
+            {
+                int oldIdx = SelectedIndex;
+                FilesList.Move(SelectedIndex, SelectedIndex - 1);
+                SelectedIndex = oldIdx - 1;
+            }
+        }
+
+        private void MoveSelectedFileDown()
+        {
+            if (SelectedIndex >= 0 && SelectedIndex < (FilesList.Count - 1))
+            {
+                int oldIdx = SelectedIndex;
+                FilesList.Move(SelectedIndex, SelectedIndex + 1);
+                SelectedIndex = oldIdx + 1;
             }
         }
     }
