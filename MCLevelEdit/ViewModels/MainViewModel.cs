@@ -64,6 +64,7 @@ public class MainViewModel : ViewModelBase
     public ICommand RunCommand { get; }
     public ICommand EditGameSettingsCommand { get; }
     public ICommand UnpackLevelsCommand { get; }
+    public ICommand PackageLevelsCommand { get; }
     public ICommand DisplayFailCommand { get; }
     public ICommand DisplayWarningsCommand { get; }
     public ICommand DisplayAboutCommand { get; }
@@ -81,6 +82,7 @@ public class MainViewModel : ViewModelBase
     public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowEntitiesDialog { get; }
     public Interaction<SelectEntitiesTableViewModel, IList<EntityViewModel>?> ShowSelectEntitiesDialog { get; }
     public Interaction<UnpackLevelsViewModel, UnpackLevelsViewModel?> ShowUnpackLevelsDialog { get; }
+    public Interaction<PackageFilesViewModel, PackageFilesViewModel?> ShowPackageFilesDialog { get; }
     public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
     public Interaction<AboutWindowViewModel, AboutWindowViewModel?> ShowAboutDialog { get; }
@@ -98,6 +100,7 @@ public class MainViewModel : ViewModelBase
 
         ShowGameSettingsDialog = new Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?>();
         ShowUnpackLevelsDialog = new Interaction<UnpackLevelsViewModel, UnpackLevelsViewModel?>();
+        ShowPackageFilesDialog = new Interaction<PackageFilesViewModel, PackageFilesViewModel?>();
         ShowEntitiesDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
         ShowSelectEntitiesDialog = new Interaction<SelectEntitiesTableViewModel, IList<EntityViewModel>?>();
         ShowValidationResultsDialog = new Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?>();
@@ -112,6 +115,12 @@ public class MainViewModel : ViewModelBase
         {
             var result = await ShowUnpackLevelsDialog.Handle(Locator.Current.GetService<UnpackLevelsViewModel>());
         });
+
+        PackageLevelsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var result = await ShowPackageFilesDialog.Handle(Locator.Current.GetService<PackageFilesViewModel>());
+        });
+
 
         NewFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {

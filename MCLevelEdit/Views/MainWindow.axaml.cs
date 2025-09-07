@@ -26,6 +26,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         this.WhenActivated(action => action(ViewModel!.ShowSelectEntitiesDialog.RegisterHandler(DoShowSelectEntitiesDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowGameSettingsDialog.RegisterHandler(DoShowGameDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowUnpackLevelsDialog.RegisterHandler(DoShowUnpackLevelsDialogAsync)));
+        this.WhenActivated(action => action(ViewModel!.ShowPackageFilesDialog.RegisterHandler(DoShowPackageLevelsDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowValidationResultsDialog.RegisterHandler(DoShowValidationResultsDialogAsync)));
         this.WhenActivated(action => action(ViewModel!.ShowAboutDialog.RegisterHandler(DoShowAboutDialogAsync)));
 
@@ -91,6 +92,15 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         dialog.DataContext = interaction.Input;
 
         var result = await dialog.ShowDialog<UnpackLevelsViewModel?>(this);
+        interaction.SetOutput(result);
+    }
+
+    private async Task DoShowPackageLevelsDialogAsync(IInteractionContext<PackageFilesViewModel, PackageFilesViewModel?> interaction)
+    {
+        var dialog = new PackageLevelsWindow();
+        dialog.DataContext = interaction.Input;
+
+        var result = await dialog.ShowDialog<PackageFilesViewModel?>(this);
         interaction.SetOutput(result);
     }
 

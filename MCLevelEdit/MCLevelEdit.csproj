@@ -90,6 +90,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\PackageLevelsView.axaml.cs">
+      <DependentUpon>PackageLevelsView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PackageLevelsWindow.axaml.cs">
+      <DependentUpon>PackageLevelsWindow.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\UnpackLevelsWindow.axaml.cs">
       <DependentUpon>UnpackLevelsWindow.axaml</DependentUpon>
     </Compile>

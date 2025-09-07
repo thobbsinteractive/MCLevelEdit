@@ -32,6 +32,7 @@
       <MenuItem Header="_Game">
         <MenuItem Header="_Game Settings" Command="{Binding EditGameSettingsCommand}"/>
         <MenuItem Header="_Unpack Levels" Command="{Binding UnpackLevelsCommand}"/>
+        <MenuItem Header="_Package Levels" Command="{Binding PackageLevelsCommand}"/>
         <MenuItem Header="_Validate Level" Command="{Binding ValidateCommand}"/>
         <MenuItem Header="_Run Current Level" Command="{Binding RunCommand}"/>
       </MenuItem>
