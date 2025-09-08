@@ -60,6 +60,9 @@ namespace MCLevelEdit.ViewModels
                         throw new Exception($"Unknown Error, code {errorCode}");
 
                     FileUtils.SetFilesToReadonly(OutputPath, Path.GetFileName(OutputPath));
+
+                    var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Files Packaged Successfully!", ButtonEnum.Ok, Icon.Info);
+                    await box.ShowAsync();
                 }
                 catch (Exception ex)
                 {
@@ -119,7 +122,7 @@ namespace MCLevelEdit.ViewModels
                 AllowMultiple = true,
             });
 
-            if (files != null)
+            if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
             {
                 var newFiles = files.Select(f => f.Path.LocalPath).Except(FilesList);
                 if (newFiles.Any())

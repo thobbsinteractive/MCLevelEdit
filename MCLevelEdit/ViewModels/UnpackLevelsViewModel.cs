@@ -63,6 +63,9 @@ namespace MCLevelEdit.ViewModels
                     var errorCode = UnpackFile(LevelsDatPath, OutputPath);
                     if (errorCode != 0)
                         throw new Exception($"Unknown Error, code {errorCode}");
+
+                    var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Files Unpacked Successfully!", ButtonEnum.Ok, Icon.Info);
+                    await box.ShowAsync();
                 }
                 catch (Exception ex)
                 {
@@ -113,7 +116,7 @@ namespace MCLevelEdit.ViewModels
                 Title = "Select Levels.Dat file to unpack",
             });
 
-            if (files != null)
+            if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
             {
                 LevelsDatPath = files[0].Path.LocalPath;
                 this.RaisePropertyChanged(nameof(LevelsDatPath));

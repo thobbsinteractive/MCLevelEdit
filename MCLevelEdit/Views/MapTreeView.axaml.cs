@@ -24,7 +24,10 @@ public partial class MapTreeView : UserControl
 
     private void CboEntityType_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        int index = ((KeyValuePair<int, string>)this?.cboEntityType?.SelectedItem).Key;
+        int index = 0;
+        var selectedItem = cboEntityType?.SelectedItem;
+        if (selectedItem != null)
+            index = ((KeyValuePair<int, string>)selectedItem).Key;
         MapTreeViewModel?.OnCboEntityTypeSelectionChanged(index);
     }
 }
