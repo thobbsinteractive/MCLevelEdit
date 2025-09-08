@@ -198,7 +198,7 @@ public class MainViewModel : ViewModelBase
 
         DisplayAboutCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            var versionStr = Assembly.GetExecutingAssembly().GetName().Version?.ToString() + "-beta";
+            var versionStr = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
             await ShowAboutDialog.Handle(new AboutWindowViewModel()
             {
                 Version = versionStr
