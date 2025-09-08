@@ -63,6 +63,8 @@ public class MainViewModel : ViewModelBase
     public ICommand ExitCommand { get; }
     public ICommand RunCommand { get; }
     public ICommand EditGameSettingsCommand { get; }
+    public ICommand UnpackLevelsCommand { get; }
+    public ICommand PackageLevelsCommand { get; }
     public ICommand DisplayFailCommand { get; }
     public ICommand DisplayWarningsCommand { get; }
     public ICommand DisplayAboutCommand { get; }
@@ -79,6 +81,8 @@ public class MainViewModel : ViewModelBase
     public NodePropertiesViewModel NodePropertiesViewModel { get; }
     public Interaction<EntitiesTableViewModel, EntitiesTableViewModel?> ShowEntitiesDialog { get; }
     public Interaction<SelectEntitiesTableViewModel, IList<EntityViewModel>?> ShowSelectEntitiesDialog { get; }
+    public Interaction<UnpackLevelsViewModel, UnpackLevelsViewModel?> ShowUnpackLevelsDialog { get; }
+    public Interaction<PackageFilesViewModel, PackageFilesViewModel?> ShowPackageFilesDialog { get; }
     public Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?> ShowGameSettingsDialog { get; }
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
     public Interaction<AboutWindowViewModel, AboutWindowViewModel?> ShowAboutDialog { get; }
@@ -95,6 +99,8 @@ public class MainViewModel : ViewModelBase
         MapEditorViewModel = new MapEditorViewModel(eventAggregator, mapService, terrainService);
 
         ShowGameSettingsDialog = new Interaction<EditGameSettingsViewModel, EditGameSettingsViewModel?>();
+        ShowUnpackLevelsDialog = new Interaction<UnpackLevelsViewModel, UnpackLevelsViewModel?>();
+        ShowPackageFilesDialog = new Interaction<PackageFilesViewModel, PackageFilesViewModel?>();
         ShowEntitiesDialog = new Interaction<EntitiesTableViewModel, EntitiesTableViewModel?>();
         ShowSelectEntitiesDialog = new Interaction<SelectEntitiesTableViewModel, IList<EntityViewModel>?>();
         ShowValidationResultsDialog = new Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?>();
@@ -104,6 +110,17 @@ public class MainViewModel : ViewModelBase
         {
             var result = await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
         });
+
+        UnpackLevelsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var result = await ShowUnpackLevelsDialog.Handle(Locator.Current.GetService<UnpackLevelsViewModel>());
+        });
+
+        PackageLevelsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var result = await ShowPackageFilesDialog.Handle(Locator.Current.GetService<PackageFilesViewModel>());
+        });
+
 
         NewFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -181,7 +198,7 @@ public class MainViewModel : ViewModelBase
 
         DisplayAboutCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            var versionStr = Assembly.GetExecutingAssembly().GetName().Version?.ToString() + "-beta";
+            var versionStr = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
             await ShowAboutDialog.Handle(new AboutWindowViewModel()
             {
                 Version = versionStr
@@ -324,8 +341,9 @@ public class MainViewModel : ViewModelBase
 
     public async Task<bool> PromptSaveAndOrContinue()
     {
+        var topLevel = TopLevel.GetTopLevel(MainWindow.I);
         var box = MessageBoxManager.GetMessageBoxStandard("Question", $"Do you want to Save your changes?", ButtonEnum.YesNoCancel, Icon.Question);
-        var result = await box.ShowAsync();
+        var result = await box.ShowAsPopupAsync(topLevel);
 
         if (result == ButtonResult.Yes)
         {
