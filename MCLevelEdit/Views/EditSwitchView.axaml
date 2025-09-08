@@ -36,7 +36,7 @@
               VerticalAlignment="Center"
               HorizontalAlignment="Stretch"
               SelectedIndex="{Binding EntityView.ModelIdx}"
-              DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+              DisplayMemberBinding="{Binding ., Converter={StaticResource keyValuePairToNameConverter}}"
               ItemsSource="{Binding EntityView.ModelTypes}">
     </ComboBox>
     <Label Grid.Column="0"
