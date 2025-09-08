@@ -19,7 +19,7 @@
               Grid.Column="0"
               VerticalAlignment="Center"
               HorizontalAlignment="Stretch"
-              DisplayMemberBinding="{Binding .Value, Converter={StaticResource keyValuePairToNameConverter}}"
+              DisplayMemberBinding="{Binding ., Converter={StaticResource keyValuePairToNameConverter}}"
               ItemsSource="{Binding TypeIds}"/>
     <TreeView Margin="10"
               Grid.Column="0"

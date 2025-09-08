@@ -1,0 +1,145 @@
+﻿using Avalonia.Controls;
+using Avalonia.Platform.Storage;
+using MCLevelEdit.Application.Model;
+using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Views;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+using ReactiveUI;
+using Serilog;
+using Serilog.Extensions.Logging;
+using Splat;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using System.Windows.Input;
+
+namespace MCLevelEdit.ViewModels
+{
+    public class UnpackLevelsViewModel : ReactiveObject, IEnableLogger
+    {
+        private bool _canUnpack = true;
+        private IGameService _gameService;
+        public ICommand UnpackLevelsCommand { get; }
+        public ICommand SetDefaultsCommand { get; }
+        public ICommand SelectLevelsDatPathCommand { get; }
+        public ICommand SelectOutputFolderCommand { get; }
+        public string LevelsDatPath { get; set; }
+        public string OutputPath { get; set; }
+
+        public bool CanUnpack
+        {
+            get => _canUnpack;
+            set => this.RaiseAndSetIfChanged(ref _canUnpack, value);
+        }
+
+        public UnpackLevelsViewModel(EventAggregator<object> eventAggregator, IGameService gameService)
+        {
+            _gameService = gameService;
+
+            LevelsDatPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\LEVELS.DAT";
+            OutputPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Globals.APP_DIRECTORY), "Extracted");
+
+            SetDefaultsCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                LevelsDatPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\LEVELS.DAT";
+                OutputPath = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Globals.APP_DIRECTORY), "Extracted");
+                this.RaisePropertyChanged(nameof(LevelsDatPath));
+                this.RaisePropertyChanged(nameof(OutputPath));
+            });
+
+            UnpackLevelsCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                try
+                {
+                    CanUnpack = false;
+
+                    if (!Directory.Exists(OutputPath))
+                    {
+                        Directory.CreateDirectory(OutputPath);
+                    }
+
+                    var errorCode = UnpackFile(LevelsDatPath, OutputPath);
+                    if (errorCode != 0)
+                        throw new Exception($"Unknown Error, code {errorCode}");
+
+                    var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Files Unpacked Successfully!", ButtonEnum.Ok, Icon.Info);
+                    await box.ShowAsync();
+                }
+                catch (Exception ex)
+                {
+                    this.Log().Error(ex, $"Error unpacking files!");
+                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error unpacking Levels! Please check and validate your paths: {ex.Message}", ButtonEnum.Ok, Icon.Warning);
+                    await box.ShowAsync();
+                }
+                finally
+                {
+                    CanUnpack = true;
+                }
+            });
+
+            SelectLevelsDatPathCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                await SelectLevelDatFile();
+            });
+
+            SelectOutputFolderCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                await SelectOutputFolder();
+            });
+        }
+
+        public int UnpackFile(string inputPath, string outputFolder)
+        {
+            uint MAX_BUF_SIZE = 0x1E00000;
+
+            if (!Directory.Exists(outputFolder))
+                throw new ArgumentException($"Output directory not found: {outputFolder}", nameof(outputFolder));
+
+            if (!File.Exists(inputPath))
+                throw new ArgumentException($"File not found {inputPath}", nameof(inputPath));
+
+            var microsoftLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("rncProPack");
+
+            return  _gameService.UnpackAsync(inputPath, outputFolder).Result;
+        }
+
+        private async Task SelectLevelDatFile()
+        {
+            // Get top level from the current control. Alternatively, you can use Window reference instead.
+            var topLevel = TopLevel.GetTopLevel(UnpackLevelsWindow.I);
+
+            // Start async operation to open the dialog.
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Select Levels.Dat file to unpack",
+            });
+
+            if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
+            {
+                LevelsDatPath = files[0].Path.LocalPath;
+                this.RaisePropertyChanged(nameof(LevelsDatPath));
+            }
+        }
+
+        private async Task SelectOutputFolder()
+        {
+            // Get top level from the current control. Alternatively, you can use Window reference instead.
+            var topLevel = TopLevel.GetTopLevel(UnpackLevelsWindow.I);
+
+            // Start async operation to open the dialog.
+            var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = "Select File Extract Directory",
+                AllowMultiple = false
+            });
+
+            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
+            {
+                OutputPath = folder[0].Path.LocalPath;
+                this.RaisePropertyChanged(nameof(OutputPath));
+            }
+        }
+    }
+}
