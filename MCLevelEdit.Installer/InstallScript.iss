@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Magic Carpet Level Editor"
-#define MyAppVersion "1.1"
+#define MyAppVersion "1.2"
 #define MyAppPublisher "THobbsInteractive"
 #define MyAppURL "https://github.com/thobbsinteractive/MCLevelEdit/"
 #define MyAppExeName "MCLevelEdit.Desktop.exe"
