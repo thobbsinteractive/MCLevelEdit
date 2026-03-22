@@ -5,6 +5,7 @@ using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Views;
+using Microsoft.Extensions.Logging;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using ReactiveUI;
@@ -55,6 +56,7 @@ namespace MCLevelEdit.ViewModels
         public ICommand RestoreCommand { get; }
         public ICommand BackupCommand { get; }
 
+        public TopLevel TopLevel => TopLevel.GetTopLevel(GameSettingsWindow.I);
         public string LevelPathsString => _levelPaths is not null ? string.Join(",", _levelPaths) : string.Empty;
         public bool CanRun => _levelPaths?.Length > 0;
 
@@ -182,38 +184,51 @@ namespace MCLevelEdit.ViewModels
                     if (!await _gameService.RunLevelFromSettings(LevelPaths))
                     {
                         var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error packing level!", ButtonEnum.Ok, Icon.Error);
-                        await box.ShowAsync();
+                        await box.ShowAsPopupAsync(TopLevel);
                     }
                 }
             });
 
             CheckLevelCommand = ReactiveCommand.CreateFromTask(async() =>
             {
-                await CheckForGameLaunch();
+                if (await CheckForGameLaunch())
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Success", $"All paths correct", ButtonEnum.Ok, Icon.Info);
+                    await box.ShowAsPopupAsync(TopLevel);
+                }
+
             });
 
             SaveCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                return SaveLevelPaths();
+                if (await SaveLevelPaths())
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Save complete", ButtonEnum.Ok, Icon.Info);
+                    await box.ShowAsPopupAsync(TopLevel);
+                }
             });
 
             BackupCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 if (await CheckGameLevelPaths())
                 {
-                    BackupLevels();
+                    if (await BackupLevels())
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Backup complete", ButtonEnum.Ok, Icon.Info);
+                        await box.ShowAsPopupAsync(TopLevel);
+                    }
                 }
             });
 
             RestoreCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                return RestoreLevels();
+                await RestoreLevels();
             });
 
             SetDefaultsCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Restore Defaults", $"Restoring defaults will clear your current settings, Are you sure?", ButtonEnum.YesNo, Icon.Question);
-                var result = await box.ShowAsync();
+                var result = await box.ShowAsPopupAsync(TopLevel);
                 if (result == ButtonResult.Yes)
                 {
                     SetDefaultPaths();
@@ -252,11 +267,8 @@ namespace MCLevelEdit.ViewModels
 
         private async Task SelectLevelFiles()
         {
-            // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(GameSettingsWindow.I);
-
             // Start async operation to open the dialog.
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Select Levels to Package and run",
                 AllowMultiple = true
@@ -271,11 +283,8 @@ namespace MCLevelEdit.ViewModels
 
         private async Task SelectGameLauncher()
         {
-            // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(GameSettingsWindow.I);
-
             // Start async operation to open the dialog.
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Select Magic Carpet Laucher",
                 AllowMultiple = false
@@ -289,11 +298,8 @@ namespace MCLevelEdit.ViewModels
 
         private async Task SelectLevelsFolder()
         {
-            // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(GameSettingsWindow.I);
-
             // Start async operation to open the dialog.
-            var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            var folder = await TopLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
                 Title = "Select Levels Directory",
                 AllowMultiple = false
@@ -307,11 +313,8 @@ namespace MCLevelEdit.ViewModels
 
         private async Task SelectCloudLevelsFolder()
         {
-            // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(GameSettingsWindow.I);
-
             // Start async operation to open the dialog.
-            var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            var folder = await TopLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
                 Title = "Select Levels Directory",
                 AllowMultiple = false
@@ -325,11 +328,8 @@ namespace MCLevelEdit.ViewModels
 
         private async Task SelectBackupLevelsFolder()
         {
-            // Get top level from the current control. Alternatively, you can use Window reference instead.
-            var topLevel = TopLevel.GetTopLevel(GameSettingsWindow.I);
-
             // Start async operation to open the dialog.
-            var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            var folder = await TopLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
                 Title = "Select Backup Directory for Levels",
                 AllowMultiple = false
@@ -353,14 +353,14 @@ namespace MCLevelEdit.ViewModels
                 {
                     this.Log().Error($"Game Exe/lnk not found! Please re-check!");
                     var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Game Exe/lnk not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                    await box.ShowAsync();
+                    await box.ShowAsPopupAsync(TopLevel);
                 }
             }
             else
             {
                 this.Log().Error($"No Level selected to run! Please re-check!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"No Level selected to run! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                await box.ShowAsync();
+                await box.ShowAsPopupAsync(TopLevel);
             }
             return false;
         }
@@ -381,7 +381,7 @@ namespace MCLevelEdit.ViewModels
                         {
                             this.Log().Error($"LEVELS GOG cloud directory not found! Please re-check!");
                             var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS GOG cloud directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                            await box.ShowAsync();
+                            await box.ShowAsPopupAsync(TopLevel);
                         }
                     }
                     else
@@ -393,14 +393,14 @@ namespace MCLevelEdit.ViewModels
                 {
                     this.Log().Error($"Game Levels Backup directory not set! Please re-check!");
                     var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Game Levels Backup directory not set! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                    await box.ShowAsync();
+                    await box.ShowAsPopupAsync(TopLevel);
                 }
             }
             else
             {
                 this.Log().Error($"LEVELS directory not found! Please re-check!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                await box.ShowAsync();
+                await box.ShowAsPopupAsync(TopLevel);
             }
 
             return false;
@@ -421,7 +421,7 @@ namespace MCLevelEdit.ViewModels
             {
                 this.Log().Error($"Error saving settings!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error saving settings! Do you want to continue?", ButtonEnum.OkCancel, Icon.Warning);
-                var result = await box.ShowAsync();
+                var result = await box.ShowAsPopupAsync(TopLevel);
                 return result == ButtonResult.Ok;
             }
             return true;
@@ -433,7 +433,7 @@ namespace MCLevelEdit.ViewModels
             {
                 this.Log().Error($"Error backing up Levels!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error backing up Levels! Please check and validate your paths", ButtonEnum.Ok, Icon.Warning);
-                var result = await box.ShowAsync();
+                var result = await box.ShowAsPopupAsync(TopLevel);
                 return result == ButtonResult.Ok;
             }
             return true;
@@ -452,13 +452,13 @@ namespace MCLevelEdit.ViewModels
             {
                 this.Log().Error($"Error restoring you game files Levels!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error restoring you game files Levels!", ButtonEnum.Ok, Icon.Error);
-                await box.ShowAsync();
+                await box.ShowAsPopupAsync(TopLevel);
                 return false;
             }
             else
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Restore Success!", ButtonEnum.Ok, Icon.Info);
-                await box.ShowAsync();
+                await box.ShowAsPopupAsync(TopLevel);
             }
             return true;
         }
