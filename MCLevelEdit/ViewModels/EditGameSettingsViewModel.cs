@@ -28,7 +28,7 @@ namespace MCLevelEdit.ViewModels
 
         private string _defaultClassicArgs = @"-conf ""C:\CARPET\dosboxMC.conf""";
         private string _defaultClassicExePath = @"C:\Program Files (x86)\DOSBox-0.74-3\DOSBox.exe";
-        private string _defaultClassicLevelsPath = @"C:\CARPET\CARPET.CD\LEVELS";
+        private string _defaultClassicLevelsPath = @"C:\CARPET\CARPET.CD\LEVELS\";
         private string _defaultClassicLevelsBackupPath = @"C:\CARPET\CARPET.CD\LEVELS\BACKUP\";
 
         private string _defaultGoGArgs = @"-conf ""..\dosboxMC.conf"" -conf ""..\dosboxMC_single.conf"" -noconsole -c ""exit""";
@@ -435,7 +435,7 @@ namespace MCLevelEdit.ViewModels
                 this.Log().Error($"Error backing up Levels!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error backing up Levels! Please check and validate your paths", ButtonEnum.Ok, Icon.Warning);
                 var result = await box.ShowAsPopupAsync(TopLevel);
-                return result == ButtonResult.Ok;
+                return false;
             }
             return true;
         }
