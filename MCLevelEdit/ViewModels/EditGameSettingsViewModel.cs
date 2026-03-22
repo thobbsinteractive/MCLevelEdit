@@ -26,9 +26,10 @@ namespace MCLevelEdit.ViewModels
         private string[] _levelPaths;
         private bool _gameIsClassic = false;
 
-        private string _defaultClassicExePath = @"C:\CARPET\CARPET.EXE";
-        private string _defaultClassicLevelsPath = @"C:\CARPET\LEVELS\";
-        private string _defaultClassicLevelsBackupPath = @"C:\CARPET\LEVELS\BACKUP\";
+        private string _defaultClassicArgs = @"-conf ""C:\CARPET\dosboxMC.conf""";
+        private string _defaultClassicExePath = @"C:\Program Files (x86)\DOSBox-0.74-3\DOSBox.exe";
+        private string _defaultClassicLevelsPath = @"C:\CARPET\CARPET.CD\LEVELS";
+        private string _defaultClassicLevelsBackupPath = @"C:\CARPET\CARPET.CD\LEVELS\BACKUP\";
 
         private string _defaultGoGArgs = @"-conf ""..\dosboxMC.conf"" -conf ""..\dosboxMC_single.conf"" -noconsole -c ""exit""";
         private string _defaultGoGExePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\DOSBOX\DOSBox.exe";
@@ -250,7 +251,7 @@ namespace MCLevelEdit.ViewModels
             if (this.GameIsClassic)
             {
                 GameExePath = _defaultClassicExePath;
-                GameExeArgs = string.Empty;
+                GameExeArgs = _defaultClassicArgs;
                 GameLevelsPath = _defaultClassicLevelsPath;
                 GameCloudLevelsPath = string.Empty;
                 GameLevelsBackupPath = _defaultClassicLevelsBackupPath;
