@@ -23,6 +23,7 @@ https://github.com/thobbsinteractive/MCLevelEdit/releases/latest
 * Keep in mind that a large number of the game's levels work by only giving the player the spell inventory they have found at that point, and ignore what is set in the level file. When you use the [Run] button, your level will be the first one in the game and the player will always start with NO spells, regardless what is set in the level file. So include the spells on the ground at map start.
 
 ## Creating a basic level
+* Check out the basic intoduction video here [https://www.youtube.com/watch?v=XzkODXg-13o](https://www.youtube.com/watch?v=XzkODXg-13o)
 * Check out the [Wiki](https://github.com/thobbsinteractive/MCLevelEdit/wiki) for guidance on creating your first level
 
 ## Creating a Campaign
