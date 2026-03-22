@@ -414,7 +414,7 @@ namespace MCLevelEdit.ViewModels
                 GameExeLocation = this.GameExePath,
                 GameArgs = this.GameExeArgs,
                 GameBackupFolder = this.GameLevelsBackupPath,
-                GameLevelFolders = new string[] { this.GameLevelsPath, this.GameCloudLevelsPath }
+                GameLevelFolders = string.IsNullOrEmpty(this.GameCloudLevelsPath) ? new string[] { this.GameLevelsPath } : new string[] { this.GameLevelsPath, this.GameCloudLevelsPath }
             };
 
             if (!_settingsPort.SaveSettings(settings))
