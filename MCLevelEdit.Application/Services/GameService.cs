@@ -3,6 +3,7 @@ using MagicCarpetLevelPackager.Abstractions;
 using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
 using RncProPackDotNet;
 using Serilog;
 using Serilog.Extensions.Logging;
@@ -171,6 +172,16 @@ namespace MCLevelEdit.Application.Services
         {
             try
             {
+                // Every level in a package must be from the same game; the level size tells them apart
+                var levelSizes = filePaths.Select(f => new FileInfo(f).Length).Distinct().ToArray();
+                if (levelSizes.Length != 1 || LevelFormat.DetectFromFileSize(levelSizes[0]) is null)
+                {
+                    this.Log().Error($"Cannot package levels: all files must be uncompressed levels from the same game " +
+                        $"({LevelFormat.MC1_FILE_SIZE} bytes for Magic Carpet 1, {LevelFormat.MC2_FILE_SIZE} bytes for Magic Carpet 2).");
+                    return Task.FromResult(-1);
+                }
+                int levelSize = (int)levelSizes[0];
+
                 var microsoftLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("GameService");
                 var rncProPack = new RncProPackDotNet.RncProPack(microsoftLogger);
                 var vars = rncProPack.InitVars();
@@ -179,7 +190,7 @@ namespace MCLevelEdit.Application.Services
 
                 return Task.Run(() =>
                 {
-                    return rncProPack.DoPackAndPackageBullfrogFilesToDatandTab(ref vars, filePaths, 38812, true, outputPath);
+                    return rncProPack.DoPackAndPackageBullfrogFilesToDatandTab(ref vars, filePaths, levelSize, true, outputPath);
                 });
             }
             catch (Exception ex)

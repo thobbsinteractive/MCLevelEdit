@@ -18,6 +18,12 @@ public class FileAdapter : IFilePort
 
     public bool SaveMap(Map map, string fileName)
     {
+        if (map is MCLevelEdit.Model.Domain.MC2.Mc2Map mc2Map)
+        {
+            File.WriteAllBytes(fileName, Mc2LevelFormat.Write(mc2Map));
+            return true;
+        }
+
         var levfile = new byte[FILE_SIZE];
         var counter = 0;
         var numWizards = map.Wizards.Where(w => w.IsActive).Count();
@@ -223,14 +229,21 @@ public class FileAdapter : IFilePort
     public Map LoadMap(string fileName)
     {
         var levfile = File.ReadAllBytes(fileName);
-        Map map = new Map();
-        var counter = 0;
-        var Wnumber = 1;
 
         if (levfile[0] == 82 && levfile[1] == 78 && levfile[2] == 67)
         {
             throw new Exception("Compressed level detected! You must uncompress this file first");
         }
+
+        if (LevelFormat.DetectFromFileSize(levfile.Length) == GameVersion.MagicCarpet2)
+        {
+            var mc2Map = Mc2LevelFormat.Read(levfile);
+            mc2Map.FilePath = fileName;
+            return mc2Map;
+        }
+
+        Map map = new Map();
+        var counter = 0;
 
         map.FilePath = fileName;
         map.ManaTotal = BitConverter.ToUInt32(levfile, 0);
@@ -276,7 +289,7 @@ public class FileAdapter : IFilePort
             ushort Parent = BitConverter.ToUInt16(levfile, fpos + 14);
             ushort Child = BitConverter.ToUInt16(levfile, fpos + 16);
 
-            var entityType = entityTypeId.GetEntityTypeFromTypeIdAndModelId(modelId);
+            var entityType = entityTypeId.GetEntityTypeFromTypeIdAndModelId(modelId, GameVersion.MagicCarpet1);
 
             if (entityType != null)
             {

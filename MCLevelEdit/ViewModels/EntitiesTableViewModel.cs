@@ -17,11 +17,7 @@ namespace MCLevelEdit.ViewModels
         protected IList<EntityViewModel>? _selectedEntityViewModels;
         protected int _entityFilter;
 
-        public new List<KeyValuePair<int, string>> TypeIds { get; } =
-            Enum.GetValues(typeof(TypeId))
-            .Cast<int>()
-            .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
-            .ToList();
+        public new IList<KeyValuePair<int, string>> TypeIds => EntityTypeLists.TypeIdsWithAll;
 
         public IAvaloniaList<EntityViewModel> Entities { get; } = new AvaloniaList<EntityViewModel>();
         public ICommand AddNewEntityCommand { get; }
@@ -65,7 +61,6 @@ namespace MCLevelEdit.ViewModels
                 RefreshData();
             });
 
-            TypeIds.Insert(0, new KeyValuePair<int, string>(0, ""));
             _entityFilter = 0;
         }
 

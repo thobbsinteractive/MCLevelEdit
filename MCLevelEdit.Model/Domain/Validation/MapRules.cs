@@ -1,4 +1,5 @@
-﻿using MCLevelEdit.Model.Enums;
+﻿using MCLevelEdit.Model.Domain.Shared;
+using MCLevelEdit.Model.Enums;
 
 namespace MCLevelEdit.Model.Domain.Validation
 {

@@ -1,4 +1,5 @@
-﻿namespace MCLevelEdit.Model.Domain;
+﻿using MCLevelEdit.Model.Domain.MC1; // MC1 effect IDs for paths, walls, canyons etc. are the same in MC2
+namespace MCLevelEdit.Model.Domain;
 
 public class Entity
 {
@@ -12,17 +13,27 @@ public class Entity
     public ushort Parent { get; set; }
     public ushort Child { get; set; }
 
-    public Entity Copy()
+    public virtual Entity Copy() => CopyTo(new Entity());
+
+    /// <summary>Copies the shared fields onto <paramref name="target"/>; subclasses add their own.</summary>
+    protected T CopyTo<T>(T target) where T : Entity
     {
-        return new Entity()
-        {
-            Id = this.Id,
-            Position = this.Position.Copy(),
-            EntityType = this.EntityType.Copy(),
-            Parent = this.Parent,
-            Child = this.Child
-        };
+        target.Id = this.Id;
+        target.Position = this.Position.Copy();
+        target.EntityType = this.EntityType.Copy();
+        target.DisId = this.DisId;
+        target.SwitchSize = this.SwitchSize;
+        target.SwitchId = this.SwitchId;
+        target.Parent = this.Parent;
+        target.Child = this.Child;
+        return target;
     }
+
+    /// <summary>
+    /// Type 0 slots that still hold data. The game ignores them: remc2's GenerateEvents_49290 sets an
+    /// entity's type to 0 once its terrain feature has been built. They are kept in the file but hidden.
+    /// </summary>
+    public bool IsInert() => (int)this.EntityType.TypeId == 0;
 
     public bool IsBuilding() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.VillagerBuilding;
     public bool IsPath() => this?.EntityType.TypeId == TypeId.Effect && this?.EntityType.Model.Id == (int)Effect.Path;

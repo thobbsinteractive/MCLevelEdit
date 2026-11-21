@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using MCLevelEdit.Model.Domain.Shared;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
@@ -18,7 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using Effect = MCLevelEdit.Model.Domain.Effect;
+using Effect = MCLevelEdit.Model.Domain.MC1.Effect;
 
 namespace MCLevelEdit.ViewModels;
 

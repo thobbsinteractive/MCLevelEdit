@@ -24,11 +24,7 @@ public class MapTreeViewModel : ReactiveObject
     protected readonly Dictionary<string, Bitmap> _icons;
     protected int _entityFilter;
 
-    public List<KeyValuePair<int, string>> TypeIds { get; } =
-        Enum.GetValues(typeof(TypeId))
-        .Cast<int>()
-        .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
-        .ToList();
+    public IList<KeyValuePair<int, string>> TypeIds => EntityTypeLists.TypeIdsWithAll;
 
     public ObservableCollection<Node> Nodes { get; } = new ObservableCollection<Node>();
     public ObservableCollection<Node> SelectedNodes { get; } = new ObservableCollection<Node>();
@@ -49,7 +45,9 @@ public class MapTreeViewModel : ReactiveObject
             { "Effect", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/volcano-32.png"))) },
             { "Spell", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/magic-32.png"))) },
             { "Switch", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/switch-32.png"))) },
-            { "Weather", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/wind-32.png"))) }
+            { "Weather", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/wind-32.png"))) },
+            { "Vase", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/magic-32.png"))) },
+            { "Special", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/switch-32.png"))) }
         };
 
         SelectedNodes.CollectionChanged += SelectedNodes_CollectionChanged;
@@ -61,7 +59,6 @@ public class MapTreeViewModel : ReactiveObject
         _eventAggregator.RegisterEvent("RefreshWizards", RefreshWizardsHandler);
         _eventAggregator.RegisterEvent("OnCursorClicked", SelectNodeHandler);
 
-        TypeIds.Insert(0, new KeyValuePair<int, string>(0, ""));
         _entityFilter = 0;
         RefreshData();
     }
@@ -166,7 +163,7 @@ public class MapTreeViewModel : ReactiveObject
 
         worldNode.SubNodes.Clear();
 
-        var squareEntities = map?.Entities.Where(e => (_entityFilter > 0 ? (int)e.EntityType.TypeId == _entityFilter : true))?.OrderBy(e => e.Id)?.ToEntityViewModels();
+        var squareEntities = map?.VisibleEntities.Where(e => (_entityFilter > 0 ? (int)e.EntityType.TypeId == _entityFilter : true))?.OrderBy(e => e.Id)?.ToEntityViewModels();
         if (squareEntities?.Any() ?? false)
         {
             foreach (var entity in squareEntities)

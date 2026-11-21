@@ -1,4 +1,5 @@
-﻿using MagicCarpet2Terrain.Model;
+﻿using MCLevelEdit.Model.Domain.MC1; // MC1 effect IDs for paths, walls, canyons etc. are the same in MC2
+using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Model.Domain.Validation;
 
 namespace MCLevelEdit.Model.Domain;
@@ -6,6 +7,9 @@ namespace MCLevelEdit.Model.Domain;
 public class Map
 {
     public string FilePath {  get; set; }
+    /// <summary>The game this level is for. Magic Carpet 2 levels are <see cref="MC2.Mc2Map"/>.</summary>
+    public virtual GameVersion GameVersion => GameVersion.MagicCarpet1;
+    public int MaxEntities => LevelFormat.GetMaxEntities(GameVersion);
     public uint ManaTotal { get; set; }
     public byte ManaTarget { get; set; }
     public IList<ValidationResult> ValidationResults { get; set; } = new List<ValidationResult>();
@@ -86,6 +90,9 @@ public class Map
         }
     };
 
+    /// <summary>Entities shown in the editor: everything except inert type 0 leftovers.</summary>
+    public IEnumerable<Entity> VisibleEntities => Entities.Where(e => !e.IsInert());
+
     public IList<Entity> GetEntitiesByPosition(Position postion)
     {
         return Entities.Where(e => e.Position == postion).ToList();
@@ -100,7 +107,7 @@ public class Map
 
     public int AddEntity(Entity entity)
     {
-        if (this.Entities.Count < Globals.MAX_ENTITIES)
+        if (this.Entities.Count < MaxEntities)
         {
             entity.Id = GetNextId();
             this.Entities.Add(entity);
@@ -140,20 +147,25 @@ public class Map
         foreach (var wizardResult in wizardValidation)
             ValidationResults.Add(wizardResult);
 
-        var spellValidation = MapRules.HasBasicSpells(this);
-        foreach (var spellResult in spellValidation)
-            ValidationResults.Add(spellResult);
-
-        foreach (Entity entity in this.Entities)
+        // The basic-spells check is for MC1 spell jars; MC2 levels use vases
+        if (GameVersion == GameVersion.MagicCarpet1)
         {
-            ValidationResults.Add(EntityRules.HasSwitch(entity, Entities));
+            var spellValidation = MapRules.HasBasicSpells(this);
+            foreach (var spellResult in spellValidation)
+                ValidationResults.Add(spellResult);
+        }
+
+        var entities = VisibleEntities.ToList();
+        foreach (Entity entity in entities)
+        {
+            ValidationResults.Add(EntityRules.HasSwitch(entity, entities));
             ValidationResults.Add(EntityRules.BuildingHasSwidAndDisIdAndParent(entity));
             ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Wall));
             ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Path));
             ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Canyon));
             ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.RidgeNode));
-            ValidationResults.Add(EntityRules.HasUniqueCoordinates(entity, Entities));
-            ValidationResults.Add(EntityRules.CheckConnectedWalls(entity, Entities));
+            ValidationResults.Add(EntityRules.HasUniqueCoordinates(entity, entities));
+            ValidationResults.Add(EntityRules.CheckConnectedWalls(entity, entities));
             ValidationResults.Add(EntityRules.TeleportDestinationCoordinatesAreDifferentToStart(entity));
         }
         
@@ -178,7 +190,7 @@ public class Map
             return 1;
 
         var entityIds = this.Entities.Select(e => e.Id).OrderBy(e => e).ToList();
-        var allIds = Enumerable.Range(1, Globals.MAX_ENTITIES + 1).ToArray();
+        var allIds = Enumerable.Range(1, MaxEntities + 1).ToArray();
         var freeIds = allIds.Except(entityIds).ToList();
 
         return freeIds.FirstOrDefault();

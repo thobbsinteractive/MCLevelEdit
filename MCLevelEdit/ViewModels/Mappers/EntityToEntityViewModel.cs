@@ -15,7 +15,8 @@ public static class EntityToEntityViewModel
             DisId = entity.DisId,
             SwitchSize = entity.SwitchSize, SwitchId = entity.SwitchId,
             Parent = entity.Parent,
-            Child = entity.Child
+            Child = entity.Child,
+            Par3 = (entity as MCLevelEdit.Model.Domain.MC2.Mc2Entity)?.Par3 ?? 0
         };
     }
 }

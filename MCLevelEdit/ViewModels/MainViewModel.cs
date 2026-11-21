@@ -92,6 +92,9 @@ public class MainViewModel : ViewModelBase
         _settingsPort = settingsPort;
         _gameService = gameService;
 
+        // Registered first so the type dropdowns switch game before other views refresh their entities
+        _eventAggregator.RegisterEvent("RefreshEntities", (sender, args) => EntityTypeLists.Refresh());
+
         _mapService.CreateNewMap(true);
         NodePropertiesViewModel = new NodePropertiesViewModel(eventAggregator, mapService, terrainService);
         EntityToolBarViewModel = new EntityToolBarViewModel(eventAggregator, mapService, terrainService);

@@ -1,0 +1,40 @@
+namespace MCLevelEdit.Model.Domain.MC2;
+
+/// <summary>A Magic Carpet 2 level: a <see cref="Map"/> plus the fields only MC2 levels have.</summary>
+public class Mc2Map : Map
+{
+    public override GameVersion GameVersion => GameVersion.MagicCarpet2;
+
+    public ushort LevelId { get; set; }
+    public byte LevelType { get; set; }
+    public byte BasicHeight { get; set; }
+
+    /// <summary>The 8 objective slots.</summary>
+    public IList<Objective> Objectives { get; set; } = new List<Objective>();
+
+    /// <summary>The 11 scripted creature behaviour slots.</summary>
+    public IList<StageVar> StageVars { get; set; } = new List<StageVar>();
+
+    /// <summary>
+    /// The bytes the level was loaded from. When saving, fields the editor does not model yet
+    /// are written back from here unchanged.
+    /// </summary>
+    public byte[]? SourceData { get; set; }
+
+    public Mc2Map()
+    {
+        // MC2 wizards have their own settings, and MC1's wizard names (Vodor, Gryshnak, ...) do not apply
+        Wizards = Enumerable.Range(0, 8)
+            .Select(i => (Wizard)new Mc2Wizard
+            {
+                Name = i == 0 ? "Player" : $"Wizard {i + 1}",
+                IsActive = i == 0,
+                Agression = 128,
+                Perception = 128,
+                Reflexes = 128
+            })
+            .ToArray();
+    }
+
+    public IEnumerable<Mc2Wizard> Mc2Wizards => Wizards.OfType<Mc2Wizard>();
+}

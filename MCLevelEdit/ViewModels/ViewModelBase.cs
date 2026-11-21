@@ -16,11 +16,7 @@ public class ViewModelBase : ReactiveObject
     protected readonly ITerrainService _terrainService;
     protected readonly EventAggregator<object> _eventAggregator;
 
-    public static KeyValuePair<int, string>[] TypeIds { get; } =
-        Enum.GetValues(typeof(TypeId))
-        .Cast<int>()
-        .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
-        .ToArray();
+    public static IList<KeyValuePair<int, string>> TypeIds => EntityTypeLists.TypeIds;
 
     public ViewModelBase(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService)
     {

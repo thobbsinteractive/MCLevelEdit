@@ -1,4 +1,5 @@
-﻿using MCLevelEdit.Model.Enums;
+﻿using MCLevelEdit.Model.Domain.MC1; // MC1 effect IDs for paths, walls, canyons etc. are the same in MC2
+using MCLevelEdit.Model.Enums;
 
 namespace MCLevelEdit.Model.Domain.Validation
 {

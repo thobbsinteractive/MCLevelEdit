@@ -1,8 +1,10 @@
-﻿using MagicCarpet2Terrain.Model;
+﻿using MCLevelEdit.Model.Domain.MC1; // MC1 effect IDs for paths, walls, canyons etc. are the same in MC2
+using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using Mc2Wizard = MCLevelEdit.Model.Domain.MC2.Mc2Wizard;
 using MCLevelEdit.Model.Enums;
 using MCLevelEdit.Model.Repository;
 using Splat;
@@ -42,14 +44,18 @@ public class MapService : IMapService, IEnableLogger
     {
         try
         {
-            if (MapRepository.Map.ManaTotal == 0)
+            // Magic Carpet 2 levels have no mana total and set their goals through objectives
+            if (MapRepository.Map.GameVersion == GameVersion.MagicCarpet1)
             {
-                MapRepository.Map.ManaTotal = CalculateMana();
-            }
+                if (MapRepository.Map.ManaTotal == 0)
+                {
+                    MapRepository.Map.ManaTotal = CalculateMana();
+                }
 
-            if (MapRepository.Map.ManaTarget == 0)
-            {
-                MapRepository.Map.ManaTarget = 35;
+                if (MapRepository.Map.ManaTarget == 0)
+                {
+                    MapRepository.Map.ManaTarget = 35;
+                }
             }
             MapRepository.Map.ValidateEntities();
 
@@ -176,19 +182,19 @@ public class MapService : IMapService, IEnableLogger
 
     public List<Entity> GetEntities()
     {
-        return MapRepository.Map.Entities.ToList();
+        return MapRepository.Map.VisibleEntities.ToList();
     }
 
     public List<Entity> GetEntitiesByCoords(int x, int y)
     {
-        return MapRepository.Map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();
+        return MapRepository.Map.VisibleEntities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();
     }
 
     public List<Entity> GetEntitiesBySwitchId(ushort switchId, int excludeId = 0)
     {
         if (switchId > 0 && MapRepository.Map.Entities.Count > 0)
         {
-            return MapRepository.Map.Entities.Where(e => e.Id != excludeId && e.SwitchId == switchId && e.DisId < ushort.MaxValue).ToList();
+            return MapRepository.Map.VisibleEntities.Where(e => e.Id != excludeId && e.SwitchId == switchId && e.DisId < ushort.MaxValue).ToList();
         }
         else
             return new List<Entity>();
@@ -259,6 +265,16 @@ public class MapService : IMapService, IEnableLogger
                 wizardToUpdate.Perception = wizard.Perception;
                 wizardToUpdate.Reflexes = wizard.Reflexes;
                 wizardToUpdate.CastleLevel = wizard.CastleLevel;
+
+                // MC2 wizards also carry spell settings and Life (only taken when all 26 spells are supplied)
+                if (wizardToUpdate is Mc2Wizard mc2Target && wizard is Mc2Wizard mc2Source
+                    && mc2Source.StartingSpells?.Length == LevelFormat.MC2_SPELL_COUNT)
+                {
+                    mc2Target.Life = mc2Source.Life;
+                    mc2Target.StartingSpells = mc2Source.StartingSpells;
+                    mc2Target.SpellLevels = mc2Source.SpellLevels;
+                    mc2Target.BlockedSpells = mc2Source.BlockedSpells;
+                }
 
                 if (wizardToUpdate.Spells != null)
                 {
