@@ -4,8 +4,9 @@ public interface IGameService
 {
     Task<bool> RunLevelFromSettings(string[] levelFilePaths);
     bool RunGame(string gamePath, string args);
-    Task<bool> BackupLevelFiles(string gameLevelsPath, string gameLevelsBackupPath);
-    Task<bool> RestoringLevelFiles(string gameLevelsBackupPath, string[] gameLevelsPaths);
+    /// <param name="levelsFileName">LEVELS.DAT for Magic Carpet, DDLEVELS.DAT for Hidden Worlds (see <see cref="Domain.LevelsFile"/>).</param>
+    Task<bool> BackupLevelFiles(string gameLevelsPath, string gameLevelsBackupPath, string levelsFileName = Domain.LevelsFile.MAGIC_CARPET);
+    Task<bool> RestoringLevelFiles(string gameLevelsBackupPath, string[] gameLevelsPaths, string levelsFileName = Domain.LevelsFile.MAGIC_CARPET);
     Task<int> PackageAsync(string[] filePaths, string outputPath);
     Task<int> UnpackAsync(string inputPath, string outputFolder);
 }

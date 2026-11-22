@@ -83,9 +83,16 @@ namespace MCLevelEdit.ViewModels
             set => this.RaiseAndSetIfChanged(ref _gameLevelsBackupPath, value);
         }
 
-        public DosGameSettingsViewModel(string gameName, IGameService gameService, DosGameSettings? settings, DosGameDefaults gogDefaults, DosGameDefaults classicDefaults)
+        /// <summary>The packed levels file this game reads: LEVELS.DAT, or DDLEVELS.DAT for Hidden Worlds.</summary>
+        public string LevelsFileName { get; }
+
+        public string LevelsFolderLabel => $"{LevelsFileName} folder:";
+        public string CloudLevelsFolderLabel => $"{LevelsFileName} (Cloud) folder:";
+
+        public DosGameSettingsViewModel(string gameName, string levelsFileName, IGameService gameService, DosGameSettings? settings, DosGameDefaults gogDefaults, DosGameDefaults classicDefaults)
         {
             GameName = gameName;
+            LevelsFileName = levelsFileName;
             _gameService = gameService;
             _gogDefaults = gogDefaults;
             _classicDefaults = classicDefaults;
@@ -234,7 +241,7 @@ namespace MCLevelEdit.ViewModels
 
         public async Task<bool> BackupLevels()
         {
-            if (!await _gameService.BackupLevelFiles(GameLevelsPath, GameLevelsBackupPath))
+            if (!await _gameService.BackupLevelFiles(GameLevelsPath, GameLevelsBackupPath, LevelsFileName))
             {
                 this.Log().Error($"Error backing up {GameName} Levels!");
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error backing up {GameName} Levels! Please check and validate your paths", ButtonEnum.Ok, Icon.Warning);
@@ -250,7 +257,7 @@ namespace MCLevelEdit.ViewModels
                 ? new string[] { GameLevelsPath }
                 : new string[] { GameLevelsPath, GameCloudLevelsPath };
 
-            if (!await _gameService.RestoringLevelFiles(GameLevelsBackupPath, paths))
+            if (!await _gameService.RestoringLevelFiles(GameLevelsBackupPath, paths, LevelsFileName))
             {
                 await ShowError($"Error restoring your {GameName} Levels!");
                 return false;

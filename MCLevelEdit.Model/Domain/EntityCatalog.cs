@@ -27,7 +27,14 @@ public static class EntityCatalog
     public static Dictionary<int, EntityType>? GetKinds(GameVersion game, TypeId typeId) =>
         GetEntityTypes(game).ForType(typeId);
 
-    /// <summary>The entity type lookup tables for a game.</summary>
+    /// <summary>
+    /// The entity type lookup tables for a game. Magic Carpet format levels marked as Hidden Worlds
+    /// (see <see cref="Map.IsHiddenWorlds"/>) get the Hidden Worlds tables, which name one spell differently.
+    /// </summary>
     public static EntityTypesBase GetEntityTypes(GameVersion game) =>
-        game == GameVersion.MagicCarpet2 ? Mc2.EntityTypes.I : Mc1.EntityTypes.I;
+        game == GameVersion.MagicCarpet2 ? Mc2.EntityTypes.I : GetMc1EntityTypes(Repository.MapRepository.Map?.IsHiddenWorlds ?? false);
+
+    /// <summary>The Magic Carpet tables, or the Hidden Worlds ones.</summary>
+    public static Mc1.EntityTypes GetMc1EntityTypes(bool hiddenWorlds) =>
+        hiddenWorlds ? Mc1.HiddenWorldsEntityTypes.I : Mc1.EntityTypes.I;
 }

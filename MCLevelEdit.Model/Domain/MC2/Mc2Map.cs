@@ -5,6 +5,8 @@ public class Mc2Map : Map
 {
     public override GameVersion GameVersion => GameVersion.MagicCarpet2;
 
+    public override MagicCarpet2Terrain.Model.TerrainGame TerrainGame => MagicCarpet2Terrain.Model.TerrainGame.MagicCarpet2;
+
     public ushort LevelId { get; set; }
     public byte LevelType { get; set; }
 

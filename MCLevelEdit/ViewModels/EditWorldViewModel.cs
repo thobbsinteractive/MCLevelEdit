@@ -46,6 +46,43 @@ namespace MCLevelEdit.ViewModels
         /// <summary>Map type (Day/Night/Cave) only exists in Magic Carpet 2 levels.</summary>
         public bool IsMc2 => _mapService.GetMap().GameVersion == GameVersion.MagicCarpet2;
 
+        /// <summary>Magic Carpet format levels can be for Magic Carpet or Hidden Worlds; the file can't say which.</summary>
+        public bool IsMc1Format => !IsMc2;
+
+        public bool IsMagicCarpetGame
+        {
+            get => !_mapService.GetMap().IsHiddenWorlds;
+            set { if (value) SetHiddenWorlds(false); }
+        }
+
+        public bool IsHiddenWorldsGame
+        {
+            get => _mapService.GetMap().IsHiddenWorlds;
+            set { if (value) SetHiddenWorlds(true); }
+        }
+
+        private void SetHiddenWorlds(bool hiddenWorlds)
+        {
+            var map = _mapService.GetMap();
+            if (map.IsHiddenWorlds == hiddenWorlds)
+                return;
+
+            // Renames the level's spell jars (Hidden Worlds has Homing Meteor for Wall of Fire)
+            map.SetHiddenWorlds(hiddenWorlds);
+            RaiseGameChanged();
+            _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
+            // Hidden Worlds generates terrain a little differently (and has its own colours), so regenerate.
+            // The variables are unchanged, so the landscape stays the same.
+            _ = GenerateHeightMap();
+        }
+
+        private void RaiseGameChanged()
+        {
+            this.RaisePropertyChanged(nameof(IsMc1Format));
+            this.RaisePropertyChanged(nameof(IsMagicCarpetGame));
+            this.RaisePropertyChanged(nameof(IsHiddenWorldsGame));
+        }
+
         /// <summary>Roof height given to a level converted to a cave that has none (MC2's own caves use around 114-154).</summary>
         private const byte DEFAULT_CAVE_BASIC_HEIGHT = 128;
 
@@ -113,6 +150,8 @@ namespace MCLevelEdit.ViewModels
         public ICommand DecreaseGnarlCommand { get; }
         public ICommand IncreaseRiverCommand { get; }
         public ICommand DecreaseRiverCommand { get; }
+        public ICommand IncreaseLRiverCommand { get; }
+        public ICommand DecreaseLRiverCommand { get; }
         public ICommand IncreaseSourceCommand { get; }
         public ICommand DecreaseSourceCommand { get; }
         public ICommand IncreaseSnLinCommand { get; }
@@ -204,6 +243,17 @@ namespace MCLevelEdit.ViewModels
             DecreaseRiverCommand = ReactiveCommand.Create(async () =>
             {
                 GenerationParameters.River--;
+                await GenerateHeightMap();
+            });
+
+            IncreaseLRiverCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.LRiver++;
+                await GenerateHeightMap();
+            });
+            DecreaseLRiverCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.LRiver--;
                 await GenerateHeightMap();
             });
 
@@ -304,6 +354,7 @@ namespace MCLevelEdit.ViewModels
             GenerationParameters = map.Terrain.GenerationParameters.ToTerrainGenerationParamsViewModel();
             GenerateTerrainButtonEnable = true;
             this.RaisePropertyChanged(nameof(IsMc2));
+            RaiseGameChanged();
             RaiseMapTypeChanged();
         }
 

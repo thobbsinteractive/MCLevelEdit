@@ -6,9 +6,10 @@ namespace MCLevelEdit.Model.Abstractions;
 
 public interface ITerrainService
 {
-    Task<Terrain> CalculateMc2Terrain(GenerationParameters genParams, byte stage = 18);
-    /// <param name="fog">Use the fog palette for Night maps (MC2 levels with level type bit 2 set).</param>
-    Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Terrain terrain, Layer layer, bool fog = false);
-    WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Terrain terrain, Layer layer, bool fog = false);
+    /// <summary>Generates terrain the way <paramref name="game"/> does (and, for Magic Carpet 2, the map type).</summary>
+    Task<Terrain> CalculateTerrain(GenerationParameters genParams, TerrainGame game = TerrainGame.MagicCarpet2, byte stage = 18);
+    /// <summary>Draws the map's terrain in the colours of its game (and, for MC2, its map type and fog).</summary>
+    Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Domain.Map map, Layer layer);
+    WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Domain.Map map, Layer layer);
     GenerationParameters GetRandomGeneratorParamters();
 }

@@ -25,6 +25,14 @@ public class TerrainService : ITerrainService, IEnableLogger
     public TerrainColourTable NightColours;
     public TerrainColourTable CaveColours;
 
+    // Magic Carpet 1 (CD_Files/DATA), a palette and colour table each:
+    // Magic Carpet PAL0-0.DAT and TABLES.DAT; Hidden Worlds (the data disk) PAL1-0.DAT and DTABLES.DAT.
+    // The palettes go with the terrain textures TMAPS0 and TMAPS1.
+    public Color[] Mc1Pallet;
+    public Color[] HiddenWorldsPallet;
+    public TerrainColourTable Mc1Colours;
+    public TerrainColourTable HiddenWorldsColours;
+
     public TerrainService()
     {
         Pallet = LoadPallet("day-palette.bmp");
@@ -35,6 +43,25 @@ public class TerrainService : ITerrainService, IEnableLogger
         DayColours = LoadColourTable("terrain-colours-day.dat");
         NightColours = LoadColourTable("terrain-colours-night.dat");
         CaveColours = LoadColourTable("terrain-colours-cave.dat");
+
+        Mc1Pallet = LoadPallet("mc1-palette.bmp");
+        HiddenWorldsPallet = LoadPallet("hidden-worlds-palette.bmp");
+        Mc1Colours = LoadColourTable("terrain-colours-mc1.dat");
+        HiddenWorldsColours = LoadColourTable("terrain-colours-hidden-worlds.dat");
+    }
+
+    /// <summary>
+    /// The palette and colour table the map's game draws its minimap with: Magic Carpet or Hidden Worlds for
+    /// Magic Carpet format levels, otherwise Magic Carpet 2's for the map type (Night levels may use fog).
+    /// </summary>
+    public (Color[] Pallet, TerrainColourTable Colours) GetColours(Map map)
+    {
+        if (map.GameVersion == GameVersion.MagicCarpet1)
+            return map.IsHiddenWorlds ? (HiddenWorldsPallet, HiddenWorldsColours) : (Mc1Pallet, Mc1Colours);
+
+        var mapType = map.Terrain.GenerationParameters?.MapType ?? MapType.Day;
+        bool fog = (map as MCLevelEdit.Model.Domain.MC2.Mc2Map)?.UsesFogPalette ?? false;
+        return (GetPallet(mapType, fog), GetColourTable(mapType));
     }
 
     private static TerrainColourTable LoadColourTable(string fileName)
@@ -77,19 +104,19 @@ public class TerrainService : ITerrainService, IEnableLogger
         _ => Pallet
     };
 
-    public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Terrain terrain, Layer layer, bool fog = false)
+    public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Map map, Layer layer)
     {
         return Task.Run(() =>
         {
-            return DrawBitmap(bitmap, terrain, layer, fog);
+            return DrawBitmap(bitmap, map, layer);
         });
     }
 
-    public WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Terrain terrain, Layer layer, bool fog = false)
+    public WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Map map, Layer layer)
     {
+        var terrain = map.Terrain;
         var mapType = terrain.GenerationParameters?.MapType ?? MapType.Day;
-        var pallet = GetPallet(mapType, fog);
-        var colours = GetColourTable(mapType);
+        var (pallet, colours) = GetColours(map);
         // Only terrain generated as a cave has a ceiling, and with it the rock mask (angle bit 8).
         // Day/Night terrain uses bit 8 for water edges, so switching the type without regenerating must not mask.
         var isCave = mapType == MapType.Cave && terrain.MapCeilingHeightmap_14B4E0 is not null && terrain.MapAngle_13B4E0 is not null;
@@ -126,9 +153,9 @@ public class TerrainService : ITerrainService, IEnableLogger
         return bitmap;
     }
 
-    public async Task<Terrain> CalculateMc2Terrain(GenerationParameters genParams, byte stage = 18)
+    public async Task<Terrain> CalculateTerrain(GenerationParameters genParams, TerrainGame game = TerrainGame.MagicCarpet2, byte stage = 18)
     {
-        ITerrainGenerator terrainGenerator = TerrainGenerator.Create(genParams.MapType);
+        ITerrainGenerator terrainGenerator = TerrainGenerator.Create(genParams.MapType, game);
         return await terrainGenerator.CalculateTerrainAsync(genParams, stage);
     }
 

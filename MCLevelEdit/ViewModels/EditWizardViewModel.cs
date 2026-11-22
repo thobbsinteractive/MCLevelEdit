@@ -88,7 +88,7 @@ public class EditWizardViewModel : ReactiveObject
         _mapService = mapService;
         var map = _mapService.GetMap();
         IsMc1 = map.GameVersion == GameVersion.MagicCarpet1;
-        _wizard = map.Wizards.Where(w => w.Name.Equals(wizardName)).Select(w => w.ToWizardViewModel()).First();
+        _wizard = map.Wizards.Where(w => w.Name.Equals(wizardName)).Select(w => w.ToWizardViewModel(map.IsHiddenWorlds)).First();
 
         foreach (var spell in _wizard.Mc2Spells)
             spell.Changed += SpellsUpdatedEvent;

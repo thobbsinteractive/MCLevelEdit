@@ -13,13 +13,15 @@ public class EntityTypes : EntityTypesBase
 
     protected override TypeId SpellTypeId => TypeId.Spell;
 
-    public EntityTypes() : base(
+    public EntityTypes() : this(x => new SpellType(x)) { }
+
+    protected EntityTypes(Func<Spell, EntityType> createSpell) : base(
         GameVersion.MagicCarpet1,
         sceneries: Build<Scenery>(x => new SceneryType(x)),
         creatures: Build<Creature>(x => new CreatureType(x)),
         effects: Build<Effect>(x => new EffectType(x)),
         switches: Build<Switch>(x => new SwitchType(x)),
-        spells: Build<Spell>(x => new SpellType(x)))
+        spells: Build<Spell>(createSpell))
     {
         Weathers = Build<Weather>(x => new WeatherType(x));
     }

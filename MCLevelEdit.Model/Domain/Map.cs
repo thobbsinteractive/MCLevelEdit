@@ -10,6 +10,31 @@ public class Map
     /// <summary>The game this level is for. Magic Carpet 2 levels are <see cref="MC2.Mc2Map"/>.</summary>
     public virtual GameVersion GameVersion => GameVersion.MagicCarpet1;
     public int MaxEntities => LevelFormat.GetMaxEntities(GameVersion);
+
+    /// <summary>
+    /// Whether this Magic Carpet format level is for Hidden Worlds. The level file can't say, so the editor
+    /// keeps it while the level is open: set it with <see cref="SetHiddenWorlds"/>. Always false for MC2 levels.
+    /// </summary>
+    public bool IsHiddenWorlds { get; private set; }
+
+    /// <summary>The game whose terrain generation this level uses. Magic Carpet 2 levels override it.</summary>
+    public virtual TerrainGame TerrainGame => IsHiddenWorlds ? TerrainGame.HiddenWorlds : TerrainGame.MagicCarpet1;
+
+    /// <summary>Marks the level as Hidden Worlds (or Magic Carpet) and renames its spell jars to match.</summary>
+    public void SetHiddenWorlds(bool hiddenWorlds)
+    {
+        if (GameVersion != GameVersion.MagicCarpet1)
+            return;
+
+        IsHiddenWorlds = hiddenWorlds;
+
+        var spells = EntityCatalog.GetMc1EntityTypes(hiddenWorlds).Spells;
+        foreach (var entity in Entities)
+        {
+            if (entity.EntityType?.TypeId == TypeId.Spell && spells.TryGetValue(entity.EntityType.Model.Id, out var spellType))
+                entity.EntityType = spellType;
+        }
+    }
     public uint ManaTotal { get; set; }
     public byte ManaTarget { get; set; }
     public IList<ValidationResult> ValidationResults { get; set; } = new List<ValidationResult>();

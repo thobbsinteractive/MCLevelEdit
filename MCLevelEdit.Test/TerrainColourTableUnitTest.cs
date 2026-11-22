@@ -19,6 +19,8 @@ namespace MCLevelEdit.Test
         [TestCase("terrain-colours-day.dat")]
         [TestCase("terrain-colours-night.dat")]
         [TestCase("terrain-colours-cave.dat")]
+        [TestCase("terrain-colours-mc1.dat")]
+        [TestCase("terrain-colours-hidden-worlds.dat")]
         public void ColourTableLoads(string name)
         {
             Assert.That(new FileInfo(AssetPath(name)).Length, Is.EqualTo(TerrainColourTable.SIZE));

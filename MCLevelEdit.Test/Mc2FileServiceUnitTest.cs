@@ -143,7 +143,9 @@ namespace MCLevelEdit.Test
             // Toggle one spell and check only that byte changes, then that it is saved
             var spell = spells[4];
             spell.StartsWith = !spell.StartsWith;
-            spell.Level = 3;
+            // A valid level (0 to 2) that differs from the original
+            byte newLevel = (byte)((Math.Min(before.Item2[4], (byte)2) + 1) % 3);
+            spell.Level = newLevel;
             spell.Blocked = !spell.Blocked;
             wizard.ApplyMc2Spells(spells);
 
@@ -156,7 +158,7 @@ namespace MCLevelEdit.Test
                 Assert.That(reloaded.BlockedSpells[i], Is.EqualTo(before.Item3[i]));
             }
             Assert.That(reloaded.StartingSpells[4], Is.EqualTo(before.Item1[4] == 0 ? 1 : 0));
-            Assert.That(reloaded.SpellLevels[4], Is.EqualTo(3));
+            Assert.That(reloaded.SpellLevels[4], Is.EqualTo(newLevel));
             Assert.That(reloaded.BlockedSpells[4], Is.EqualTo(before.Item3[4] == 0 ? 1 : 0));
         }
 

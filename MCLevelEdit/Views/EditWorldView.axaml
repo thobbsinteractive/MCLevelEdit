@@ -10,7 +10,7 @@
              x:DataType="vm:EditWorldViewModel">
   <Grid Margin="5"
         ColumnDefinitions="3*,1*,2*,1*"
-        RowDefinitions="40,Auto,30,30,40,40,30,30,30,30,30,30,30,30,30,30,30,Auto,40,*">
+        RowDefinitions="40,Auto,30,30,40,40,30,30,30,30,30,30,30,30,30,30,30,Auto,Auto,40,*">
     <Grid.Resources>
       <c:UInt32ToStringConverter x:Key="uInt32ToStringConverter"/>
       <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
@@ -24,6 +24,25 @@
            VerticalAlignment="Center">
       Level Properties
     </Label>
+    <!-- Magic Carpet format levels: which game the level is for (the file can't say). Shares row 1 with MC2's Map Type -->
+    <Label Grid.Column="0"
+           Grid.Row="1"
+           HorizontalAlignment="Left"
+           VerticalAlignment="Top"
+           IsVisible="{Binding IsMc1Format}">
+      Game:
+    </Label>
+    <StackPanel Grid.Column="1"
+                Grid.Row="1"
+                Grid.ColumnSpan="3"
+                Orientation="Vertical"
+                Margin="0,0,0,5"
+                ToolTip.Tip="Hidden Worlds levels use the Magic Carpet format, so the level file can't say which game it is for"
+                IsVisible="{Binding IsMc1Format}">
+      <RadioButton Content="Magic Carpet" IsChecked="{Binding IsMagicCarpetGame}"/>
+      <RadioButton Content="Hidden Worlds" IsChecked="{Binding IsHiddenWorldsGame}"/>
+    </StackPanel>
+
     <!-- Magic Carpet 2 only: the row is Auto height so it collapses for other levels -->
     <Label Grid.Column="0"
            Grid.Row="1"
@@ -185,162 +204,191 @@
             Content="+"
             HorizontalAlignment="Center"
             Command="{Binding IncreaseRiverCommand}"/>
-    
+
+    <!-- The lowest height a river can start from (both games) -->
     <Label Grid.Column="0"
            Grid.Row="11"
-           HorizontalAlignment="Left">
-      Source:
+           HorizontalAlignment="Left"
+           ToolTip.Tip="The lowest height a river can start from">
+      LRiver:
     </Label>
     <Button Grid.Column="1"
             Grid.Row="11"
             Content="-"
             HorizontalAlignment="Center"
-            Command="{Binding DecreaseSourceCommand}"/>
+            Command="{Binding DecreaseLRiverCommand}"/>
     <TextBox Grid.Column="2"
              Grid.Row="11"
+             HorizontalAlignment="Stretch"
+             Text="{Binding GenerationParameters.LRiver, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Button Grid.Column="3"
+            Grid.Row="11"
+            Content="+"
+            HorizontalAlignment="Center"
+            Command="{Binding IncreaseLRiverCommand}"/>
+
+    <Label Grid.Column="0"
+           Grid.Row="12"
+           HorizontalAlignment="Left">
+      Source:
+    </Label>
+    <Button Grid.Column="1"
+            Grid.Row="12"
+            Content="-"
+            HorizontalAlignment="Center"
+            Command="{Binding DecreaseSourceCommand}"/>
+    <TextBox Grid.Column="2"
+             Grid.Row="12"
              HorizontalAlignment="Stretch"
              Text="{Binding GenerationParameters.Source, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Button Grid.Column="3"
-            Grid.Row="11"
+            Grid.Row="12"
             Content="+"
             HorizontalAlignment="Center"
             Command="{Binding IncreaseSourceCommand}"/>
     
     <Label Grid.Column="0"
-           Grid.Row="12"
+           Grid.Row="13"
            HorizontalAlignment="Left">
       SnLin:
     </Label>
     <Button Grid.Column="1"
-            Grid.Row="12"
+            Grid.Row="13"
             Content="-"
             HorizontalAlignment="Center"
             Command="{Binding DecreaseSnLinCommand}"/>
     <TextBox Grid.Column="2"
-             Grid.Row="12"
+             Grid.Row="13"
              HorizontalAlignment="Stretch"
              Text="{Binding GenerationParameters.SnLin, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Button Grid.Column="3"
-            Grid.Row="12"
+            Grid.Row="13"
             Content="+"
             HorizontalAlignment="Center"
             Command="{Binding IncreaseSnLinCommand}"/>
     
     <Label Grid.Column="0"
-           Grid.Row="13"
+           Grid.Row="14"
            HorizontalAlignment="Left">
       SnFlt:
     </Label>
     <Button Grid.Column="1"
-            Grid.Row="13"
+            Grid.Row="14"
             Content="-"
             HorizontalAlignment="Center"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding DecreaseSnFltCommand}"/>
     <TextBox Grid.Column="2"
-             Grid.Row="13"
+             Grid.Row="14"
              HorizontalAlignment="Stretch"
              IsEnabled="{Binding GenerateTerrainButtonEnable}"
              Text="{Binding GenerationParameters.SnFlt, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Button Grid.Column="3"
-            Grid.Row="13"
+            Grid.Row="14"
             Content="+"
             HorizontalAlignment="Center"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding IncreaseSnFltCommand}"/>
     
     <Label Grid.Column="0"
-           Grid.Row="14"
+           Grid.Row="15"
            HorizontalAlignment="Left">
       BhLin:
     </Label>
     <Button Grid.Column="1"
-            Grid.Row="14"
+            Grid.Row="15"
             Content="-"
             HorizontalAlignment="Center"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding DecreaseBhLinCommand}"/>
     <TextBox Grid.Column="2"
-             Grid.Row="14"
+             Grid.Row="15"
              HorizontalAlignment="Stretch"
              IsEnabled="{Binding GenerateTerrainButtonEnable}"
              Text="{Binding GenerationParameters.BhLin, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Button Grid.Column="3"
-            Grid.Row="14"
+            Grid.Row="15"
             Content="+"
             HorizontalAlignment="Center"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding IncreaseBhLinCommand}"/>
     
     <Label Grid.Column="0"
-           Grid.Row="15"
+           Grid.Row="16"
            HorizontalAlignment="Left">
       Sand (BhFlt):
     </Label>
     <Button Grid.Column="1"
-            Grid.Row="15"
+            Grid.Row="16"
             Content="-"
             HorizontalAlignment="Center"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding DecreaseSandCommand}"/>
     <TextBox Grid.Column="2"
-             Grid.Row="15"
+             Grid.Row="16"
              HorizontalAlignment="Stretch"
              IsEnabled="{Binding GenerateTerrainButtonEnable}"
              Text="{Binding GenerationParameters.BhFlt, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Button Grid.Column="3"
-            Grid.Row="15"
+            Grid.Row="16"
             Content="+"
             HorizontalAlignment="Center"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding IncreaseSandCommand}"/>
     
+    <!-- Magic Carpet 2 only: MC1 levels have no RkSte. The row is Auto so it collapses otherwise -->
     <Label Grid.Column="0"
-           Grid.Row="16"
-           HorizontalAlignment="Left">
+           Grid.Row="17"
+           HorizontalAlignment="Left"
+           IsVisible="{Binding IsMc2}">
       RkSte:
     </Label>
     <Button Grid.Column="1"
-            Grid.Row="16"
+            Grid.Row="17"
             Content="-"
             HorizontalAlignment="Center"
+            IsVisible="{Binding IsMc2}"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding DecreaseRkSteCommand}"/>
     <TextBox Grid.Column="2"
-             Grid.Row="16"
+             Grid.Row="17"
+             Height="30"
              HorizontalAlignment="Stretch"
+             IsVisible="{Binding IsMc2}"
              IsEnabled="{Binding GenerateTerrainButtonEnable}"
              Text="{Binding GenerationParameters.RkSte, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Button Grid.Column="3"
-            Grid.Row="16"
+            Grid.Row="17"
             Content="+"
             HorizontalAlignment="Center"
+            IsVisible="{Binding IsMc2}"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding IncreaseRkSteCommand}"/>
 
     <!-- Cave levels only: the roof height the cave ceiling is built down from. The row is Auto so it collapses otherwise -->
     <Label Grid.Column="0"
-           Grid.Row="17"
+           Grid.Row="18"
            HorizontalAlignment="Left"
            ToolTip.Tip="The height of the cave roof. Ground at or above the roof becomes solid rock"
            IsVisible="{Binding IsCave}">
       Basic Height:
     </Label>
     <Button Grid.Column="1"
-            Grid.Row="17"
+            Grid.Row="18"
             Content="-"
             HorizontalAlignment="Center"
             IsVisible="{Binding IsCave}"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding DecreaseBasicHeightCommand}"/>
     <TextBox Grid.Column="2"
-             Grid.Row="17"
+             Grid.Row="18"
              Height="30"
              HorizontalAlignment="Stretch"
              IsVisible="{Binding IsCave}"
@@ -348,7 +396,7 @@
              Text="{Binding GenerationParameters.BasicHeight, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Button Grid.Column="3"
-            Grid.Row="17"
+            Grid.Row="18"
             Content="+"
             HorizontalAlignment="Center"
             IsVisible="{Binding IsCave}"
@@ -357,7 +405,7 @@
 
     <Button x:Name="btnGenerate"
             Grid.Column="0"
-            Grid.Row="18"
+            Grid.Row="19"
             HorizontalAlignment="Center"
             Grid.ColumnSpan="4"
             Command="{Binding GenerateTerrainCommand}"

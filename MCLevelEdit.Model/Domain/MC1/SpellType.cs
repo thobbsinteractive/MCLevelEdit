@@ -32,7 +32,17 @@ public enum Spell
 
 public class SpellType : EntityType
 {
-    public SpellType(Spell spell) : base(TypeId.Spell, ((int)spell), spell.ToString()) { }
+    public SpellType(Spell spell) : this(spell, GetName) { }
+
+    private readonly Func<Spell, string> _getName;
+
+    protected SpellType(Spell spell, Func<Spell, string> getName) : base(TypeId.Spell, ((int)spell), getName(spell))
+    {
+        _getName = getName;
+    }
+
+    /// <summary>The spell's name in Magic Carpet.</summary>
+    public static string GetName(Spell spell) => spell.ToString();
 
     public override ModelType[] ModelTypes
     {
@@ -40,13 +50,24 @@ public class SpellType : EntityType
         {
             if (_modelTypes is null)
             {
-                _modelTypes = Enum.GetValues(typeof(Spell))
-                    .Cast<int>()
-                    .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Spell), x) })
+                _modelTypes = Enum.GetValues<Spell>()
+                    .Select(x => new ModelType() { Id = (int)x, Name = _getName(x) })
                     .ToArray();
             }
 
             return _modelTypes;
         }
     }
+}
+
+/// <summary>
+/// Hidden Worlds spells: the same as Magic Carpet's except that Wall of Fire (<see cref="Spell.FireWall"/>)
+/// is Homing Meteor.
+/// </summary>
+public class HiddenWorldsSpellType : SpellType
+{
+    public HiddenWorldsSpellType(Spell spell) : base(spell, GetHiddenWorldsName) { }
+
+    /// <summary>The spell's name in Hidden Worlds.</summary>
+    public static string GetHiddenWorldsName(Spell spell) => spell == Spell.FireWall ? "HomingMeteor" : GetName(spell);
 }

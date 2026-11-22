@@ -128,20 +128,21 @@ public class MainViewModel : ViewModelBase
 
 
         // The menu passes the game as the CommandParameter (Hidden Worlds uses MagicCarpet1)
-        NewFileCommand = ReactiveCommand.CreateFromTask<GameVersion>(async game =>
+        // Magic Carpet and Hidden Worlds: the menu passes the game; both use the Magic Carpet level format
+        NewFileCommand = ReactiveCommand.CreateFromTask<GameTarget>(async game =>
         {
             if (await PromptSaveAndOrContinue())
             {
-                await mapService.CreateNewMap(false, game: game);
+                await mapService.CreateNewMap(false, game: GameVersion.MagicCarpet1, hiddenWorlds: game == GameTarget.HiddenWorlds);
                 MainWindow.I.Title = GetTitle("NewLevel.DAT");
             }
         });
 
-        NewRandomFileCommand = ReactiveCommand.CreateFromTask<GameVersion>(async game =>
+        NewRandomFileCommand = ReactiveCommand.CreateFromTask<GameTarget>(async game =>
         {
             if (await PromptSaveAndOrContinue())
             {
-                await mapService.CreateNewMap(true, game: game);
+                await mapService.CreateNewMap(true, game: GameVersion.MagicCarpet1, hiddenWorlds: game == GameTarget.HiddenWorlds);
                 MainWindow.I.Title = GetTitle("NewLevel.DAT");
             }
         });
@@ -350,7 +351,7 @@ public class MainViewModel : ViewModelBase
                     new Vector(96, 96),
                     PixelFormat.Rgba8888);
 
-                var bmp = await _terrainService.DrawBitmapAsync(preview, map.Terrain, layer, (map as MCLevelEdit.Model.Domain.MC2.Mc2Map)?.UsesFogPalette ?? false);
+                var bmp = await _terrainService.DrawBitmapAsync(preview, map, layer);
 
                 bmp.Save(filePath);
             }
@@ -479,7 +480,7 @@ public class MainViewModel : ViewModelBase
     private string GetTitle(string filePath)
     {
         string title = !string.IsNullOrWhiteSpace(filePath)? Path.GetFileName(filePath) : string.Empty;
-        return $"Magic Carpet 1 Level Editor: {title}";
+        return $"Magic Carpet Level Editor: {title}";
     }
 
     private void RefreshData()

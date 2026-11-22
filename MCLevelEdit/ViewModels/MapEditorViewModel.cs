@@ -578,7 +578,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         if (entityViewModel.IsSpawn() && entityViewModel.Model != (int)Spawn.Flyer1)
         {
             var map = _mapService.GetMap();
-            var wizard = map.Wizards[entityViewModel.Model - 4].ToWizardViewModel();
+            var wizard = map.Wizards[entityViewModel.Model - 4].ToWizardViewModel(map.IsHiddenWorlds);
 
             for (int i = 1; i < wizard.CastleLevel + 1; i++)
             {
@@ -845,7 +845,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                     BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(0, 0, 0, 0), preview);
 
-                    Preview = await _terrainService.DrawBitmapAsync(preview, map.Terrain, _selectedLayer, (map as MCLevelEdit.Model.Domain.MC2.Mc2Map)?.UsesFogPalette ?? false);
+                    Preview = await _terrainService.DrawBitmapAsync(preview, map, _selectedLayer);
                 }
 
                 this.Log().Debug("Preview refreshed");

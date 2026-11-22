@@ -80,22 +80,24 @@ namespace MCLevelEdit.Application.Services
             var gameExeLocation = dosSettings?.GameExeLocation;
             var gameArgs = dosSettings?.GameArgs;
             var gameLevelsBackupPath = dosSettings?.GameBackupFolder;
+            // Hidden Worlds reads DDLEVELS.DAT, Magic Carpet LEVELS.DAT, from the same LEVELS folder
+            var levelsFileName = LevelsFile.For(settings!.SelectedGame);
 
             if (!string.IsNullOrWhiteSpace(gameExeLocation) && gameLevelsPaths is not null && gameLevelsPaths.Any())
             {
                 try
                 {
-                    await BackupLevelFiles(gameLevelsPaths[0], gameLevelsBackupPath);
+                    await BackupLevelFiles(gameLevelsPaths[0], gameLevelsBackupPath, levelsFileName);
 
                     foreach (var gameLevelsPath in gameLevelsPaths)
                     {
-                        FileUtils.DeleteExistingFiles(gameLevelsPath);
+                        FileUtils.DeleteExistingFiles(gameLevelsPath, levelsFileName);
                     }
-  
+
                     foreach (var gameLevelsPath in gameLevelsPaths)
                     {
-                        var result = await PackageAsync(levelFilePaths, Path.Combine(gameLevelsPath, "LEVELS.DAT"));
-                        FileUtils.SetFilesToReadonly(gameLevelsPath);
+                        var result = await PackageAsync(levelFilePaths, Path.Combine(gameLevelsPath, levelsFileName));
+                        FileUtils.SetFilesToReadonly(gameLevelsPath, levelsFileName);
                     }
                     return RunGame(gameExeLocation, gameArgs);
                     
@@ -108,13 +110,13 @@ namespace MCLevelEdit.Application.Services
             return false;
         }
 
-        public async Task<bool> BackupLevelFiles(string gameLevelsPath, string gameLevelsBackupPath)
-        { 
+        public async Task<bool> BackupLevelFiles(string gameLevelsPath, string gameLevelsBackupPath, string levelsFileName = LevelsFile.MAGIC_CARPET)
+        {
             if (gameLevelsPath is not null)
             {
                 try
                 {
-                    return FileUtils.CopyBackupFiles(gameLevelsPath, gameLevelsBackupPath);
+                    return FileUtils.CopyBackupFiles(gameLevelsPath, gameLevelsBackupPath, levelsFileName);
                 }
                 catch (Exception ex)
                 {
@@ -124,7 +126,7 @@ namespace MCLevelEdit.Application.Services
             return false;
         }
 
-        public async Task<bool> RestoringLevelFiles(string gameLevelsBackupPath, string[] gameLevelsPaths)
+        public async Task<bool> RestoringLevelFiles(string gameLevelsBackupPath, string[] gameLevelsPaths, string levelsFileName = LevelsFile.MAGIC_CARPET)
         {
             if (gameLevelsPaths is not null && gameLevelsPaths.Any())
             {
@@ -132,9 +134,9 @@ namespace MCLevelEdit.Application.Services
                 {
                     foreach (var gameLevelsPath in gameLevelsPaths)
                     {
-                        FileUtils.DeleteExistingFiles(gameLevelsPath);
+                        FileUtils.DeleteExistingFiles(gameLevelsPath, levelsFileName);
 
-                        if (!FileUtils.RestoreBackupFiles(gameLevelsPath, gameLevelsBackupPath))
+                        if (!FileUtils.RestoreBackupFiles(gameLevelsPath, gameLevelsBackupPath, levelsFileName))
                             return false;
                     }
                     return true;

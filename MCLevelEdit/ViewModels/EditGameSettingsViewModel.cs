@@ -41,20 +41,12 @@ namespace MCLevelEdit.ViewModels
             string.Empty,
             @"C:\CARPET\CARPET.CD\LEVELS\BACKUP\");
 
-        // Hidden Worlds ships in the same install as Magic Carpet; its levels live under NETHERW
-        private static readonly DosGameDefaults HiddenWorldsGogDefaults = new(
-            GOG_ROOT + @"DOSBOX\DOSBox.exe",
-            GOG_ARGS,
-            GOG_ROOT + @"CARPET.CD\NETHERW\LEVELS\",
-            GOG_ROOT + @"cloud_saves\CARPET.CD\NETHERW\LEVELS\",
-            GOG_ROOT + @"CARPET.CD\NETHERW\LEVELS\BACKUP\");
-
-        private static readonly DosGameDefaults HiddenWorldsClassicDefaults = new(
-            CLASSIC_EXE,
-            CLASSIC_ARGS,
-            @"C:\CARPET\CARPET.CD\NETHERW\LEVELS\",
-            string.Empty,
-            @"C:\CARPET\CARPET.CD\NETHERW\LEVELS\BACKUP\");
+        // Hidden Worlds (the data disk) ships in the same install as Magic Carpet: its levels are DDLEVELS.DAT
+        // in the same LEVELS folder, so the folders match Magic Carpet's. Backups are named after the file
+        // (DDLEVELS.DAT.BK), so sharing the backup folder is safe.
+        // The launch is the same too: the game asks the player whether to play Magic Carpet or Hidden Worlds.
+        private static readonly DosGameDefaults HiddenWorldsGogDefaults = Mc1GogDefaults;
+        private static readonly DosGameDefaults HiddenWorldsClassicDefaults = Mc1ClassicDefaults;
 
         // Tab order in the dialog
         private static readonly GameTarget[] TabGames = { GameTarget.MagicCarpet1, GameTarget.HiddenWorlds, GameTarget.MagicCarpet2 };
@@ -125,8 +117,8 @@ namespace MCLevelEdit.ViewModels
 
             LevelPaths = new string[] { _settingsPort.CurrentLevelFilePath };
 
-            MagicCarpet1 = new DosGameSettingsViewModel("Magic Carpet", gameService, settings?.MagicCarpet1, Mc1GogDefaults, Mc1ClassicDefaults);
-            HiddenWorlds = new DosGameSettingsViewModel("Hidden Worlds", gameService, settings?.HiddenWorlds, HiddenWorldsGogDefaults, HiddenWorldsClassicDefaults);
+            MagicCarpet1 = new DosGameSettingsViewModel("Magic Carpet", LevelsFile.MAGIC_CARPET, gameService, settings?.MagicCarpet1, Mc1GogDefaults, Mc1ClassicDefaults);
+            HiddenWorlds = new DosGameSettingsViewModel("Hidden Worlds", LevelsFile.HIDDEN_WORLDS, gameService, settings?.HiddenWorlds, HiddenWorldsGogDefaults, HiddenWorldsClassicDefaults);
             MagicCarpet1.SaveRequested = SaveLevelPaths;
             HiddenWorlds.SaveRequested = SaveLevelPaths;
 

@@ -5,7 +5,8 @@ namespace MCLevelEdit.ViewModels.Mappers;
 
 public static class WizardToWizardViewModel
 {
-    public static WizardViewModel ToWizardViewModel(this Wizard wizard)
+    /// <param name="hiddenWorlds">The wizard is in a Hidden Worlds level, which names one spell differently.</param>
+    public static WizardViewModel ToWizardViewModel(this Wizard wizard, bool hiddenWorlds = false)
     {
         return new WizardViewModel()
         {
@@ -15,7 +16,7 @@ public static class WizardToWizardViewModel
             Perception = wizard.Perception,
             Reflexes = wizard.Reflexes,
             CastleLevel = wizard.CastleLevel,
-            Spells = wizard.Spells.ToSpellsViewModel(),
+            Spells = wizard.Spells.ToSpellsViewModel(hiddenWorlds),
             Life = (wizard as Mc2Wizard)?.Life ?? 0,
             Mc2Spells = (wizard as Mc2Wizard)?.ToMc2SpellViewModels() ?? new()
         };

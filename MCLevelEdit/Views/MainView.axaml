@@ -13,12 +13,12 @@
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="_File">
         <MenuItem Header="Magic Carpet _1">
-          <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet1}"/>
-          <MenuItem Header="New _Random" Command="{Binding NewRandomFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet1}"/>
+          <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}" CommandParameter="{x:Static domain:GameTarget.MagicCarpet1}"/>
+          <MenuItem Header="New _Random" Command="{Binding NewRandomFileCommand}" CommandParameter="{x:Static domain:GameTarget.MagicCarpet1}"/>
         </MenuItem>
         <MenuItem Header="Magic Carpet _Hidden Worlds">
-          <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet1}"/>
-          <MenuItem Header="New _Random" Command="{Binding NewRandomFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet1}"/>
+          <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}" CommandParameter="{x:Static domain:GameTarget.HiddenWorlds}"/>
+          <MenuItem Header="New _Random" Command="{Binding NewRandomFileCommand}" CommandParameter="{x:Static domain:GameTarget.HiddenWorlds}"/>
         </MenuItem>
         <MenuItem Header="Magic Carpet _2">
           <MenuItem Header="_Day">

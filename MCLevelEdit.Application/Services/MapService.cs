@@ -29,7 +29,7 @@ public class MapService : IMapService, IEnableLogger
         try
         {
             MapRepository.Map = await _filePort.LoadMapAsync(filePath);
-            MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(MapRepository.Map.Terrain.GenerationParameters);
+            MapRepository.Map.Terrain = await _terrainService.CalculateTerrain(MapRepository.Map.Terrain.GenerationParameters, MapRepository.Map.TerrainGame);
             MapRepository.Map.ValidateEntities();
         }
         catch (Exception ex)
@@ -87,12 +87,13 @@ public class MapService : IMapService, IEnableLogger
         return true;
     }
 
-    public async Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE, GameVersion game = GameVersion.MagicCarpet1, MapType mapType = MapType.Day)
+    public async Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE, GameVersion game = GameVersion.MagicCarpet1, MapType mapType = MapType.Day, bool hiddenWorlds = false)
     {
         try
         {
             // Hidden Worlds levels use the Magic Carpet 1 format
             MapRepository.Map = game == GameVersion.MagicCarpet2 ? new MCLevelEdit.Model.Domain.MC2.Mc2Map() : new Map();
+            MapRepository.Map.SetHiddenWorlds(hiddenWorlds);
             _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
             _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
             if (randomTerrain)
@@ -120,7 +121,7 @@ public class MapService : IMapService, IEnableLogger
     {
         try
         {
-            MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(generationParameters);
+            MapRepository.Map.Terrain = await _terrainService.CalculateTerrain(generationParameters, MapRepository.Map.TerrainGame);
             _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
         }
         catch (Exception ex)

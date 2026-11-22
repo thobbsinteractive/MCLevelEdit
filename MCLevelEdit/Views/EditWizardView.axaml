@@ -102,7 +102,7 @@
       <Grid Grid.Row="0" ColumnDefinitions="*,40,40,40" Margin="0,0,0,2">
         <TextBlock Grid.Column="0" FontWeight="Bold" Text="Spell"/>
         <TextBlock Grid.Column="1" FontWeight="Bold" Text="Start" ToolTip.Tip="Wizard starts with this spell"/>
-        <TextBlock Grid.Column="2" FontWeight="Bold" Text="Lvl" ToolTip.Tip="Spell level"/>
+        <TextBlock Grid.Column="2" FontWeight="Bold" Text="Lvl" ToolTip.Tip="Spell level, 0 to 2 (the game treats anything higher as 2)"/>
         <TextBlock Grid.Column="3" FontWeight="Bold" Text="Block" ToolTip.Tip="Wizard can never have this spell"/>
       </Grid>
       <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">

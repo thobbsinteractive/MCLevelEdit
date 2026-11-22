@@ -37,11 +37,17 @@ public class Mc2SpellViewModel : ReactiveObject
         set => Set(ref _starting, (byte)(value ? 1 : 0), nameof(StartsWith));
     }
 
-    /// <summary>Spell level (0 = none; the original levels use 1 to 4).</summary>
+    /// <summary>The highest spell level: each MC2 spell has three levels, 0 to 2 (remc2 subspell[3]).</summary>
+    public const byte MAX_LEVEL = 2;
+
+    /// <summary>
+    /// Spell level, 0 to 2. The game treats anything above 2 as 2 (remc2 Spells.cpp). A few original levels
+    /// hold 3, 4 or 255; those are kept until edited, and edits are limited to 0 to 2.
+    /// </summary>
     public byte Level
     {
         get => _level;
-        set => Set(ref _level, value, nameof(Level));
+        set => Set(ref _level, Math.Min(value, MAX_LEVEL), nameof(Level));
     }
 
     public bool Blocked
@@ -53,7 +59,11 @@ public class Mc2SpellViewModel : ReactiveObject
     private void Set(ref byte field, byte value, string propertyName)
     {
         if (field == value)
+        {
+            // Still notify: a typed value that was limited (e.g. 5 -> 2) must be redrawn as the limited value
+            this.RaisePropertyChanged(propertyName);
             return;
+        }
         field = value;
         this.RaisePropertyChanged(propertyName);
         Changed?.Invoke(this, EventArgs.Empty);

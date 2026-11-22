@@ -11,6 +11,18 @@
         HiddenWorlds = 3
     }
 
+    /// <summary>
+    /// The packed levels file each DOSBox game reads. Hidden Worlds (the data disk) keeps its levels in
+    /// DDLEVELS.DAT/.TAB, next to Magic Carpet's LEVELS.DAT/.TAB in the same LEVELS folder.
+    /// </summary>
+    public static class LevelsFile
+    {
+        public const string MAGIC_CARPET = "LEVELS.DAT";
+        public const string HIDDEN_WORLDS = "DDLEVELS.DAT";
+
+        public static string For(GameTarget game) => game == GameTarget.HiddenWorlds ? HIDDEN_WORLDS : MAGIC_CARPET;
+    }
+
     /// <summary>Settings for a game run through DOSBox (GOG or original install).</summary>
     public class DosGameSettings
     {
