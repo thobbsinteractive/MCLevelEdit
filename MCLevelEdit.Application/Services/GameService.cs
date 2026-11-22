@@ -52,10 +52,22 @@ namespace MCLevelEdit.Application.Services
         {
             var settings = _settingsPort.LoadSettings();
 
-            var gameLevelsPaths = settings?.GameLevelFolders;
-            var gameExeLocation = settings?.GameExeLocation;
-            var gameArgs = settings?.GameArgs;
-            var gameLevelsBackupPath = settings?.GameBackupFolder;
+            if (settings?.SelectedGame == GameTarget.MagicCarpet2)
+            {
+                if (string.IsNullOrWhiteSpace(settings.Mc2ExeLocation) || !File.Exists(settings.Mc2ExeLocation))
+                {
+                    this.Log().Error($"Magic Carpet 2 HD exe not found: '{settings.Mc2ExeLocation}'");
+                    return false;
+                }
+                return RunGame(settings.Mc2ExeLocation, string.Empty);
+            }
+
+            // Magic Carpet 1 or Hidden Worlds, both run through DOSBox
+            var dosSettings = settings?.GetSelectedDosSettings();
+            var gameLevelsPaths = dosSettings?.GameLevelFolders;
+            var gameExeLocation = dosSettings?.GameExeLocation;
+            var gameArgs = dosSettings?.GameArgs;
+            var gameLevelsBackupPath = dosSettings?.GameBackupFolder;
 
             if (!string.IsNullOrWhiteSpace(gameExeLocation) && gameLevelsPaths is not null && gameLevelsPaths.Any())
             {

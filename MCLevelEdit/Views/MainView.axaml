@@ -4,14 +4,25 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels;assembly=MCLevelEdit"
              xmlns:views="clr-namespace:MCLevelEdit.Views"
+             xmlns:domain="clr-namespace:MCLevelEdit.Model.Domain;assembly=MCLevelEdit.Model"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              x:Class="MCLevelEdit.Views.MainView"
              x:DataType="vm:MainViewModel">
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="_File">
-        <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}"/>
-        <MenuItem Header="_New Random" Command="{Binding NewRandomFileCommand}"/>
+        <MenuItem Header="Magic Carpet _1">
+          <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet1}"/>
+          <MenuItem Header="New _Random" Command="{Binding NewRandomFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet1}"/>
+        </MenuItem>
+        <MenuItem Header="Magic Carpet _Hidden Worlds">
+          <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet1}"/>
+          <MenuItem Header="New _Random" Command="{Binding NewRandomFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet1}"/>
+        </MenuItem>
+        <MenuItem Header="Magic Carpet _2">
+          <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet2}"/>
+          <MenuItem Header="New _Random" Command="{Binding NewRandomFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet2}"/>
+        </MenuItem>
         <Separator/>
         <MenuItem Header="_Open" Command="{Binding OpenFileCommand}"/>
         <MenuItem Header="_Save" Command="{Binding SaveFileCommand}"/>

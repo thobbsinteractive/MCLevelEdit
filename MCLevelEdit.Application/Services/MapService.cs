@@ -87,11 +87,12 @@ public class MapService : IMapService, IEnableLogger
         return true;
     }
 
-    public async Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE)
+    public async Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE, GameVersion game = GameVersion.MagicCarpet1)
     {
         try
         {
-            MapRepository.Map = new Map();
+            // Hidden Worlds levels use the Magic Carpet 1 format
+            MapRepository.Map = game == GameVersion.MagicCarpet2 ? new MCLevelEdit.Model.Domain.MC2.Mc2Map() : new Map();
             _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
             _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
             if (randomTerrain)

@@ -8,7 +8,7 @@ public static class TerrainGenerationParamsViewModelToGenerationParams
     {
         return new GenerationParameters()
         {
-            MapType = MapType.Day,
+            MapType = terrainGenerationParamsViewModel.MapType,
             Seed = terrainGenerationParamsViewModel.Seed,
             Offset = terrainGenerationParamsViewModel.Offset,
             Raise = terrainGenerationParamsViewModel.Raise,

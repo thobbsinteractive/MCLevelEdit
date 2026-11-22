@@ -26,6 +26,9 @@ public class MapTreeViewModel : ReactiveObject
 
     public IList<KeyValuePair<int, string>> TypeIds => EntityTypeLists.TypeIdsWithAll;
 
+    /// <summary>The game the open map is for. Hidden Worlds levels use the Magic Carpet 1 format, so they show as Magic Carpet 1.</summary>
+    public string GameName => _mapService.GetMap()?.GameVersion == GameVersion.MagicCarpet2 ? "Magic Carpet 2" : "Magic Carpet 1";
+
     public ObservableCollection<Node> Nodes { get; } = new ObservableCollection<Node>();
     public ObservableCollection<Node> SelectedNodes { get; } = new ObservableCollection<Node>();
 
@@ -145,6 +148,7 @@ public class MapTreeViewModel : ReactiveObject
         SelectedNodes.Clear();
         Nodes.Clear();
 
+        this.RaisePropertyChanged(nameof(GameName));
         RefreshWizardsData();
         RefreshEntitiesData();
     }

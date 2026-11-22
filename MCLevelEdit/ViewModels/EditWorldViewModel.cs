@@ -1,6 +1,7 @@
 ﻿using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
 using System.Threading.Tasks;
@@ -40,6 +41,50 @@ namespace MCLevelEdit.ViewModels
         {
             get => _generationParameters;
             set => this.RaiseAndSetIfChanged(ref _generationParameters, value);
+        }
+
+        /// <summary>Map type (Day/Night/Cave) only exists in Magic Carpet 2 levels.</summary>
+        public bool IsMc2 => _mapService.GetMap().GameVersion == GameVersion.MagicCarpet2;
+
+        public MapType MapType
+        {
+            get => GenerationParameters?.MapType ?? MapType.Day;
+            set
+            {
+                if (GenerationParameters is null || GenerationParameters.MapType == value)
+                    return;
+
+                GenerationParameters.MapType = value;
+                // Store it on the map directly so it is saved without regenerating the terrain
+                _mapService.GetMap().Terrain.GenerationParameters.MapType = value;
+                RaiseMapTypeChanged();
+            }
+        }
+
+        public bool IsDay
+        {
+            get => MapType == MapType.Day;
+            set { if (value) MapType = MapType.Day; }
+        }
+
+        public bool IsNight
+        {
+            get => MapType == MapType.Night;
+            set { if (value) MapType = MapType.Night; }
+        }
+
+        public bool IsCave
+        {
+            get => MapType == MapType.Cave;
+            set { if (value) MapType = MapType.Cave; }
+        }
+
+        private void RaiseMapTypeChanged()
+        {
+            this.RaisePropertyChanged(nameof(MapType));
+            this.RaisePropertyChanged(nameof(IsDay));
+            this.RaisePropertyChanged(nameof(IsNight));
+            this.RaisePropertyChanged(nameof(IsCave));
         }
 
         public ICommand CalculateManaCommand { get; }
@@ -231,6 +276,8 @@ namespace MCLevelEdit.ViewModels
             var map = _mapService.GetMap();
             GenerationParameters = map.Terrain.GenerationParameters.ToTerrainGenerationParamsViewModel();
             GenerateTerrainButtonEnable = true;
+            this.RaisePropertyChanged(nameof(IsMc2));
+            RaiseMapTypeChanged();
         }
 
         public void RefreshWorldHandler(object sender, PubSubEventArgs<object> args)

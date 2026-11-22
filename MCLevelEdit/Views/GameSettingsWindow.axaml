@@ -8,7 +8,7 @@
         Icon="/Assets/editor.ico"
         Title="Game Settings"
         WindowStartupLocation="CenterScreen"
-        MinHeight="300"
+        MinHeight="440"
         MinWidth="700">
   <views:EditGameSettingsView />
 </Window>

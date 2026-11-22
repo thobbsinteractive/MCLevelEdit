@@ -125,20 +125,21 @@ public class MainViewModel : ViewModelBase
         });
 
 
-        NewFileCommand = ReactiveCommand.CreateFromTask(async () =>
+        // The menu passes the game as the CommandParameter (Hidden Worlds uses MagicCarpet1)
+        NewFileCommand = ReactiveCommand.CreateFromTask<GameVersion>(async game =>
         {
             if (await PromptSaveAndOrContinue())
             {
-                await mapService.CreateNewMap();
+                await mapService.CreateNewMap(false, game: game);
                 MainWindow.I.Title = GetTitle("NewLevel.DAT");
             }
         });
 
-        NewRandomFileCommand = ReactiveCommand.CreateFromTask(async () =>
+        NewRandomFileCommand = ReactiveCommand.CreateFromTask<GameVersion>(async game =>
         {
             if (await PromptSaveAndOrContinue())
             {
-                await mapService.CreateNewMap(true);
+                await mapService.CreateNewMap(true, game: game);
                 MainWindow.I.Title = GetTitle("NewLevel.DAT");
             }
         });
@@ -261,7 +262,7 @@ public class MainViewModel : ViewModelBase
         if (await SaveFile(false) && !string.IsNullOrWhiteSpace(_settingsPort.CurrentLevelFilePath) && File.Exists(_settingsPort.CurrentLevelFilePath))
         {
             var settings = _settingsPort.LoadSettings();
-            if (settings == null || string.IsNullOrWhiteSpace(settings.GameExeLocation))
+            if (settings == null || string.IsNullOrWhiteSpace(settings.GetSelectedExeLocation()))
             {
                 await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
             }
