@@ -73,15 +73,21 @@
             }
         }
 
-        /// <summary>The DOSBox settings for the selected game, or null for Magic Carpet 2.</summary>
-        public DosGameSettings? GetSelectedDosSettings() => SelectedGame switch
+        /// <summary>The DOSBox settings for a game, or null for Magic Carpet 2.</summary>
+        public DosGameSettings? GetDosSettings(GameTarget game) => game switch
         {
             GameTarget.HiddenWorlds => HiddenWorlds,
             GameTarget.MagicCarpet2 => null,
             _ => MagicCarpet1
         };
 
-        public string GetSelectedExeLocation() =>
-            GetSelectedDosSettings()?.GameExeLocation ?? Mc2ExeLocation;
+        /// <summary>The exe that runs a game: DOSBox for Magic Carpet and Hidden Worlds, Magic Carpet 2 HD for MC2.</summary>
+        public string GetExeLocation(GameTarget game) =>
+            GetDosSettings(game)?.GameExeLocation ?? Mc2ExeLocation;
+
+        /// <summary>The DOSBox settings for the selected game, or null for Magic Carpet 2.</summary>
+        public DosGameSettings? GetSelectedDosSettings() => GetDosSettings(SelectedGame);
+
+        public string GetSelectedExeLocation() => GetExeLocation(SelectedGame);
     }
 }

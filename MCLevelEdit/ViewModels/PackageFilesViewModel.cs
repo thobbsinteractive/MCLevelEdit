@@ -5,6 +5,7 @@ using MCLevelEdit.Application.Model;
 using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Utils;
 using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -120,6 +121,8 @@ namespace MCLevelEdit.ViewModels
             {
                 Title = "Select files to package",
                 AllowMultiple = true,
+                // Where the last file in the list came from
+                SuggestedStartLocation = await PickerStartFolder.GetAsync(topLevel.StorageProvider, FilesList.LastOrDefault())
             });
 
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
@@ -135,8 +138,8 @@ namespace MCLevelEdit.ViewModels
             // Get top level from the current control. Alternatively, you can use Window reference instead.
             var topLevel = TopLevel.GetTopLevel(PackageLevelsWindow.I);
 
-            var uri = Path.GetDirectoryName(OutputPath) ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Globals.APP_DIRECTORY);
-            var startlocation = await topLevel.StorageProvider.TryGetFolderFromPathAsync(uri);
+            var startlocation = await PickerStartFolder.GetAsync(topLevel.StorageProvider,
+                string.IsNullOrWhiteSpace(OutputPath) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Globals.APP_DIRECTORY) : OutputPath);
 
             // Start async operation to open the dialog.
             var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions

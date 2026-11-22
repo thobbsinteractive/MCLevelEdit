@@ -17,6 +17,9 @@ public class Map
     /// </summary>
     public bool IsHiddenWorlds { get; private set; }
 
+    /// <summary>The game this level is for, and runs in. Magic Carpet 2 levels override it.</summary>
+    public virtual GameTarget Game => IsHiddenWorlds ? GameTarget.HiddenWorlds : GameTarget.MagicCarpet1;
+
     /// <summary>The game whose terrain generation this level uses. Magic Carpet 2 levels override it.</summary>
     public virtual TerrainGame TerrainGame => IsHiddenWorlds ? TerrainGame.HiddenWorlds : TerrainGame.MagicCarpet1;
 

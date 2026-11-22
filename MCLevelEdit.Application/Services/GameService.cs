@@ -48,11 +48,16 @@ namespace MCLevelEdit.Application.Services
             }
         }
 
-        public async Task<bool> RunLevelFromSettings(string[] levelFilePaths)
+        public async Task<bool> RunLevelFromSettings(string[] levelFilePaths, GameTarget? game = null)
         {
             var settings = _settingsPort.LoadSettings();
+            if (settings is null)
+                return false;
 
-            if (settings?.SelectedGame == GameTarget.MagicCarpet2)
+            // The level's own game when given (the main window's Run), else the game selected in Game Settings
+            var target = game ?? settings.SelectedGame;
+
+            if (target == GameTarget.MagicCarpet2)
             {
                 if (string.IsNullOrWhiteSpace(settings.Mc2ExeLocation) || !File.Exists(settings.Mc2ExeLocation))
                 {
@@ -75,13 +80,21 @@ namespace MCLevelEdit.Application.Services
             }
 
             // Magic Carpet 1 or Hidden Worlds, both run through DOSBox
-            var dosSettings = settings?.GetSelectedDosSettings();
+            var notMc1 = levelFilePaths?.FirstOrDefault(p => !File.Exists(p) || LevelFormat.DetectFromFileSize(new FileInfo(p).Length) != GameVersion.MagicCarpet1);
+            if (levelFilePaths is null || levelFilePaths.Length == 0 || notMc1 is not null)
+            {
+                // Never pack a Magic Carpet 2 level into the game's LEVELS.DAT / DDLEVELS.DAT
+                this.Log().Error($"'{notMc1}' is not a Magic Carpet level ({LevelFormat.MC1_FILE_SIZE} bytes).");
+                return false;
+            }
+
+            var dosSettings = settings.GetDosSettings(target);
             var gameLevelsPaths = dosSettings?.GameLevelFolders;
             var gameExeLocation = dosSettings?.GameExeLocation;
             var gameArgs = dosSettings?.GameArgs;
             var gameLevelsBackupPath = dosSettings?.GameBackupFolder;
             // Hidden Worlds reads DDLEVELS.DAT, Magic Carpet LEVELS.DAT, from the same LEVELS folder
-            var levelsFileName = LevelsFile.For(settings!.SelectedGame);
+            var levelsFileName = LevelsFile.For(target);
 
             if (!string.IsNullOrWhiteSpace(gameExeLocation) && gameLevelsPaths is not null && gameLevelsPaths.Any())
             {

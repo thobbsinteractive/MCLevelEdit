@@ -4,6 +4,7 @@ using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Utils;
 using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -82,6 +83,10 @@ namespace MCLevelEdit.ViewModels
                 this.RaisePropertyChanged(nameof(CanRun));
             }
         }
+
+        /// <summary>Shows the tab for a game.</summary>
+        public void SelectGame(GameTarget game) =>
+            SelectedGameTabIndex = System.Math.Max(0, System.Array.IndexOf(TabGames, game));
 
         public GameTarget SelectedGame => TabGames[System.Math.Clamp(_selectedGameTabIndex, 0, TabGames.Length - 1)];
         public bool IsMagicCarpet2 => SelectedGame == GameTarget.MagicCarpet2;
@@ -205,7 +210,8 @@ namespace MCLevelEdit.ViewModels
             var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Select Levels to Package and run",
-                AllowMultiple = true
+                AllowMultiple = true,
+                SuggestedStartLocation = await PickerStartFolder.GetAsync(TopLevel.StorageProvider, LevelPaths?.FirstOrDefault())
             });
 
             if (files != null)
@@ -219,7 +225,8 @@ namespace MCLevelEdit.ViewModels
             var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Select Magic Carpet 2 HD executable",
-                AllowMultiple = false
+                AllowMultiple = false,
+                SuggestedStartLocation = await PickerStartFolder.GetAsync(TopLevel.StorageProvider, Mc2ExePath)
             });
 
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))

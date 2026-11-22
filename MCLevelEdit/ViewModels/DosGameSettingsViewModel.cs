@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Utils;
 using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -108,9 +109,9 @@ namespace MCLevelEdit.ViewModels
             }
 
             SelectGameFolderCommand = ReactiveCommand.CreateFromTask(SelectGameLauncher);
-            SelectLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () => GameLevelsPath = await PickFolder("Select Levels Directory") ?? GameLevelsPath);
-            SelectCloudLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () => GameCloudLevelsPath = await PickFolder("Select Levels Directory") ?? GameCloudLevelsPath);
-            SelectBackupLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () => GameLevelsBackupPath = await PickFolder("Select Backup Directory for Levels") ?? GameLevelsBackupPath);
+            SelectLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () => GameLevelsPath = await PickFolder("Select Levels Directory", GameLevelsPath) ?? GameLevelsPath);
+            SelectCloudLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () => GameCloudLevelsPath = await PickFolder("Select Levels Directory", GameCloudLevelsPath) ?? GameCloudLevelsPath);
+            SelectBackupLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () => GameLevelsBackupPath = await PickFolder("Select Backup Directory for Levels", GameLevelsBackupPath) ?? GameLevelsBackupPath);
 
             SetDefaultsCommand = ReactiveCommand.CreateFromTask(async () =>
             {
@@ -169,7 +170,8 @@ namespace MCLevelEdit.ViewModels
             var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = $"Select {GameName} Launcher",
-                AllowMultiple = false
+                AllowMultiple = false,
+                SuggestedStartLocation = await PickerStartFolder.GetAsync(TopLevel.StorageProvider, GameExePath)
             });
 
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
@@ -178,12 +180,13 @@ namespace MCLevelEdit.ViewModels
             }
         }
 
-        private async Task<string?> PickFolder(string title)
+        private async Task<string?> PickFolder(string title, string? currentPath)
         {
             var folder = await TopLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
                 Title = title,
-                AllowMultiple = false
+                AllowMultiple = false,
+                SuggestedStartLocation = await PickerStartFolder.GetAsync(TopLevel.StorageProvider, currentPath, isFolder: true)
             });
 
             if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))

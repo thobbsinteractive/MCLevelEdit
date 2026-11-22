@@ -10,6 +10,7 @@ using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Enums;
+using MCLevelEdit.Utils;
 using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -283,17 +284,30 @@ public class MainViewModel : ViewModelBase
     {
         if (await SaveFile(false) && !string.IsNullOrWhiteSpace(_settingsPort.CurrentLevelFilePath) && File.Exists(_settingsPort.CurrentLevelFilePath))
         {
+            // Run the open level in its own game, whatever game is selected in Game Settings
+            var game = _mapService.GetMap().Game;
             var settings = _settingsPort.LoadSettings();
-            if (settings == null || string.IsNullOrWhiteSpace(settings.GetSelectedExeLocation()))
+            if (settings == null || string.IsNullOrWhiteSpace(settings.GetExeLocation(game)))
             {
-                await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
+                // Not set up yet: open Game Settings on this game's tab
+                var settingsViewModel = Locator.Current.GetService<EditGameSettingsViewModel>()!;
+                settingsViewModel.SelectGame(game);
+                await ShowGameSettingsDialog.Handle(settingsViewModel);
             }
-            else
+            else if (!await _gameService.RunLevelFromSettings(new string[] { _settingsPort.CurrentLevelFilePath }, game))
             {
-                await _gameService.RunLevelFromSettings(new string[] { _settingsPort.CurrentLevelFilePath });
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to run the level in {GetGameName(game)}! Please check its paths in Game Settings.", ButtonEnum.Ok, Icon.Error);
+                await box.ShowAsync();
             }
         }
     }
+
+    private static string GetGameName(GameTarget game) => game switch
+    {
+        GameTarget.MagicCarpet2 => "Magic Carpet 2 HD",
+        GameTarget.HiddenWorlds => "Magic Carpet Hidden Worlds",
+        _ => "Magic Carpet"
+    };
 
     public void OnKeyPressed(Key key)
     {
@@ -409,7 +423,7 @@ public class MainViewModel : ViewModelBase
             if (!string.IsNullOrWhiteSpace(map.FilePath))
             {
                 suggestedFileName = Path.GetFileName(map.FilePath);
-                storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
+                storageFolder = await PickerStartFolder.GetAsync(topLevel.StorageProvider, map.FilePath);
                 suggestedExtension = Path.GetExtension(map.FilePath);
             }
 
@@ -455,7 +469,9 @@ public class MainViewModel : ViewModelBase
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Open Map File",
-            AllowMultiple = false
+            AllowMultiple = false,
+            // The folder of the level that is open
+            SuggestedStartLocation = await PickerStartFolder.GetAsync(topLevel.StorageProvider, _mapService.GetMap()?.FilePath ?? _settingsPort.CurrentLevelFilePath)
         });
 
         if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
