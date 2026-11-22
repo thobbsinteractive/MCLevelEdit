@@ -180,9 +180,14 @@ namespace MCLevelEdit.Application.Services
                 vars.Output = new byte[MAX_BUF_SIZE];
                 vars.Temp = new byte[MAX_BUF_SIZE];
 
+                vars.FileSize = RncUtils.FindEndOfRncData(vars.Input);
+
                 return Task.Run(() =>
                 {
-                    return rncProPack.DoSearch(ref vars, vars.FileSize, true, outputFolder);
+                    var result = rncProPack.DoSearch(ref vars, vars.FileSize, true, outputFolder);
+                    if (result == 0)
+                        RncUtils.NumberExtractedFiles(outputFolder);
+                    return result;
                 });
             }
             catch (Exception ex)
