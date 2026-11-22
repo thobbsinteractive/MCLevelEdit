@@ -845,7 +845,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                     BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(0, 0, 0, 0), preview);
 
-                    Preview = await _terrainService.DrawBitmapAsync(preview, map.Terrain, _selectedLayer);
+                    Preview = await _terrainService.DrawBitmapAsync(preview, map.Terrain, _selectedLayer, (map as MCLevelEdit.Model.Domain.MC2.Mc2Map)?.UsesFogPalette ?? false);
                 }
 
                 this.Log().Debug("Preview refreshed");

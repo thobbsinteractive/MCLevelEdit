@@ -63,7 +63,6 @@ public static class Mc2LevelFormat
             SourceData = (byte[])data.Clone(),
             LevelId = U16(data, LEVEL_ID),
             LevelType = data[LEVEL_TYPE],
-            BasicHeight = data[BASIC_HEIGHT],
             ManaTarget = (byte)U16(data, MANA_GOAL)
         };
 
@@ -83,7 +82,9 @@ public static class Mc2LevelFormat
                 SnFlt = (byte)U16(data, SNFLT),
                 BhLin = (byte)U16(data, BHLIN),
                 BhFlt = (byte)U16(data, BHFLT),
-                RkSte = (byte)U16(data, RKSTE)
+                RkSte = (byte)U16(data, RKSTE),
+                // The cave ceiling is generated from it, so it lives with the terrain parameters
+                BasicHeight = data[BASIC_HEIGHT]
             }
         };
 

@@ -8,10 +8,9 @@
              x:Class="MCLevelEdit.Views.EditGameSettingsView"
              x:DataType="vm:EditGameSettingsViewModel">
   <Grid Margin="10" RowDefinitions="40,*,40">
-    <!-- The level(s) to run, shared by the DOSBox games -->
+    <!-- The level(s) to run. Magic Carpet 2 HD runs only the first one -->
     <Grid Grid.Row="0"
-          ColumnDefinitions="205,*,100"
-          IsVisible="{Binding IsDosGame}">
+          ColumnDefinitions="205,*,100">
       <Label Grid.Column="0"
              Content="Level File:"
              VerticalAlignment="Center"/>

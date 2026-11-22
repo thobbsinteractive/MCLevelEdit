@@ -87,7 +87,7 @@ public class MapService : IMapService, IEnableLogger
         return true;
     }
 
-    public async Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE, GameVersion game = GameVersion.MagicCarpet1)
+    public async Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE, GameVersion game = GameVersion.MagicCarpet1, MapType mapType = MapType.Day)
     {
         try
         {
@@ -97,6 +97,15 @@ public class MapService : IMapService, IEnableLogger
             _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
             if (randomTerrain)
                 MapRepository.Map.Terrain.GenerationParameters = _terrainService.GetRandomGeneratorParamters();
+
+            // Only Magic Carpet 2 levels have a map type
+            var gp = MapRepository.Map.Terrain.GenerationParameters;
+            gp.MapType = game == GameVersion.MagicCarpet2 ? mapType : MapType.Day;
+            if (gp.MapType == MapType.Cave && gp.BasicHeight == 0)
+            {
+                // The cave roof: with none, the whole cave is solid rock. MC2's own caves use around 114-154.
+                gp.BasicHeight = (byte)Random.Shared.Next(110, 161);
+            }
 
             return await RecalculateTerrain(MapRepository.Map.Terrain.GenerationParameters);
         }

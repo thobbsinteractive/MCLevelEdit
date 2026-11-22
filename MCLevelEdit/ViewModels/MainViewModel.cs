@@ -55,6 +55,8 @@ public class MainViewModel : ViewModelBase
 
     public ICommand NewFileCommand { get; }
     public ICommand NewRandomFileCommand { get; }
+    public ICommand NewMc2FileCommand { get; }
+    public ICommand NewMc2RandomFileCommand { get; }
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
     public ICommand SaveFileAsCommand { get; }
@@ -140,6 +142,25 @@ public class MainViewModel : ViewModelBase
             if (await PromptSaveAndOrContinue())
             {
                 await mapService.CreateNewMap(true, game: game);
+                MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            }
+        });
+
+        // Magic Carpet 2: the menu passes the map type (Day/Night/Cave) as the CommandParameter
+        NewMc2FileCommand = ReactiveCommand.CreateFromTask<MagicCarpet2Terrain.Model.MapType>(async mapType =>
+        {
+            if (await PromptSaveAndOrContinue())
+            {
+                await mapService.CreateNewMap(false, game: GameVersion.MagicCarpet2, mapType: mapType);
+                MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            }
+        });
+
+        NewMc2RandomFileCommand = ReactiveCommand.CreateFromTask<MagicCarpet2Terrain.Model.MapType>(async mapType =>
+        {
+            if (await PromptSaveAndOrContinue())
+            {
+                await mapService.CreateNewMap(true, game: GameVersion.MagicCarpet2, mapType: mapType);
                 MainWindow.I.Title = GetTitle("NewLevel.DAT");
             }
         });
@@ -329,7 +350,7 @@ public class MainViewModel : ViewModelBase
                     new Vector(96, 96),
                     PixelFormat.Rgba8888);
 
-                var bmp = await _terrainService.DrawBitmapAsync(preview, map.Terrain, layer);
+                var bmp = await _terrainService.DrawBitmapAsync(preview, map.Terrain, layer, (map as MCLevelEdit.Model.Domain.MC2.Mc2Map)?.UsesFogPalette ?? false);
 
                 bmp.Save(filePath);
             }

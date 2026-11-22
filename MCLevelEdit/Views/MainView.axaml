@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:MCLevelEdit.ViewModels;assembly=MCLevelEdit"
              xmlns:views="clr-namespace:MCLevelEdit.Views"
              xmlns:domain="clr-namespace:MCLevelEdit.Model.Domain;assembly=MCLevelEdit.Model"
+             xmlns:terrain="clr-namespace:MagicCarpet2Terrain.Model;assembly=MagicCarpet2Terrain"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              x:Class="MCLevelEdit.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -20,8 +21,18 @@
           <MenuItem Header="New _Random" Command="{Binding NewRandomFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet1}"/>
         </MenuItem>
         <MenuItem Header="Magic Carpet _2">
-          <MenuItem Header="_New Blank" Command="{Binding NewFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet2}"/>
-          <MenuItem Header="New _Random" Command="{Binding NewRandomFileCommand}" CommandParameter="{x:Static domain:GameVersion.MagicCarpet2}"/>
+          <MenuItem Header="_Day">
+            <MenuItem Header="_New Blank" Command="{Binding NewMc2FileCommand}" CommandParameter="{x:Static terrain:MapType.Day}"/>
+            <MenuItem Header="New _Random" Command="{Binding NewMc2RandomFileCommand}" CommandParameter="{x:Static terrain:MapType.Day}"/>
+          </MenuItem>
+          <MenuItem Header="_Night">
+            <MenuItem Header="_New Blank" Command="{Binding NewMc2FileCommand}" CommandParameter="{x:Static terrain:MapType.Night}"/>
+            <MenuItem Header="New _Random" Command="{Binding NewMc2RandomFileCommand}" CommandParameter="{x:Static terrain:MapType.Night}"/>
+          </MenuItem>
+          <!-- A blank cave has no terrain to build the cave from, so caves always start random -->
+          <MenuItem Header="_Cave">
+            <MenuItem Header="New _Random" Command="{Binding NewMc2RandomFileCommand}" CommandParameter="{x:Static terrain:MapType.Cave}"/>
+          </MenuItem>
         </MenuItem>
         <Separator/>
         <MenuItem Header="_Open" Command="{Binding OpenFileCommand}"/>

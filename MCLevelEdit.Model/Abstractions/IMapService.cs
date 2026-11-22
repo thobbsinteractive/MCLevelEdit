@@ -6,7 +6,7 @@ namespace MCLevelEdit.Model.Abstractions;
 
 public interface IMapService
 {
-    Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE, GameVersion game = GameVersion.MagicCarpet1);
+    Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE, GameVersion game = GameVersion.MagicCarpet1, MapType mapType = MapType.Day);
     Task<bool> LoadMapFromFileAsync(string filePath);
     Task<bool> SaveMapToFileAsync(string filePath);
     Task<bool> ValidateMapAsync();

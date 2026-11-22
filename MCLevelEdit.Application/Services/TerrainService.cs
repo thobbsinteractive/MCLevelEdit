@@ -14,151 +14,48 @@ namespace MCLevelEdit.Application.Services;
 
 public class TerrainService : ITerrainService, IEnableLogger
 {
-    public Color WATER_COLOUR = new Color(255, 46, 78, 166);
-    public Color COAST_COLOUR = new Color(255, 136, 99, 66);
-    public Color SAND_COLOUR = new Color(255, 186, 150, 101);
-    public Color STONE_COLOUR = new Color(255, 186, 150, 101);
-    public Color GRASS_COLOUR = new Color(255, 117, 105, 40);
+    // Palettes extracted from the Magic Carpet 2 data files (DATA/PALD|PALN|PALF|PALC-0.DAT, colours x4)
     public Color[] Pallet;
+    public Color[] NightPallet;
+    public Color[] FogPallet;
+    public Color[] CavePallet;
 
-    public Dictionary<int, int> terrainTypeToPalletMapping = new Dictionary<int, int>()
-    {
-        {0  , 3},
-        {1  , 108},
-        {2  , 168},
-        {3  , 74},
-        {4  , 139},
-        {5  , 168},
-        {6  , 46},
-        {8  , 78},
-        {9  , 82},
-        {10 , 171},
-        {11 , 170},
-        {12 , 170},
-        {18 , 149},
-        {19 , 149},
-        {20 , 149},
-        {21 , 118},
-        {22 , 118},
-        {23 , 171},
-        {24 , 171},
-        {25 , 171},
-        {26 , 172},
-        {27 , 171},
-        {32 , 108},
-        {33 , 170},
-        {34 , 108},
-        {35 , 79},
-        {36 , 108},
-        {37 , 108},
-        {38 , 22},
-        {39 , 108},
-        {40 , 181},
-        {42 , 16},
-        {43 , 143},
-        {44 , 54},
-        {45 , 170},
-        {46 , 32},
-        {47 , 170},
-        {48 , 74},
-        {49 , 86},
-        {50 , 86},
-        {51 , 86},
-        {52 , 170},
-        {53 , 78},
-        {54 , 33},
-        {55 , 36},
-        {56 , 168},
-        {57 , 168},
-        {58 , 168},
-        {59 , 168},
-        {60 , 76},
-        {61 , 76},
-        {62 , 76},
-        {63 , 32},
-        {64 , 36},
-        {65 , 140},
-        {66 , 141},
-        {67 , 141},
-        {68 , 54},
-        {69 , 170},
-        {70 , 35},
-        {71 , 78},
-        {72 , 54},
-        {73 , 54},
-        {74 , 33},
-        {75 , 54},
-        {76 , 170},
-        {77 , 98},
-        {79 , 82},
-        {80 , 16},
-        {81 , 82},
-        {82 , 41},
-        {83 , 99},
-        {84 , 33},
-        {85 , 78},
-        {86 , 35},
-        {87 , 35},
-        {88 , 142},
-        {89 , 36},
-        {90 , 86},
-        {91 , 32},
-        {92 , 54},
-        {93 , 54},
-        {94 , 86},
-        {95 , 54},
-        {96 , 144},
-        {97 , 170},
-        {98 , 81},
-        {99 , 142},
-        {100, 170},
-        {101, 79},
-        {102, 34},
-        {103, 181},
-        {104, 172},
-        {105, 82},
-        {106, 18},
-        {107, 16},
-        {109, 171},
-        {110, 97},
-        {111, 97},
-        {113, 97},
-        {114, 108},
-        {115, 54},
-        {116, 170},
-        {117, 54},
-        {118, 54},
-        {119, 170},
-        {120, 34},
-        {121, 33},
-        {122, 33},
-        {123, 35},
-        {124, 54},
-        {125, 33},
-        {128, 181},
-        {130, 41},
-        {131, 38},
-        {132, 144},
-        {133, 82},
-        {134, 16},
-        {135, 76},
-        {136, 143},
-        {138, 79},
-        {140, 170},
-        {141, 82},
-        {142, 78},
-        {143, 80},
-        {144, 79},
-        {145, 54},
-        {146, 170},
-        {147, 81}
-    };
+    // Terrain type and shading lookups extracted from DATA/TABLESD|N|C.DAT
+    public TerrainColourTable DayColours;
+    public TerrainColourTable NightColours;
+    public TerrainColourTable CaveColours;
 
     public TerrainService()
     {
-        Pallet = new Color[256];
+        Pallet = LoadPallet("day-palette.bmp");
+        NightPallet = LoadPallet("night-palette.bmp");
+        FogPallet = LoadPallet("fog-palette.bmp");
+        CavePallet = LoadPallet("cave-palette.bmp");
 
-        var writeableBitmap = WriteableBitmap.Decode(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/day-palette.bmp")));
+        DayColours = LoadColourTable("terrain-colours-day.dat");
+        NightColours = LoadColourTable("terrain-colours-night.dat");
+        CaveColours = LoadColourTable("terrain-colours-cave.dat");
+    }
+
+    private static TerrainColourTable LoadColourTable(string fileName)
+    {
+        using var stream = AssetLoader.Open(new Uri($"avares://MCLevelEdit/Assets/{fileName}"));
+        return TerrainColourTable.FromStream(stream);
+    }
+
+    /// <summary>The colour lookup the game uses for this map type (see remc2 ReadAndDecompressTables_54800). Fog levels use the night table.</summary>
+    public TerrainColourTable GetColourTable(MapType mapType) => mapType switch
+    {
+        MapType.Night => NightColours,
+        MapType.Cave => CaveColours,
+        _ => DayColours
+    };
+
+    private static Color[] LoadPallet(string fileName)
+    {
+        var pallet = new Color[256];
+
+        var writeableBitmap = WriteableBitmap.Decode(AssetLoader.Open(new Uri($"avares://MCLevelEdit/Assets/{fileName}")));
 
         using (var fb = writeableBitmap.Lock())
         {
@@ -166,21 +63,37 @@ public class TerrainService : ITerrainService, IEnableLogger
             {
                 var bytes = fb.GetPixel(x, 0);
 
-                Pallet[x] = new Color(bytes[3], bytes[2], bytes[1], bytes[0]);
+                pallet[x] = new Color(bytes[3], bytes[2], bytes[1], bytes[0]);
             }
         }
+        return pallet;
     }
 
-    public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Terrain terrain, Layer layer)
+    /// <summary>The palette the game uses for this map type (see remc2 Level.cpp).</summary>
+    public Color[] GetPallet(MapType mapType, bool fog = false) => mapType switch
+    {
+        MapType.Night => fog ? FogPallet : NightPallet,
+        MapType.Cave => CavePallet,
+        _ => Pallet
+    };
+
+    public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Terrain terrain, Layer layer, bool fog = false)
     {
         return Task.Run(() =>
         {
-            return DrawBitmap(bitmap, terrain, layer);
+            return DrawBitmap(bitmap, terrain, layer, fog);
         });
     }
 
-    public WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Terrain terrain, Layer layer)
+    public WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Terrain terrain, Layer layer, bool fog = false)
     {
+        var mapType = terrain.GenerationParameters?.MapType ?? MapType.Day;
+        var pallet = GetPallet(mapType, fog);
+        var colours = GetColourTable(mapType);
+        // Only terrain generated as a cave has a ceiling, and with it the rock mask (angle bit 8).
+        // Day/Night terrain uses bit 8 for water edges, so switching the type without regenerating must not mask.
+        var isCave = mapType == MapType.Cave && terrain.MapCeilingHeightmap_14B4E0 is not null && terrain.MapAngle_13B4E0 is not null;
+
         using (var fb = bitmap.Lock())
         {
             for (int y = 0; y < Globals.MAX_MAP_SIZE; y++)
@@ -191,17 +104,15 @@ public class TerrainService : ITerrainService, IEnableLogger
 
                     if (layer == Layer.Game)
                     {
-                        Color baseColour = WATER_COLOUR;
                         if (terrain.MapTerrainType_10B4E0 != null)
                         {
-                            if (terrainTypeToPalletMapping.ContainsKey((int)terrain.MapTerrainType_10B4E0[index]))
-                            {
-                                baseColour = Pallet[terrainTypeToPalletMapping[(int)terrain.MapTerrainType_10B4E0[index]]];
-                            }
-
-                            fb.SetPixel(x, y, new Color(255, (byte)Math.Max(baseColour.R - terrain.MapShading_12B4E0[index], byte.MinValue),
-                                        (byte)Math.Max(baseColour.G - terrain.MapShading_12B4E0[index], byte.MinValue),
-                                        (byte)Math.Max(baseColour.B - terrain.MapShading_12B4E0[index], byte.MinValue)));
+                            // As the game's minimap: terrain type -> base colour, then shaded through the lookup table.
+                            // In caves, squares where the ceiling meets the floor (solid rock) are drawn as colour 0.
+                            var palletIndex = isCave && (terrain.MapAngle_13B4E0[index] & 8) != 0
+                                ? (byte)0
+                                : colours.GetPalletIndex(terrain.MapTerrainType_10B4E0[index], terrain.MapShading_12B4E0[index]);
+                            var colour = pallet[palletIndex];
+                            fb.SetPixel(x, y, new Color(255, colour.R, colour.G, colour.B));
                         }
                     }
                     if (layer == Layer.Height)
@@ -217,7 +128,7 @@ public class TerrainService : ITerrainService, IEnableLogger
 
     public async Task<Terrain> CalculateMc2Terrain(GenerationParameters genParams, byte stage = 18)
     {
-        ITerrainGenerator terrainGenerator = new TerrainGenerator();
+        ITerrainGenerator terrainGenerator = TerrainGenerator.Create(genParams.MapType);
         return await terrainGenerator.CalculateTerrainAsync(genParams, stage);
     }
 

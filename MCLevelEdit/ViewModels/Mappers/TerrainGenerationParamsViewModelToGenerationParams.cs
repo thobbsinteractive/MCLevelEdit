@@ -20,7 +20,8 @@ public static class TerrainGenerationParamsViewModelToGenerationParams
             SnFlt = terrainGenerationParamsViewModel.SnFlt,
             BhLin = terrainGenerationParamsViewModel.BhLin,
             BhFlt = terrainGenerationParamsViewModel.BhFlt,
-            RkSte = terrainGenerationParamsViewModel.RkSte
+            RkSte = terrainGenerationParamsViewModel.RkSte,
+            BasicHeight = terrainGenerationParamsViewModel.BasicHeight
         };
     }
 }

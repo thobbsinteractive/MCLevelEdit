@@ -10,7 +10,7 @@
              x:DataType="vm:EditWorldViewModel">
   <Grid Margin="5"
         ColumnDefinitions="3*,1*,2*,1*"
-        RowDefinitions="40,Auto,30,30,40,40,30,30,30,30,30,30,30,30,30,30,30,40,*">
+        RowDefinitions="40,Auto,30,30,40,40,30,30,30,30,30,30,30,30,30,30,30,Auto,40,*">
     <Grid.Resources>
       <c:UInt32ToStringConverter x:Key="uInt32ToStringConverter"/>
       <c:UInt16ToStringConverter x:Key="uInt16ToStringConverter"/>
@@ -323,10 +323,41 @@
             HorizontalAlignment="Center"
             IsEnabled="{Binding GenerateTerrainButtonEnable}"
             Command="{Binding IncreaseRkSteCommand}"/>
-    
-    <Button x:Name="btnGenerate" 
-            Grid.Column="0"
+
+    <!-- Cave levels only: the roof height the cave ceiling is built down from. The row is Auto so it collapses otherwise -->
+    <Label Grid.Column="0"
+           Grid.Row="17"
+           HorizontalAlignment="Left"
+           ToolTip.Tip="The height of the cave roof. Ground at or above the roof becomes solid rock"
+           IsVisible="{Binding IsCave}">
+      Basic Height:
+    </Label>
+    <Button Grid.Column="1"
             Grid.Row="17"
+            Content="-"
+            HorizontalAlignment="Center"
+            IsVisible="{Binding IsCave}"
+            IsEnabled="{Binding GenerateTerrainButtonEnable}"
+            Command="{Binding DecreaseBasicHeightCommand}"/>
+    <TextBox Grid.Column="2"
+             Grid.Row="17"
+             Height="30"
+             HorizontalAlignment="Stretch"
+             IsVisible="{Binding IsCave}"
+             IsEnabled="{Binding GenerateTerrainButtonEnable}"
+             Text="{Binding GenerationParameters.BasicHeight, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Button Grid.Column="3"
+            Grid.Row="17"
+            Content="+"
+            HorizontalAlignment="Center"
+            IsVisible="{Binding IsCave}"
+            IsEnabled="{Binding GenerateTerrainButtonEnable}"
+            Command="{Binding IncreaseBasicHeightCommand}"/>
+
+    <Button x:Name="btnGenerate"
+            Grid.Column="0"
+            Grid.Row="18"
             HorizontalAlignment="Center"
             Grid.ColumnSpan="4"
             Command="{Binding GenerateTerrainCommand}"

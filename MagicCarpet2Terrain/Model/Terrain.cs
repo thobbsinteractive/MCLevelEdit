@@ -8,5 +8,7 @@
         public byte[] MapAngle_13B4E0 { get; set; }
         public byte[] MapTerrainType_10B4E0 { get; set; }
         public byte[] MapShading_12B4E0 { get; set; }
+        /// <summary>Cave levels only: ceiling height of each square (secondHeightmap_14B4E0). Null for other map types.</summary>
+        public byte[] MapCeilingHeightmap_14B4E0 { get; set; }
     }
 }

@@ -16,6 +16,8 @@
         public byte BhLin { get; set; }
         public byte BhFlt { get; set; }
         public byte RkSte { get; set; }
+        /// <summary>Cave levels: the height of the cave roof the ceiling is built down from (level basicHeight_0x2FED3).</summary>
+        public byte BasicHeight { get; set; }
     }
 }
 

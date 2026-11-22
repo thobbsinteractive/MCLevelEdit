@@ -59,7 +59,19 @@ namespace MCLevelEdit.Application.Services
                     this.Log().Error($"Magic Carpet 2 HD exe not found: '{settings.Mc2ExeLocation}'");
                     return false;
                 }
-                return RunGame(settings.Mc2ExeLocation, string.Empty);
+                // Magic Carpet 2 HD runs a single uncompressed level directly: --custom_level "level path"
+                var levelPath = levelFilePaths?.FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(levelPath) || !File.Exists(levelPath))
+                {
+                    this.Log().Error($"Level file not found: '{levelPath}'");
+                    return false;
+                }
+                if (LevelFormat.DetectFromFileSize(new FileInfo(levelPath).Length) != GameVersion.MagicCarpet2)
+                {
+                    this.Log().Error($"'{levelPath}' is not a Magic Carpet 2 level ({LevelFormat.MC2_FILE_SIZE} bytes).");
+                    return false;
+                }
+                return RunGame(settings.Mc2ExeLocation, $"--custom_level \"{Path.GetFullPath(levelPath)}\"");
             }
 
             // Magic Carpet 1 or Hidden Worlds, both run through DOSBox

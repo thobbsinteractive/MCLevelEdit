@@ -46,6 +46,9 @@ namespace MCLevelEdit.ViewModels
         /// <summary>Map type (Day/Night/Cave) only exists in Magic Carpet 2 levels.</summary>
         public bool IsMc2 => _mapService.GetMap().GameVersion == GameVersion.MagicCarpet2;
 
+        /// <summary>Roof height given to a level converted to a cave that has none (MC2's own caves use around 114-154).</summary>
+        private const byte DEFAULT_CAVE_BASIC_HEIGHT = 128;
+
         public MapType MapType
         {
             get => GenerationParameters?.MapType ?? MapType.Day;
@@ -55,9 +58,19 @@ namespace MCLevelEdit.ViewModels
                     return;
 
                 GenerationParameters.MapType = value;
-                // Store it on the map directly so it is saved without regenerating the terrain
                 _mapService.GetMap().Terrain.GenerationParameters.MapType = value;
+
+                if (value == MapType.Cave && GenerationParameters.BasicHeight == 0)
+                {
+                    // With no roof the whole cave would be solid rock
+                    GenerationParameters.BasicHeight = DEFAULT_CAVE_BASIC_HEIGHT;
+                }
                 RaiseMapTypeChanged();
+
+                // Each map type is generated differently: caves build a ceiling and rock, and Day is shaded
+                // the other way round from Night and Cave. Regenerating converts the level; the variables
+                // are unchanged, so the landscape stays the same.
+                _ = GenerateHeightMap();
             }
         }
 
@@ -110,6 +123,8 @@ namespace MCLevelEdit.ViewModels
         public ICommand DecreaseBhLinCommand { get; }
         public ICommand IncreaseSandCommand { get; }
         public ICommand DecreaseSandCommand { get; }
+        public ICommand IncreaseBasicHeightCommand { get; }
+        public ICommand DecreaseBasicHeightCommand { get; }
         public ICommand IncreaseRkSteCommand { get; }
         public ICommand DecreaseRkSteCommand { get; }
 
@@ -255,6 +270,18 @@ namespace MCLevelEdit.ViewModels
             DecreaseRkSteCommand = ReactiveCommand.Create(async () =>
             {
                 GenerationParameters.RkSte--;
+                await GenerateHeightMap();
+            });
+
+            // Cave levels: the roof height the ceiling is built down from
+            IncreaseBasicHeightCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.BasicHeight++;
+                await GenerateHeightMap();
+            });
+            DecreaseBasicHeightCommand = ReactiveCommand.Create(async () =>
+            {
+                GenerationParameters.BasicHeight--;
                 await GenerateHeightMap();
             });
         }

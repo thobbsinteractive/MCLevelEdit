@@ -76,7 +76,7 @@ namespace MCLevelEdit.ViewModels
 
         public TopLevel TopLevel => TopLevel.GetTopLevel(GameSettingsWindow.I);
         public string LevelPathsString => _levelPaths is not null ? string.Join(",", _levelPaths) : string.Empty;
-        public bool CanRun => IsMagicCarpet2 || _levelPaths?.Length > 0;
+        public bool CanRun => _levelPaths?.Length > 0;
 
         /// <summary>Tab 0 = Magic Carpet, 1 = Hidden Worlds (both DOSBox), 2 = Magic Carpet 2 (Remc2).</summary>
         public int SelectedGameTabIndex
@@ -238,11 +238,20 @@ namespace MCLevelEdit.ViewModels
 
         private async Task<bool> CheckForMc2Launch()
         {
-            if (!string.IsNullOrWhiteSpace(Mc2ExePath) && File.Exists(Mc2ExePath))
+            string? error = null;
+            var levelPath = LevelPaths?.FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(Mc2ExePath) || !File.Exists(Mc2ExePath))
+                error = "Magic Carpet 2 HD exe not found! Please re-check!";
+            else if (string.IsNullOrWhiteSpace(levelPath) || !File.Exists(levelPath))
+                error = "No Level selected to run! Please re-check!";
+            else if (LevelFormat.DetectFromFileSize(new FileInfo(levelPath).Length) != GameVersion.MagicCarpet2)
+                error = "The selected level is not a Magic Carpet 2 level! Please re-check!";
+            else
                 return true;
 
-            this.Log().Error($"Magic Carpet 2 HD exe not found! Please re-check!");
-            var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Magic Carpet 2 HD exe not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
+            this.Log().Error(error);
+            var box = MessageBoxManager.GetMessageBoxStandard("Error", error, ButtonEnum.Ok, Icon.Error);
             await box.ShowAsPopupAsync(TopLevel);
             return false;
         }

@@ -7,7 +7,15 @@ public class Mc2Map : Map
 
     public ushort LevelId { get; set; }
     public byte LevelType { get; set; }
-    public byte BasicHeight { get; set; }
+
+    /// <summary>Night levels with level type bit 2 set use the fog palette (PALF-0.DAT) in remc2.</summary>
+    public bool UsesFogPalette => (LevelType & 2) != 0;
+    /// <summary>Cave roof height. Stored on the terrain generation parameters, which build the cave ceiling from it.</summary>
+    public byte BasicHeight
+    {
+        get => Terrain.GenerationParameters.BasicHeight;
+        set => Terrain.GenerationParameters.BasicHeight = value;
+    }
 
     /// <summary>The 8 objective slots.</summary>
     public IList<Objective> Objectives { get; set; } = new List<Objective>();
