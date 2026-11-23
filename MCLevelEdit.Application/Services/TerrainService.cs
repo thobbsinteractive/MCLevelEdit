@@ -33,6 +33,12 @@ public class TerrainService : ITerrainService, IEnableLogger
     public TerrainColourTable Mc1Colours;
     public TerrainColourTable HiddenWorldsColours;
 
+    // The building shapes the levels build into the terrain: DATA/BUILD0-0.TAB|DAT of Magic Carpet 2 (with its
+    // DATA/BLDGPRM.DAT) and of Magic Carpet (unpacked), and Hidden Worlds' DATA/BUILD1-0.TAB|DAT.
+    private readonly Mc2BuildingTerrainBuilder _mc2Buildings;
+    private readonly Mc1BuildingTerrainBuilder _mc1Buildings;
+    private readonly Mc1BuildingTerrainBuilder _hiddenWorldsBuildings;
+
     public TerrainService()
     {
         Pallet = LoadPallet("day-palette.bmp");
@@ -48,6 +54,42 @@ public class TerrainService : ITerrainService, IEnableLogger
         HiddenWorldsPallet = LoadPallet("hidden-worlds-palette.bmp");
         Mc1Colours = LoadColourTable("terrain-colours-mc1.dat");
         HiddenWorldsColours = LoadColourTable("terrain-colours-hidden-worlds.dat");
+
+        _mc2Buildings = new Mc2BuildingTerrainBuilder(LoadBuildingShapes("mc2"), BuildingParams.Load(LoadAsset("building-params-mc2.dat")));
+        _mc1Buildings = new Mc1BuildingTerrainBuilder(LoadBuildingShapes("mc1"));
+        _hiddenWorldsBuildings = new Mc1BuildingTerrainBuilder(LoadBuildingShapes("hidden-worlds"));
+    }
+
+    private static byte[] LoadAsset(string fileName)
+    {
+        using var stream = AssetLoader.Open(new Uri($"avares://MCLevelEdit/Assets/{fileName}"));
+        using var memory = new MemoryStream();
+        stream.CopyTo(memory);
+        return memory.ToArray();
+    }
+
+    private static BuildingShapes LoadBuildingShapes(string game) =>
+        BuildingShapes.Load(LoadAsset($"building-shapes-{game}.tab"), LoadAsset($"building-shapes-{game}.dat"));
+
+    /// <summary>
+    /// The buildings the level builds before it starts: Effect 2Dh (VillagerBuilding) with no switch (DisId FFFFh),
+    /// in the order of the level, on their square, with the shape in Parent.
+    /// </summary>
+    public static List<BuildingPlacement> GetBuildingPlacements(Map map) => map.Entities
+        .Where(e => e.IsBuilding() && e.DisId == ushort.MaxValue)
+        .OrderBy(e => e.Id)
+        .Select(e => new BuildingPlacement { X = e.Position.X, Y = e.Position.Y, Shape = e.Parent })
+        .ToList();
+
+    public Terrain BuildBuildings(Terrain generated, Map map)
+    {
+        BuildingTerrainBuilder builder = map.TerrainGame switch
+        {
+            TerrainGame.MagicCarpet1 => _mc1Buildings,
+            TerrainGame.HiddenWorlds => _hiddenWorldsBuildings,
+            _ => _mc2Buildings
+        };
+        return builder.Build(generated, GetBuildingPlacements(map));
     }
 
     /// <summary>

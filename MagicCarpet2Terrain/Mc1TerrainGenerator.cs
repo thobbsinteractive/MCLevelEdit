@@ -50,9 +50,9 @@ namespace MagicCarpet2Terrain
             System.Array.Clear(mapTerrainType_10B4E0, 0, size);
             SmoothTerrain_31BB0(mapHeightmap_11B4E0, mapAngle_13B4E0);
             sub_43EE0_add_rivers(mapHeightmap_11B4E0, mapAngle_13B4E0);
-            SetTerrainAngles_32560(mapAngle_13B4E0, mapTerrainType_10B4E0, ref seed);
+            var angleTypes = SetTerrainAngles_32560(mapAngle_13B4E0, mapTerrainType_10B4E0, ref seed);
             MarkWaterEdges_31D40(mapHeightmap_11B4E0, mapAngle_13B4E0, mapTerrainType_10B4E0);
-            ComputeTerrainShading_329C0(mapHeightmap_11B4E0, mapShading_12B4E0);
+            ComputeTerrainShading_329C0(mapHeightmap_11B4E0, mapShading_12B4E0, out seed);
 
             return new Terrain()
             {
@@ -61,6 +61,8 @@ namespace MagicCarpet2Terrain
                 MapHeightmap_11B4E0 = mapHeightmap_11B4E0,
                 MapAngle_13B4E0 = mapAngle_13B4E0,
                 MapShading_12B4E0 = mapShading_12B4E0,
+                AngleTypes = angleTypes,
+                Seed = seed,
                 GenerationParameters = genParams
             };
         }
@@ -194,7 +196,8 @@ namespace MagicCarpet2Terrain
         /// remc1 SetTerrainAngles_32560: the terrain type of a tile comes from the heights (0-6) of its 4 corners;
         /// where several of the 148 patterns (in their 8 rotations / mirrors) fit, one is picked at random.
         /// </summary>
-        private void SetTerrainAngles_32560(byte[] angle, byte[] type, ref ushort seed)
+        /// <returns>The first pattern of each key (remc1 angleTypes_B5D40), which buildings use again.</returns>
+        private byte[,] SetTerrainAngles_32560(byte[] angle, byte[] type, ref ushort seed)
         {
             // The patterns are the same table as MC2's (remc1 anglePatterns_9075C = remc2 unk_D47E0)
             var records = new byte[2401 * RECORD_SIZE];
@@ -212,6 +215,13 @@ namespace MagicCarpet2Terrain
                 AddAngleType(records, AngleKey(c, b, a, d), t, 0x70);
                 AddAngleType(records, AngleKey(d, a, b, c), t, 0x50);
                 AddAngleType(records, AngleKey(a, d, c, b), t, 0x40);
+            }
+            var angleTypes = new byte[Terrain.ANGLE_TYPE_KEYS, 2];
+            for (int key = 0; key < 2401; key++)
+            {
+                int record = key * RECORD_SIZE;
+                angleTypes[key, 0] = records[record] != 0 ? records[record + 1] : (byte)1;
+                angleTypes[key, 1] = records[record] != 0 ? records[record + 0x0D] : (byte)0;
             }
             for (int i = 0; i < 0x10000; i++)
             {
@@ -234,12 +244,13 @@ namespace MagicCarpet2Terrain
                 type[i] = records[record + 1 + pick];
                 angle[i] = (byte)((angle[i] & 7) + records[record + 0x0D + pick]);
             }
+            return angleTypes;
         }
 
-        /// <summary>remc1 ComputeTerrainShading_329C0: like MC2's Day shading.</summary>
-        private static void ComputeTerrainShading_329C0(byte[] height, byte[] shading)
+        /// <summary>remc1 ComputeTerrainShading_329C0: like MC2's Day shading. It starts the seed again from 0.</summary>
+        private static void ComputeTerrainShading_329C0(byte[] height, byte[] shading, out ushort seed)
         {
-            ushort seed = 0;
+            seed = 0;
             for (int i = 0; i < 0x10000; i++)
             {
                 int x = i & 0xFF;

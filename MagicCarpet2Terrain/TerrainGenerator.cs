@@ -66,7 +66,7 @@ namespace MagicCarpet2Terrain
             byte[] mapAngle_13B4E0 = new byte[MaxMapSize * MaxMapSize];
             byte[] mapTerrainType_10B4E0 = new byte[MaxMapSize * MaxMapSize];
             byte[] mapShading_12B4E0 = new byte[MaxMapSize * MaxMapSize];
-            byte[,] x_BYTE_F2CD0x = new byte[7 * 7 * 7 * 7, 2]; // 233cd0//4802 //4816
+            byte[,] x_BYTE_F2CD0x = new byte[Terrain.ANGLE_TYPE_KEYS, 2]; // 233cd0//4802 //4816 (building_F2CD0x)
 
             ushort seed_17B4E0 = genParams.Seed;
             if (stage > 0)
@@ -125,6 +125,8 @@ namespace MagicCarpet2Terrain
                 MapAngle_13B4E0 = mapAngle_13B4E0,
                 MapShading_12B4E0 = mapShading_12B4E0,
                 MapCeilingHeightmap_14B4E0 = mapCeilingHeightmap_14B4E0,
+                AngleTypes = stage > 15 ? x_BYTE_F2CD0x : null,
+                Seed = seed_17B4E0,
                 GenerationParameters = genParams
             };
         }

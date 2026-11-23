@@ -41,6 +41,9 @@
     <None Update="Resources\mc2_*.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\mc2_00073f_afterload.bin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\mapAngle_13B4E0.bin">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

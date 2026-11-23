@@ -42,7 +42,10 @@ public class Map
     public byte ManaTarget { get; set; }
     public IList<ValidationResult> ValidationResults { get; set; } = new List<ValidationResult>();
     public IList<Entity> Entities { get; set; } = new List<Entity>();
+    /// <summary>The terrain as the game has it when the level starts: <see cref="GeneratedTerrain"/> with the buildings built.</summary>
     public Terrain Terrain { get; set; } = new Terrain();
+    /// <summary>The terrain as generated, before the buildings change it. Null until the terrain is generated.</summary>
+    public Terrain GeneratedTerrain { get; set; }
     public Wizard[] Wizards { get; set; } = new[] {
         new Wizard()
         {
