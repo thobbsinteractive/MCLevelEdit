@@ -6,7 +6,7 @@ namespace MagicCarpet2Terrain.Model
     /// <summary>
     /// One building shape of the game's DATA/BUILD?-0 files: the footprint a building stamps into the terrain.
     /// Magic Carpet 2 stores 2 bytes a square (terrain type, height above the building's base; FFh: unchanged);
-    /// Magic Carpet stores rows of run-length coded square codes (see <see cref="Mc1BuildingTerrainBuilder"/>).
+    /// Magic Carpet stores rows of run-length coded square codes (see <see cref="Mc1TerrainFeatureBuilder"/>).
     /// </summary>
     public class BuildingShape
     {
@@ -89,12 +89,33 @@ namespace MagicCarpet2Terrain.Model
         }
     }
 
-    /// <summary>A building the level builds before it starts: the square it stands on and its shape.</summary>
-    public class BuildingPlacement
+    /// <summary>
+    /// An Effect (class 10) of the level, as the terrain features read it: the fields at 4-17 of a level entity
+    /// (MC1 feature) by their editor names. Walls and paths are lines of nodes linked by Parent and Child; a
+    /// building's shape is in Parent.
+    /// </summary>
+    public class LevelFeature
     {
+        /// <summary>DisId of a feature that is built when the level loads (no switch makes it).</summary>
+        public const ushort NO_SWITCH = 0xFFFF;
+
+        /// <summary>The feature's index in the level, which Parent and Child refer to.</summary>
+        public int Id { get; set; }
+        /// <summary>The Effect model (subtype).</summary>
+        public int Model { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
-        /// <summary>The shape number as the level gives it (MC2: the shape; MC1: the shape is 10h on from it).</summary>
-        public int Shape { get; set; }
+        public ushort DisId { get; set; }
+        /// <summary>The stage tag: a line of nodes is made from the first node with one.</summary>
+        public ushort SwitchId { get; set; }
+        /// <summary>The node before (walls, paths), or the building's shape.</summary>
+        public ushort Parent { get; set; }
+        /// <summary>The node after (walls, paths).</summary>
+        public ushort Child { get; set; }
+
+        /// <summary>Set once the feature has made its entities (the game sets its type to 0).</summary>
+        internal bool Built { get; set; }
+
+        public LevelFeature Copy() => (LevelFeature)MemberwiseClone();
     }
 }

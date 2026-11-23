@@ -1,25 +1,44 @@
 using MagicCarpet2Terrain.Model;
+using System;
+using System.Collections.Generic;
 
 namespace MagicCarpet2Terrain
 {
     /// <summary>
-    /// Builds Magic Carpet (and Hidden Worlds) buildings into the terrain (remc1 CreateFeatures_36430): all in one
-    /// pass. The level's shape number is 10h before the shape in BUILD?-0.TAB. A shape is rows of run-length codes:
-    /// 0 ends the row, a negative code skips that many squares, a positive one is followed by that many square codes,
-    /// each giving the square's height above the building's base and its terrain type.
+    /// Builds Magic Carpet (and Hidden Worlds) terrain features (remc1 CreateFeatures_36430): walls, paths and
+    /// buildings all in one pass. A building's shape is 10h after the level's shape number in BUILD?-0.TAB. A shape
+    /// is rows of run-length codes: 0 ends the row, a negative code skips that many squares, a positive one is
+    /// followed by that many square codes, each giving the square's height above the building's base and its type.
     /// </summary>
-    public class Mc1BuildingTerrainBuilder : BuildingTerrainBuilder
+    public class Mc1TerrainFeatureBuilder : TerrainFeatureBuilder
     {
         /// <summary>The level's shape number is the shape's index less this.</summary>
         public const int SHAPE_OFFSET = 0x10;
 
-        public Mc1BuildingTerrainBuilder(BuildingShapes shapes) : base(shapes)
+        public Mc1TerrainFeatureBuilder(BuildingShapes shapes) : base(shapes)
         {
+        }
+
+        protected override IEnumerable<Func<LevelFeature, bool>> GetPasses()
+        {
+            yield return f => ShapesTerrain(f.Model);
         }
 
         protected override bool PassesOldTypeForType10 => true;
 
-        protected override int GetShapeIndex(BuildingPlacement placement) => placement.Shape + SHAPE_OFFSET;
+        protected override int GetShapeIndex(LevelFeature building) => building.Parent + SHAPE_OFFSET;
+
+        /// <summary>remc1 SetTerrainTypeAround_33AE0: next to wall, a flat square is shaded 20h, not at random.</summary>
+        protected override void ShadeWallTile(int x, int y)
+        {
+            int shade = (sbyte)(Height[Tile(x - 1, y - 1)] - Height[Tile(x + 1, y + 1)] + 0x20);
+            if (shade < 0x20)
+                shade = 0x20;
+            else if (shade > 0x28)
+                shade = (shade & 7) + 0x28;
+            Shading[Tile(x, y)] = (byte)shade;
+            Angle[Tile(x, y)] &= 0xF7;
+        }
 
         // The rows are read to the end of the file at most
         protected override bool IsComplete(BuildingShape shape) => true;

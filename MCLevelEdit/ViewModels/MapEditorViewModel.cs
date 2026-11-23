@@ -715,14 +715,18 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
     }
 
+    /// <summary>
+    /// The links between path and wall nodes, as thin lines: the path or wall itself is in the terrain, which the
+    /// editor builds as the game does when the level loads.
+    /// </summary>
     private void DrawPathOrWall(EntityViewModel entityViewModel, List<Shape> shapes)
     {
         if (entityViewModel.IsPathOrWall())
         {
-            SolidColorBrush brush = new SolidColorBrush(Color.FromRgb(128, 128, 128), 1);
+            SolidColorBrush brush = new SolidColorBrush(Color.FromRgb(128, 128, 128), 0.6);
 
             if (entityViewModel.Model == (int)Effect.Path)
-                brush = new SolidColorBrush(Color.FromRgb(90, 60, 40), 1);
+                brush = new SolidColorBrush(Color.FromRgb(90, 60, 40), 0.6);
 
             if (entityViewModel.Child > 0)
             {
@@ -736,7 +740,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                         StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         Stroke = brush,
-                        StrokeThickness = Globals.SQUARE_SIZE,
+                        StrokeThickness = Globals.SQUARE_SIZE / 4,
                         ZIndex = 99
                     };
                     _cvEntity.Children.Add(line1);
@@ -755,7 +759,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                         StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         Stroke = brush,
-                        StrokeThickness = Globals.SQUARE_SIZE,
+                        StrokeThickness = Globals.SQUARE_SIZE / 4,
                         ZIndex = 99
                     };
                     _cvEntity.Children.Add(line2);

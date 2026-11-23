@@ -33,11 +33,12 @@ public class TerrainService : ITerrainService, IEnableLogger
     public TerrainColourTable Mc1Colours;
     public TerrainColourTable HiddenWorldsColours;
 
-    // The building shapes the levels build into the terrain: DATA/BUILD0-0.TAB|DAT of Magic Carpet 2 (with its
-    // DATA/BLDGPRM.DAT) and of Magic Carpet (unpacked), and Hidden Worlds' DATA/BUILD1-0.TAB|DAT.
-    private readonly Mc2BuildingTerrainBuilder _mc2Buildings;
-    private readonly Mc1BuildingTerrainBuilder _mc1Buildings;
-    private readonly Mc1BuildingTerrainBuilder _hiddenWorldsBuildings;
+    // What builds the levels' walls, paths and buildings into the terrain, with the building shapes:
+    // DATA/BUILD0-0.TAB|DAT of Magic Carpet 2 (with its DATA/BLDGPRM.DAT) and of Magic Carpet (unpacked), and
+    // Hidden Worlds' DATA/BUILD1-0.TAB|DAT.
+    private readonly Mc2TerrainFeatureBuilder _mc2Features;
+    private readonly Mc1TerrainFeatureBuilder _mc1Features;
+    private readonly Mc1TerrainFeatureBuilder _hiddenWorldsFeatures;
 
     public TerrainService()
     {
@@ -55,9 +56,9 @@ public class TerrainService : ITerrainService, IEnableLogger
         Mc1Colours = LoadColourTable("terrain-colours-mc1.dat");
         HiddenWorldsColours = LoadColourTable("terrain-colours-hidden-worlds.dat");
 
-        _mc2Buildings = new Mc2BuildingTerrainBuilder(LoadBuildingShapes("mc2"), BuildingParams.Load(LoadAsset("building-params-mc2.dat")));
-        _mc1Buildings = new Mc1BuildingTerrainBuilder(LoadBuildingShapes("mc1"));
-        _hiddenWorldsBuildings = new Mc1BuildingTerrainBuilder(LoadBuildingShapes("hidden-worlds"));
+        _mc2Features = new Mc2TerrainFeatureBuilder(LoadBuildingShapes("mc2"), BuildingParams.Load(LoadAsset("building-params-mc2.dat")));
+        _mc1Features = new Mc1TerrainFeatureBuilder(LoadBuildingShapes("mc1"));
+        _hiddenWorldsFeatures = new Mc1TerrainFeatureBuilder(LoadBuildingShapes("hidden-worlds"));
     }
 
     private static byte[] LoadAsset(string fileName)
@@ -72,24 +73,39 @@ public class TerrainService : ITerrainService, IEnableLogger
         BuildingShapes.Load(LoadAsset($"building-shapes-{game}.tab"), LoadAsset($"building-shapes-{game}.dat"));
 
     /// <summary>
-    /// The buildings the level builds before it starts: Effect 2Dh (VillagerBuilding) with no switch (DisId FFFFh),
-    /// in the order of the level, on their square, with the shape in Parent.
+    /// The level's Effects in its order, which the terrain features are among. The builder picks those that shape
+    /// the terrain (walls, paths, buildings with no switch) and follows the links of the wall and path nodes.
     /// </summary>
-    public static List<BuildingPlacement> GetBuildingPlacements(Map map) => map.Entities
-        .Where(e => e.IsBuilding() && e.DisId == ushort.MaxValue)
+    public static List<LevelFeature> GetLevelFeatures(Map map) => map.Entities
+        .Where(e => e.EntityType?.TypeId == TypeId.Effect && e.EntityType.Model is not null)
         .OrderBy(e => e.Id)
-        .Select(e => new BuildingPlacement { X = e.Position.X, Y = e.Position.Y, Shape = e.Parent })
+        .Select(e => new LevelFeature
+        {
+            Id = e.Id,
+            Model = e.EntityType.Model.Id,
+            X = e.Position.X,
+            Y = e.Position.Y,
+            DisId = e.DisId,
+            SwitchId = e.SwitchId,
+            Parent = e.Parent,
+            Child = e.Child
+        })
         .ToList();
 
-    public Terrain BuildBuildings(Terrain generated, Map map)
+    /// <summary>Whether the entity is one that can change the terrain when the level loads (or links to one).</summary>
+    public static bool ShapesTerrain(Entity? entity) =>
+        entity?.EntityType?.TypeId == TypeId.Effect && entity.EntityType.Model is not null
+        && TerrainFeatureBuilder.ShapesTerrain(entity.EntityType.Model.Id);
+
+    public Terrain BuildFeatures(Terrain generated, Map map)
     {
-        BuildingTerrainBuilder builder = map.TerrainGame switch
+        TerrainFeatureBuilder builder = map.TerrainGame switch
         {
-            TerrainGame.MagicCarpet1 => _mc1Buildings,
-            TerrainGame.HiddenWorlds => _hiddenWorldsBuildings,
-            _ => _mc2Buildings
+            TerrainGame.MagicCarpet1 => _mc1Features,
+            TerrainGame.HiddenWorlds => _hiddenWorldsFeatures,
+            _ => _mc2Features
         };
-        return builder.Build(generated, GetBuildingPlacements(map));
+        return builder.Build(generated, GetLevelFeatures(map));
     }
 
     /// <summary>

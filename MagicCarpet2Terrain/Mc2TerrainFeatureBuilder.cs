@@ -1,33 +1,48 @@
 using MagicCarpet2Terrain.Model;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MagicCarpet2Terrain
 {
     /// <summary>
-    /// Builds Magic Carpet 2 buildings into the terrain (remc2 GenerateEvents_49290): first the shapes with the
-    /// building parameter flag 10h, then the others. Each square of a shape has 2 bytes: the terrain type, and the
-    /// height above the building's base (FFh: the square is left as it is).
+    /// Builds Magic Carpet 2 terrain features (remc2 GenerateEvents_49290) in the game's passes: paths, walls, then
+    /// the buildings with the building parameter flag 10h, then the other buildings. Each square of a building shape
+    /// has 2 bytes: the terrain type, and the height above the building's base (FFh: the square is left as it is).
     /// </summary>
-    public class Mc2BuildingTerrainBuilder : BuildingTerrainBuilder
+    public class Mc2TerrainFeatureBuilder : TerrainFeatureBuilder
     {
         private readonly BuildingParams _params;
 
-        public Mc2BuildingTerrainBuilder(BuildingShapes shapes, BuildingParams buildingParams) : base(shapes)
+        public Mc2TerrainFeatureBuilder(BuildingShapes shapes, BuildingParams buildingParams) : base(shapes)
         {
             _params = buildingParams;
         }
 
-        protected override IEnumerable<IList<BuildingPlacement>> GetPasses(IList<BuildingPlacement> placements)
+        protected override IEnumerable<Func<LevelFeature, bool>> GetPasses()
         {
-            yield return placements.Where(p => BuiltFirst(p)).ToList();
-            yield return placements.Where(p => !BuiltFirst(p)).ToList();
+            // the passes of the features built here (others the game builds in between: canyons, ridges, tunnels...)
+            yield return f => f.Model == PATH;
+            yield return f => f.Model == WALL_SECTION || f.Model == WALL;
+            yield return f => f.Model == BUILDING && BuiltFirst(f);
+            yield return f => f.Model == BUILDING;
         }
 
-        private bool BuiltFirst(BuildingPlacement placement) =>
-            ((_params?.GetFlags(placement.Shape) ?? 0) & BuildingParams.FLAG_BUILT_FIRST) != 0;
+        private bool BuiltFirst(LevelFeature building) =>
+            ((_params?.GetFlags(building.Parent) ?? 0) & BuildingParams.FLAG_BUILT_FIRST) != 0;
 
-        protected override int GetShapeIndex(BuildingPlacement placement) => placement.Shape;
+        protected override int GetShapeIndex(LevelFeature building) => building.Parent;
+
+        /// <summary>
+        /// remc2 CheckTileType8Neighbours_33F70 compares the square's own height where Magic Carpet compares the square
+        /// after it, so that one never counts.
+        /// </summary>
+        protected override bool IsWallEdge(int tile)
+        {
+            int x = tile & 0xFF, y = tile >> 8;
+            int limit = Height[tile] + 30;
+            return Type[Tile(x - 1, y)] != 8 || Height[Tile(x - 1, y)] > limit
+                || Height[Tile(x, y + 1)] > limit || Height[Tile(x, y - 1)] > limit;
+        }
 
         protected override bool IsComplete(BuildingShape shape) =>
             shape.Offset + 2 * shape.Width * shape.Height <= shape.Data.Length;

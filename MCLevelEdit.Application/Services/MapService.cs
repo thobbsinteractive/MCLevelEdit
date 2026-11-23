@@ -132,26 +132,26 @@ public class MapService : IMapService, IEnableLogger
         return true;
     }
 
-    /// <summary>Generates the map's terrain, then builds its buildings into it.</summary>
+    /// <summary>Generates the map's terrain, then builds its walls, paths and buildings into it.</summary>
     private async Task GenerateTerrain(GenerationParameters generationParameters)
     {
         var map = MapRepository.Map;
         map.GeneratedTerrain = await _terrainService.CalculateTerrain(generationParameters, map.TerrainGame);
-        map.Terrain = _terrainService.BuildBuildings(map.GeneratedTerrain, map);
+        map.Terrain = _terrainService.BuildFeatures(map.GeneratedTerrain, map);
     }
 
-    /// <summary>Builds the buildings into the generated terrain again, after they changed.</summary>
-    private void RebuildBuildings()
+    /// <summary>Builds the walls, paths and buildings into the generated terrain again, after one changed.</summary>
+    private void RebuildFeatures()
     {
         var map = MapRepository.Map;
         if (map.GeneratedTerrain is null)
             return;
-        map.Terrain = _terrainService.BuildBuildings(map.GeneratedTerrain, map);
+        map.Terrain = _terrainService.BuildFeatures(map.GeneratedTerrain, map);
         _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
     }
 
-    /// <summary>Whether the entity is a building the level builds before it starts (see <see cref="TerrainService.GetBuildingPlacements"/>).</summary>
-    private static bool ChangesTerrain(Entity? entity) => entity is not null && entity.IsBuilding() && entity.DisId == ushort.MaxValue;
+    /// <summary>Whether the entity is a wall, path or building, which can change the terrain when the level loads.</summary>
+    private static bool ChangesTerrain(Entity? entity) => TerrainService.ShapesTerrain(entity);
 
     public Map GetMap()
     {
@@ -177,7 +177,7 @@ public class MapService : IMapService, IEnableLogger
         {
             int id = MapRepository.Map.AddEntity(entity);
             if (ChangesTerrain(entity))
-                RebuildBuildings();
+                RebuildFeatures();
             return id;
         }
         catch (Exception ex)
@@ -191,10 +191,10 @@ public class MapService : IMapService, IEnableLogger
     {
         try
         {
-            bool wasBuilding = ChangesTerrain(MapRepository.Map.GetEntity(entity.Id));
+            bool wasFeature = ChangesTerrain(MapRepository.Map.GetEntity(entity.Id));
             MapRepository.Map.UpdateEntity(entity);
-            if (wasBuilding || ChangesTerrain(entity))
-                RebuildBuildings();
+            if (wasFeature || ChangesTerrain(entity))
+                RebuildFeatures();
             return true;
         }
         catch (Exception ex)
@@ -208,10 +208,10 @@ public class MapService : IMapService, IEnableLogger
     {
         try
         {
-            bool wasBuilding = ChangesTerrain(MapRepository.Map.GetEntity(entity.Id));
+            bool wasFeature = ChangesTerrain(MapRepository.Map.GetEntity(entity.Id));
             MapRepository.Map.DeleteEntity(entity);
-            if (wasBuilding)
-                RebuildBuildings();
+            if (wasFeature)
+                RebuildFeatures();
             return true;
         }
         catch (Exception ex)
