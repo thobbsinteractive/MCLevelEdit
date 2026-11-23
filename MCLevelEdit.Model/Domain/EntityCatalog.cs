@@ -1,6 +1,5 @@
 using Mc1 = MCLevelEdit.Model.Domain.MC1;
 using Mc2 = MCLevelEdit.Model.Domain.MC2;
-using MCLevelEdit.Model.Domain.Shared;
 
 namespace MCLevelEdit.Model.Domain;
 

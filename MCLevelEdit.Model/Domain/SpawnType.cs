@@ -1,4 +1,4 @@
-﻿namespace MCLevelEdit.Model.Domain.Shared;
+﻿namespace MCLevelEdit.Model.Domain;
 
 /// <summary>Wizard spawn points. Identical in Magic Carpet 1 and 2.</summary>
 public enum Spawn

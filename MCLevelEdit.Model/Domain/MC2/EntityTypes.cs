@@ -1,5 +1,3 @@
-using MCLevelEdit.Model.Domain.Shared;
-
 namespace MCLevelEdit.Model.Domain.MC2;
 
 /// <summary>Magic Carpet 2 entity types by type and kind, built from the MC2 enums.</summary>

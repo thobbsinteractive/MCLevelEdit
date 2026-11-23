@@ -1,4 +1,4 @@
-namespace MCLevelEdit.Model.Domain.Shared;
+namespace MCLevelEdit.Model.Domain;
 
 /// <summary>
 /// Entity types by type and kind, for the lookup tables both games have.

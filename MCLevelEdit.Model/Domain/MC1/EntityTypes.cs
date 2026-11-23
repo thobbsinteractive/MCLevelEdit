@@ -1,6 +1,4 @@
-﻿using MCLevelEdit.Model.Domain.Shared;
-
-namespace MCLevelEdit.Model.Domain.MC1;
+﻿namespace MCLevelEdit.Model.Domain.MC1;
 
 /// <summary>Magic Carpet 1 entity types by type and kind, built from the MC1 enums.</summary>
 public class EntityTypes : EntityTypesBase
