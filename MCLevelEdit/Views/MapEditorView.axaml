@@ -96,6 +96,7 @@
             Grid.Row="0"
             Content="Reset"/>
     <paz:ZoomBorder Name="pazMap"
+                    RenderOptions.BitmapInterpolationMode="None"
                     Background="LightBlue"
                     Grid.Column="0"
                     Grid.ColumnSpan="12"
