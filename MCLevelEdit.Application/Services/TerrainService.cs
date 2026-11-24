@@ -1,14 +1,19 @@
-﻿using Avalonia.Media;
+﻿using Avalonia;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Media.TextFormatting;
 using Avalonia.Platform;
 using MagicCarpet2Terrain;
 using MagicCarpet2Terrain.Abstractions;
 using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Extensions;
+using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Enums;
+
 using Splat;
+using System.Runtime.InteropServices;
 
 namespace MCLevelEdit.Application.Services;
 
@@ -205,6 +210,39 @@ public class TerrainService : ITerrainService, IEnableLogger
         });
     }
 
+    public WriteableBitmap DrawIsometric(byte[] heightMap, WriteableBitmap texture, int outputWidth, int outputHeight)
+    {
+        byte[] rgba = IsometricTerrainRender.Render(
+            heightMap,
+            GetRgbaBytes(texture),
+            256,
+            256,
+            outputWidth,
+            outputHeight,
+            heightScale: 0.10f
+        );
+
+        var bitmap = new WriteableBitmap(
+            new PixelSize(outputWidth, outputHeight),
+            new Vector(96, 96),
+            PixelFormat.Rgba8888,
+            AlphaFormat.Unpremul);
+
+        using (var fb = bitmap.Lock())
+        {
+            for (int y = 0; y < outputWidth; y++)
+            {
+                Marshal.Copy(
+                    rgba,
+                    y * outputHeight * 4,
+                    IntPtr.Add(fb.Address, y * fb.RowBytes),
+                    outputWidth * 4);
+            }
+        }
+
+        return bitmap;
+    }
+
     public WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Map map, Layer layer)
     {
         var terrain = map.Terrain;
@@ -269,5 +307,27 @@ public class TerrainService : ITerrainService, IEnableLogger
             BhFlt = (byte)rnd.Next(20),
             RkSte = (byte)rnd.Next(40)
         };
+    }
+
+    protected static byte[] GetRgbaBytes(WriteableBitmap bitmap)
+    {
+        int width = bitmap.PixelSize.Width;
+        int height = bitmap.PixelSize.Height;
+
+        byte[] rgba = new byte[width * height * 4];
+
+        using (var fb = bitmap.Lock())
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Marshal.Copy(
+                    IntPtr.Add(fb.Address, y * fb.RowBytes),
+                    rgba,
+                    y * width * 4,
+                    width * 4);
+            }
+        }
+
+        return rgba;
     }
 }

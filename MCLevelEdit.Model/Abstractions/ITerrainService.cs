@@ -15,6 +15,7 @@ public interface ITerrainService
     Terrain BuildFeatures(Terrain generated, Domain.Map map);
     /// <summary>Draws the map's terrain in the colours of its game (and, for MC2, its map type and fog).</summary>
     Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Domain.Map map, Layer layer);
+    WriteableBitmap DrawIsometric(byte[] heightMap, WriteableBitmap texture, int outputWidth, int outputHeight);
     WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Domain.Map map, Layer layer);
     GenerationParameters GetRandomGeneratorParamters();
 }
