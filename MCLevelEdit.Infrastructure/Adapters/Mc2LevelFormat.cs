@@ -19,6 +19,8 @@ public static class Mc2LevelFormat
     private const int MAP_TYPE = 6;
     private const int MANA_GOAL = 7;
     private const int NUMBER_OF_PLAYERS = 9;
+    // The castle level each wizard starts with, a byte each (player_0x2FED9)
+    private const int CASTLE_LEVELS = 11;
     private const int SEED = 23;
     private const int OFFSET = 27;
     private const int RAISE = 31;
@@ -125,6 +127,7 @@ public static class Mc2LevelFormat
             wizard.SpellLevels = data.AsSpan(pos + WIZARD_SPELL_LEVELS, LevelFormat.MC2_SPELL_COUNT).ToArray();
             wizard.BlockedSpells = data.AsSpan(pos + WIZARD_BLOCKED_SPELLS, LevelFormat.MC2_SPELL_COUNT).ToArray();
             wizard.Life = (short)U16(data, pos + WIZARD_LIFE);
+            wizard.CastleLevel = data[CASTLE_LEVELS + w];
 
             if (activeWizards > 0)
                 activeWizards--;
@@ -220,6 +223,7 @@ public static class Mc2LevelFormat
             WriteByteStat(data, pos + WIZARD_AGGRESSION, wizard.Agression);
             WriteByteStat(data, pos + WIZARD_REFLEXES, wizard.Reflexes);
             WriteByteStat(data, pos + WIZARD_PERCEPTION, wizard.Perception);
+            data[CASTLE_LEVELS + w] = wizard.CastleLevel;
 
             // A plain Wizard (no MC2 settings) leaves the file's spell settings and Life as they were
             if (wizard is Mc2Wizard mc2Wizard)

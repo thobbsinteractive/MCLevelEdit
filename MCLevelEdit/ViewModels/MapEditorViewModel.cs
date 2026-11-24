@@ -574,7 +574,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     private void DrawCastle(EntityViewModel entityViewModel, List<Shape> shapes, Rect rect, SolidColorBrush brush)
     {
-        if (entityViewModel.IsSpawn() && entityViewModel.Model != (int)Spawn.Flyer1)
+        // Magic Carpet 2 castles are built into the terrain (at their start level); Magic Carpet's are drawn
+        if (entityViewModel.IsSpawn() && entityViewModel.Model != (int)Spawn.Flyer1 && _mapService.GetMap().GameVersion != GameVersion.MagicCarpet2)
         {
             var map = _mapService.GetMap();
             var wizard = map.Wizards[entityViewModel.Model - 4].ToWizardViewModel(map.IsHiddenWorlds);
@@ -647,32 +648,18 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         }
     }
 
+    /// <summary>
+    /// The links between canyon and ridge nodes, as thin lines: the canyon or ridge itself is in the terrain, which the
+    /// editor builds as the game does when the level loads.
+    /// </summary>
     private void DrawCanyonOrRidge(EntityViewModel entityViewModel, List<Shape> shapes)
     {
         if (entityViewModel.IsCanyon() || entityViewModel.IsRidge())
         {
-            var brush = new SolidColorBrush(Color.FromRgb(0, 0, 0), 0.25);
-            var circleBrush = new SolidColorBrush(Color.FromRgb(0, 0, 0), 0.5);
+            var brush = new SolidColorBrush(Color.FromRgb(0, 0, 0), 0.6);
 
             if (entityViewModel.IsRidge())
-            {
-                brush = new SolidColorBrush(Color.FromRgb(32, 32, 32), 0.25);
-                circleBrush = new SolidColorBrush(Color.FromRgb(32, 32, 32), 0.5);
-            }
-
-            var circle = new Ellipse()
-            {
-                Width = (7 * Globals.SQUARE_SIZE),
-                Height = (7 * Globals.SQUARE_SIZE),
-                Stroke = brush,
-                Fill = circleBrush,
-                StrokeThickness = 1,
-                ZIndex = 80
-            };
-            Canvas.SetLeft(circle, (entityViewModel.X * Globals.SQUARE_SIZE) - ((Globals.SQUARE_SIZE * 7) / 2) + (Globals.SQUARE_SIZE / 2));
-            Canvas.SetTop(circle, (entityViewModel.Y * Globals.SQUARE_SIZE) - ((Globals.SQUARE_SIZE * 7) / 2) + (Globals.SQUARE_SIZE / 2));
-            _cvEntity.Children.Add(circle);
-            shapes.Add(circle);
+                brush = new SolidColorBrush(Color.FromRgb(160, 140, 110), 0.6);
 
             if (entityViewModel.Child > 0)
             {
@@ -686,7 +673,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                         StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         Stroke = brush,
-                        StrokeThickness = Globals.SQUARE_SIZE * 7,
+                        StrokeThickness = Globals.SQUARE_SIZE / 4,
                         ZIndex = 80
                     };
                     _cvEntity.Children.Add(line1);
@@ -705,7 +692,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                         StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
                         Stroke = brush,
-                        StrokeThickness = Globals.SQUARE_SIZE * 7,
+                        StrokeThickness = Globals.SQUARE_SIZE / 4,
                         ZIndex = 80
                     };
                     _cvEntity.Children.Add(line2);

@@ -25,9 +25,11 @@ namespace MCLevelEdit.Test
             BuildingShapes.Load(Asset($"building-shapes-{game}.tab"), Asset($"building-shapes-{game}.dat"));
 
         private static Mc2TerrainFeatureBuilder Mc2Builder() =>
-            new Mc2TerrainFeatureBuilder(Shapes("mc2"), BuildingParams.Load(Asset("building-params-mc2.dat")));
+            new Mc2TerrainFeatureBuilder(Shapes("mc2"), BuildingParams.Load(Asset("building-params-mc2.dat")), Search());
 
-        private static Mc1TerrainFeatureBuilder Mc1Builder() => new Mc1TerrainFeatureBuilder(Shapes("mc1"));
+        private static Mc1TerrainFeatureBuilder Mc1Builder() => new Mc1TerrainFeatureBuilder(Shapes("mc1"), Search());
+
+        private static SearchRings Search() => SearchRings.Load(Asset("search.dat"));
 
         private static List<LevelFeature> Features(Map map) => TerrainService.GetLevelFeatures(map);
 
@@ -62,34 +64,48 @@ namespace MCLevelEdit.Test
         }
 
         /// <summary>
-        /// The terrain of the second Magic Carpet 2 level (types, heights, shading and angles) as the game has it
-        /// after its first turn (remc2 regression memory at 2DC4E0): the generated terrain with its 22 buildings.
+        /// Whole levels as the game has them after its first turn (remc2 regression memory at 2DC4E0: types, heights,
+        /// shading, angles, and in caves the ceiling): level 2 (22 buildings), level 3 (a ring of walls closed by a gate)
+        /// and the cave level 15 (rooms, tunnels, mounds, craters, canyons, doors and buildings; its shading differs on a
+        /// few squares, from what happens in that first turn).
         /// </summary>
-        [Test]
-        public void Mc2FeaturesMatchTheGame()
+        [TestCase("mc2_00073f", true)]
+        [TestCase("mc2_00109e", true)]
+        [TestCase("mc2_009c1e", false)]
+        public void Mc2FeaturesMatchTheGame(string level, bool shading)
         {
-            var map = new FileAdapter().LoadMap(ResourcePath("mc2_00073f.dat"));
-            var game = File.ReadAllBytes(ResourcePath("mc2_00073f_afterload.bin"));
+            var map = new FileAdapter().LoadMap(ResourcePath(level + ".dat"));
+            var game = File.ReadAllBytes(ResourcePath(level + "_afterload.bin"));
             byte[] Part(int index) => game.Skip(index * 0x10000).Take(0x10000).ToArray();
             var generated = Generate(map);
-            Assert.That(Buildings(map), Has.Count.EqualTo(22));
-            Assert.That(generated.MapHeightmap_11B4E0, Is.Not.EqualTo(Part(1)), "the buildings change the terrain");
+            Assert.That(generated.MapHeightmap_11B4E0, Is.Not.EqualTo(Part(1)), "the features change the terrain");
 
             var built = Mc2Builder().Build(generated, Features(map));
 
             Assert.That(built.MapTerrainType_10B4E0, Is.EqualTo(Part(0)), "terrain types");
             Assert.That(built.MapHeightmap_11B4E0, Is.EqualTo(Part(1)), "heights");
-            Assert.That(built.MapShading_12B4E0, Is.EqualTo(Part(2)), "shading");
+            if (shading)
+                Assert.That(built.MapShading_12B4E0, Is.EqualTo(Part(2)), "shading");
             Assert.That(built.MapAngle_13B4E0, Is.EqualTo(Part(3)), "angles");
+            if (built.MapCeilingHeightmap_14B4E0 != null)
+                Assert.That(built.MapCeilingHeightmap_14B4E0, Is.EqualTo(Part(4)), "ceiling");
+        }
+
+        private static int WrappedDistance(int a, int b)
+        {
+            int d = ((a - b) % 256 + 256) % 256;
+            return Math.Min(d, 256 - d);
         }
 
         /// <summary>
-        /// Levels 3 (a ring of walls) and 7 (30 path nodes): every square the walls and paths change is as the game has
-        /// it after its first turn, except where a wizard's castle (Special 1) grows on that turn.
+        /// Levels 3 (a ring of walls), 7 (30 path nodes) and 9 (40 ridge nodes): every square the walls, paths and ridges
+        /// change is as the game has it after its first turn, except where a wizard's castle grows on that turn (at a
+        /// Special 1, a spawn point, or the map's corner for a player with none).
         /// </summary>
-        [TestCase("mc2_00109e", TerrainFeatureBuilder.WALL, 600)]
-        [TestCase("mc2_0041e2", TerrainFeatureBuilder.PATH, 600)]
-        public void Mc2WallsAndPathsMatchTheGame(string level, int model, int minChanged)
+        [TestCase("mc2_00109e", TerrainFeatureBuilder.WALL, 15, 600)]
+        [TestCase("mc2_0041e2", TerrainFeatureBuilder.PATH, 15, 600)]
+        [TestCase("mc2_00590d", TerrainFeatureBuilder.RIDGE, 40, 5000)]
+        public void Mc2WallsPathsAndRidgesMatchTheGame(string level, int model, int castleSize, int minChanged)
         {
             var map = new FileAdapter().LoadMap(ResourcePath(level + ".dat"));
             var game = File.ReadAllBytes(ResourcePath(level + "_afterload.bin"));
@@ -99,8 +115,15 @@ namespace MCLevelEdit.Test
             var generated = Generate(map);
             var features = Features(map).Where(f => f.Model != TerrainFeatureBuilder.BUILDING).ToList();
             Assert.That(features.Count(f => f.Model == model && f.DisId == LevelFeature.NO_SWITCH), Is.GreaterThan(1));
-            var castles = map.Entities.Where(e => e.EntityType.TypeId == TypeId.Special && e.EntityType.Model.Id == 1).ToList();
-            bool AtCastle(int x, int y) => castles.Any(c => Math.Abs(x - c.Position.X) <= 15 && Math.Abs(y - c.Position.Y) <= 15);
+            var castles = map.Entities
+                .Where(e => e.EntityType.TypeId == TypeId.Special && e.EntityType.Model.Id == 1 || e.EntityType.TypeId == TypeId.Spawn)
+                .Select(e => e.Position).Append(new Position(0, 0)).ToList();
+            // Effects that change the ground in the first turn, not before the level starts (craters, explosions...)
+            var firstTurn = map.Entities
+                .Where(e => e.EntityType.TypeId == TypeId.Effect && !(TerrainFeatureBuilder.ShapesTerrain(e.EntityType.Model.Id) && e.DisId == LevelFeature.NO_SWITCH))
+                .Select(e => e.Position).ToList();
+            bool AtCastle(int x, int y) => castles.Any(c => WrappedDistance(x, c.X) <= castleSize && WrappedDistance(y, c.Y) <= castleSize)
+                || firstTurn.Any(c => WrappedDistance(x, c.X) <= 12 && WrappedDistance(y, c.Y) <= 12);
 
             var built = Mc2Builder().Build(generated, features);
 
@@ -162,7 +185,7 @@ namespace MCLevelEdit.Test
         }
 
         [Test]
-        public void LinesAreOnlyMadeWithAStageTagAndNoSwitch()
+        public void Mc2MakesLinesWithNoSwitchWhateverTheirTag()
         {
             var generated = Level2Terrain();
             var builder = Mc2Builder();
@@ -183,7 +206,8 @@ namespace MCLevelEdit.Test
                 Node(2, TerrainFeatureBuilder.WALL, 60, 100, 1, 0),
             });
 
-            Assert.That(noTag.MapHeightmap_11B4E0, Is.EqualTo(generated.MapHeightmap_11B4E0));
+            // Magic Carpet 2 tags every line node with no switch itself (remc2 SetStagetagForTermod_49830)
+            Assert.That(noTag.MapTerrainType_10B4E0[50 | (100 << 8)], Is.EqualTo(8));
             Assert.That(switched.MapHeightmap_11B4E0, Is.EqualTo(generated.MapHeightmap_11B4E0));
             // the line is made from its first node whichever node has the tag
             Assert.That(tagOnTheLastNode.MapTerrainType_10B4E0[50 | (100 << 8)], Is.EqualTo(8));
@@ -203,6 +227,98 @@ namespace MCLevelEdit.Test
             var built = Mc2Builder().Build(generated, ring);
 
             Assert.That(built.MapTerrainType_10B4E0[50 | (100 << 8)], Is.EqualTo(8));
+        }
+
+        [Test]
+        public void CanyonDigsAlongItsLineAsDeepAsPar3()
+        {
+            var generated = Level2Terrain();
+            // a row of dry land (canyons stop at water)
+            int row = Enumerable.Range(0, 256).First(y => Enumerable.Range(30, 50).All(x => (generated.MapAngle_13B4E0[x | (y << 8)] & 0x0F) != 0
+                && generated.MapHeightmap_11B4E0[x | (y << 8)] > 20));
+            LevelFeature[] Canyon(ushort par3) => new[]
+            {
+                Node(1, TerrainFeatureBuilder.CANYON, 40, row, 0, 2),
+                Node(2, TerrainFeatureBuilder.CANYON, 70, row, 1, 0),
+            }.Select(n => { n.Par3 = par3; return n; }).ToArray();
+
+            var shallow = Mc2Builder().Build(generated, Canyon(0));
+            var deep = Mc2Builder().Build(generated, Canyon(3));
+
+            int Sum(Terrain t) => Enumerable.Range(42, 26).Sum(x => t.MapHeightmap_11B4E0[x | (row << 8)]);
+            Assert.That(Sum(shallow), Is.LessThan(Sum(generated)), "the canyon is dug");
+            Assert.That(Sum(deep), Is.LessThan(Sum(shallow)), "Par3 3 digs deeper than 0");
+            int away = 55 | (((row + 40) & 0xFF) << 8);
+            Assert.That(shallow.MapHeightmap_11B4E0[away], Is.EqualTo(generated.MapHeightmap_11B4E0[away]));
+        }
+
+        [Test]
+        public void RidgeRaisesItsLine()
+        {
+            var generated = Level2Terrain();
+            var built = Mc2Builder().Build(generated, new List<LevelFeature>
+            {
+                Node(1, TerrainFeatureBuilder.RIDGE, 40, 100, 0, 2),
+                Node(2, TerrainFeatureBuilder.RIDGE, 70, 100, 1, 0),
+            });
+
+            // 4 squares a turn: the ridge rises along the line unless it is water
+            int raised = Enumerable.Range(40, 28).Count(x => built.MapHeightmap_11B4E0[x | (100 << 8)] > generated.MapHeightmap_11B4E0[x | (100 << 8)]);
+            Assert.That(raised, Is.GreaterThan(20));
+        }
+
+        [Test]
+        public void SearchRingsGoOutFromTheCentre()
+        {
+            var search = Search();
+            var ring0 = new List<(int, int)>();
+            var walk = search.Start(0, 1);
+            while (walk.Next(out int dx, out int dy))
+                ring0.Add((dx, dy));
+            // ring 0 is the 2 x 2 centre, ring 1 around it; the last offset of the last ring is not given
+            Assert.That(ring0.Take(4), Is.EquivalentTo(new[] { (0, 0), (1, 0), (0, 1), (1, 1) }));
+            Assert.That(ring0.Skip(4), Has.All.Matches<(int, int)>(o => Math.Abs(o.Item1 - 0.5) <= 2 && Math.Abs(o.Item2 - 0.5) <= 2));
+        }
+
+        [Test]
+        public void Mc2WizardsKeepTheirCastleLevels()
+        {
+            var map = new FileAdapter().LoadMap(ResourcePath("mc2_00590d.dat"));
+            var castles = Features(map).Where(f => f.Model == TerrainFeatureBuilder.CASTLE).ToList();
+
+            // level 9: one wizard (Flyer5, at 110,110) starts with a castle of level 3
+            Assert.That(map.Wizards[4].CastleLevel, Is.EqualTo(3));
+            Assert.That(castles, Has.Count.EqualTo(1));
+            Assert.That((castles[0].X, castles[0].Y, (int)castles[0].Parent), Is.EqualTo((110, 110, 3)));
+        }
+
+        /// <summary>A castle at its start level: building shapes 1 to the level, stamped on the lowest height round shape 1.</summary>
+        [Test]
+        public void CastleIsBuiltOnItsWizardsStart()
+        {
+            var generated = Level2Terrain();
+            var shapes = Shapes("mc2");
+            // on an even square (x + y), so the castle stays where it is
+            var castle = new LevelFeature { Id = 1, Model = TerrainFeatureBuilder.CASTLE, X = 150, Y = 150, Parent = 2 };
+
+            var built = Mc2Builder().Build(generated, new List<LevelFeature> { castle });
+
+            var first = shapes[1]!;
+            int Edge(int x, int y) => generated.MapHeightmap_11B4E0[(x & 0xFF) | ((y & 0xFF) << 8)];
+            int x0 = 150 - first.Width / 2, y0 = 150 - first.Height / 2;
+            int z = Enumerable.Range(0, first.Width).SelectMany(i => new[] { Edge(x0 + i, y0), Edge(x0 + i, y0 + first.Height) })
+                .Concat(Enumerable.Range(0, first.Height).SelectMany(i => new[] { Edge(x0 + first.Width, y0 + i), Edge(x0, y0 + i) }))
+                .Append(250).Min();
+            // the middle square: the height of the last shape that sets it (FFh leaves it)
+            int expected = generated.MapHeightmap_11B4E0[150 | (150 << 8)];
+            foreach (var shape in new[] { shapes[1]!, shapes[2]! })
+            {
+                int middle = shape.Offset + 2 * (shape.Height / 2 * shape.Width + shape.Width / 2);
+                if (shape.Data[middle + 1] != 0xFF)
+                    expected = (byte)(shape.Data[middle + 1] + z);
+            }
+            Assert.That(built.MapHeightmap_11B4E0[150 | (150 << 8)], Is.EqualTo(expected));
+            Assert.That(built.MapHeightmap_11B4E0[30 | (30 << 8)], Is.EqualTo(generated.MapHeightmap_11B4E0[30 | (30 << 8)]));
         }
 
         [Test]

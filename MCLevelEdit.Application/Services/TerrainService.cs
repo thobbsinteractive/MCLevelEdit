@@ -56,9 +56,10 @@ public class TerrainService : ITerrainService, IEnableLogger
         Mc1Colours = LoadColourTable("terrain-colours-mc1.dat");
         HiddenWorldsColours = LoadColourTable("terrain-colours-hidden-worlds.dat");
 
-        _mc2Features = new Mc2TerrainFeatureBuilder(LoadBuildingShapes("mc2"), BuildingParams.Load(LoadAsset("building-params-mc2.dat")));
-        _mc1Features = new Mc1TerrainFeatureBuilder(LoadBuildingShapes("mc1"));
-        _hiddenWorldsFeatures = new Mc1TerrainFeatureBuilder(LoadBuildingShapes("hidden-worlds"));
+        var search = SearchRings.Load(LoadAsset("search.dat"));
+        _mc2Features = new Mc2TerrainFeatureBuilder(LoadBuildingShapes("mc2"), BuildingParams.Load(LoadAsset("building-params-mc2.dat")), search);
+        _mc1Features = new Mc1TerrainFeatureBuilder(LoadBuildingShapes("mc1"), search);
+        _hiddenWorldsFeatures = new Mc1TerrainFeatureBuilder(LoadBuildingShapes("hidden-worlds"), search);
     }
 
     private static byte[] LoadAsset(string fileName)
@@ -76,26 +77,60 @@ public class TerrainService : ITerrainService, IEnableLogger
     /// The level's Effects in its order, which the terrain features are among. The builder picks those that shape
     /// the terrain (walls, paths, buildings with no switch) and follows the links of the wall and path nodes.
     /// </summary>
-    public static List<LevelFeature> GetLevelFeatures(Map map) => map.Entities
-        .Where(e => e.EntityType?.TypeId == TypeId.Effect && e.EntityType.Model is not null)
+    public static List<LevelFeature> GetLevelFeatures(Map map) => GetEntityFeatures(map).Concat(GetCastles(map)).ToList();
+
+    private static IEnumerable<LevelFeature> GetEntityFeatures(Map map) => map.Entities
+        .Where(e => e.EntityType?.Model is not null && (e.EntityType.TypeId == TypeId.Effect
+            || e.EntityType.TypeId == TypeId.Special && (e.EntityType.Model.Id == TerrainFeatureBuilder.SPECIAL_CAVE_DOOR || e.EntityType.Model.Id == TerrainFeatureBuilder.SPECIAL_GATE)))
         .OrderBy(e => e.Id)
         .Select(e => new LevelFeature
         {
             Id = e.Id,
-            Model = e.EntityType.Model.Id,
+            Model = e.EntityType.TypeId == TypeId.Special ? 0x100 + e.EntityType.Model.Id : e.EntityType.Model.Id,
             X = e.Position.X,
             Y = e.Position.Y,
             DisId = e.DisId,
+            SwitchSize = e.SwitchSize,
             SwitchId = e.SwitchId,
             Parent = e.Parent,
-            Child = e.Child
+            Child = e.Child,
+            Par3 = (e as MCLevelEdit.Model.Domain.MC2.Mc2Entity)?.Par3 ?? 0
         })
         .ToList();
 
+    /// <summary>
+    /// The wizards' castles at their start level (Magic Carpet 2): an active wizard with a castle level and the castle
+    /// spell has one on its spawn point (Flyer 1 to 8 for the wizards in order), or the map's corner when there is none.
+    /// </summary>
+    private static IEnumerable<LevelFeature> GetCastles(Map map)
+    {
+        if (map.GameVersion != GameVersion.MagicCarpet2)
+            yield break;
+        for (int i = 0; i < map.Wizards.Length; i++)
+        {
+            var wizard = map.Wizards[i] as MCLevelEdit.Model.Domain.MC2.Mc2Wizard;
+            if (wizard is null || !wizard.IsActive || wizard.CastleLevel == 0)
+                continue;
+            if (wizard.StartingSpells is { Length: > 2 } spells && spells[2] == 0)
+                continue;
+            var spawn = map.Entities.Where(e => e.EntityType?.TypeId == TypeId.Spawn && e.EntityType.Model?.Id == (int)Spawn.Flyer1 + i)
+                .OrderBy(e => e.Id).FirstOrDefault();
+            yield return new LevelFeature
+            {
+                Id = 0x10000 + i,
+                Model = TerrainFeatureBuilder.CASTLE,
+                X = spawn?.Position.X ?? 0,
+                Y = spawn?.Position.Y ?? 0,
+                Parent = wizard.CastleLevel
+            };
+        }
+    }
+
     /// <summary>Whether the entity is one that can change the terrain when the level loads (or links to one).</summary>
     public static bool ShapesTerrain(Entity? entity) =>
-        entity?.EntityType?.TypeId == TypeId.Effect && entity.EntityType.Model is not null
-        && TerrainFeatureBuilder.ShapesTerrain(entity.EntityType.Model.Id);
+        entity?.EntityType?.Model is not null && (entity.EntityType.TypeId == TypeId.Special && (entity.EntityType.Model.Id == TerrainFeatureBuilder.SPECIAL_CAVE_DOOR || entity.EntityType.Model.Id == TerrainFeatureBuilder.SPECIAL_GATE)
+        || entity.EntityType.TypeId == TypeId.Effect
+        && TerrainFeatureBuilder.ShapesTerrain(entity.EntityType.Model.Id));
 
     public Terrain BuildFeatures(Terrain generated, Map map)
     {

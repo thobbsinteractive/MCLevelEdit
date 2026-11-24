@@ -151,7 +151,7 @@ public class MapService : IMapService, IEnableLogger
     }
 
     /// <summary>Whether the entity is a wall, path or building, which can change the terrain when the level loads.</summary>
-    private static bool ChangesTerrain(Entity? entity) => TerrainService.ShapesTerrain(entity);
+    private static bool ChangesTerrain(Entity? entity) => TerrainService.ShapesTerrain(entity) || entity?.EntityType?.TypeId == TypeId.Spawn;
 
     public Map GetMap()
     {
@@ -286,6 +286,7 @@ public class MapService : IMapService, IEnableLogger
                 numWizards--;
         }
 
+        RebuildFeatures();
         return true;
     }
 
@@ -305,6 +306,7 @@ public class MapService : IMapService, IEnableLogger
                 wizardToUpdate.Agression = wizard.Agression;
                 wizardToUpdate.Perception = wizard.Perception;
                 wizardToUpdate.Reflexes = wizard.Reflexes;
+
                 wizardToUpdate.CastleLevel = wizard.CastleLevel;
 
                 // MC2 wizards also carry spell settings and Life (only taken when all 26 spells are supplied)
@@ -344,6 +346,8 @@ public class MapService : IMapService, IEnableLogger
                     wizardToUpdate.Spells.GlobalDeath = wizard.Spells.GlobalDeath;
                     wizardToUpdate.Spells.RapidFireball = wizard.Spells.RapidFireball;
                 }
+                // its castle level, spells or being active can change its castle
+                RebuildFeatures();
             }
             return true;
         }

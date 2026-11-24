@@ -106,12 +106,16 @@ namespace MagicCarpet2Terrain.Model
         public int X { get; set; }
         public int Y { get; set; }
         public ushort DisId { get; set; }
+        /// <summary>The field at 10 (par0_10): the radius of a Magic Carpet 2 cave crater or cone.</summary>
+        public ushort SwitchSize { get; set; }
         /// <summary>The stage tag: a line of nodes is made from the first node with one.</summary>
         public ushort SwitchId { get; set; }
-        /// <summary>The node before (walls, paths), or the building's shape.</summary>
+        /// <summary>The node before (walls, paths, canyons, ridges), or the building's shape.</summary>
         public ushort Parent { get; set; }
-        /// <summary>The node after (walls, paths).</summary>
+        /// <summary>The node after (walls, paths, canyons, ridges).</summary>
         public ushort Child { get; set; }
+        /// <summary>Magic Carpet 2 only (par3_18): how deep a canyon from this node is dug.</summary>
+        public ushort Par3 { get; set; }
 
         /// <summary>Set once the feature has made its entities (the game sets its type to 0).</summary>
         internal bool Built { get; set; }

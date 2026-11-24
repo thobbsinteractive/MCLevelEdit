@@ -15,9 +15,14 @@ namespace MagicCarpet2Terrain
         /// <summary>The level's shape number is the shape's index less this.</summary>
         public const int SHAPE_OFFSET = 0x10;
 
-        public Mc1TerrainFeatureBuilder(BuildingShapes shapes) : base(shapes)
+        public Mc1TerrainFeatureBuilder(BuildingShapes shapes, SearchRings search) : base(shapes, search)
         {
         }
+
+        protected override uint RandMask => 0xFFFFFFFF;
+
+        // remc1 InitCreatedEntities_36620 leaves the entities' index as their slot
+        protected override bool CountsTurns => false;
 
         protected override IEnumerable<Func<LevelFeature, bool>> GetPasses()
         {
