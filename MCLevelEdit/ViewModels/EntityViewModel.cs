@@ -3,6 +3,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Domain.Extensions;
+using MCLevelEdit.Model.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,7 @@ public class EntityViewModel : ObservableObject
             _type = value;
             PopulateModelTypes();
             OnPropertyChanged(nameof(Type));
+            OnFieldHelpChanged();
         }
     }
 
@@ -81,7 +83,34 @@ public class EntityViewModel : ObservableObject
     public int ModelIdx
     {
         get { return _modelIdx; }
-        set { SetProperty(ref _modelIdx, value); }
+        set
+        {
+            if (SetProperty(ref _modelIdx, value))
+                OnFieldHelpChanged();
+        }
+    }
+
+    private static GameVersion Game => MapRepository.Map?.GameVersion ?? GameVersion.MagicCarpet1;
+
+    private string Help(EntityField field) => EntityFieldHelp.Get(Game, (TypeId)Type, Model, field);
+
+    public string XTip => Help(EntityField.X);
+    public string YTip => Help(EntityField.Y);
+    public string DisIdTip => Help(EntityField.DisId);
+    public string SwitchSizeTip => Help(EntityField.SwitchSize);
+    public string SwitchIdTip => Help(EntityField.SwitchId);
+    public string ParentTip => Help(EntityField.Parent);
+    public string ChildTip => Help(EntityField.Child);
+    public string Par3Tip => Help(EntityField.Par3);
+
+    /// <summary>Par3 is only in Magic Carpet 2 levels.</summary>
+    public bool HasPar3 => Game == GameVersion.MagicCarpet2;
+
+    private void OnFieldHelpChanged()
+    {
+        foreach (var name in new[] { nameof(XTip), nameof(YTip), nameof(DisIdTip), nameof(SwitchSizeTip), nameof(SwitchIdTip),
+            nameof(ParentTip), nameof(ChildTip), nameof(Par3Tip), nameof(HasPar3) })
+            OnPropertyChanged(name);
     }
 
     public string ModelName

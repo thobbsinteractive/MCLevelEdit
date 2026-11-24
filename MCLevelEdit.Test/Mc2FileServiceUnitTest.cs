@@ -96,7 +96,7 @@ namespace MCLevelEdit.Test
 
             Assert.That(TypeId.Creature.GetEntityTypeFromTypeIdAndModelId(20, GameVersion.MagicCarpet2)!.Model.Name, Is.EqualTo("Spider"));
             Assert.That(TypeId.Vase.GetEntityTypeFromTypeIdAndModelId(0, GameVersion.MagicCarpet2)!.Model.Name, Is.EqualTo("Fireball"));
-            Assert.That(TypeId.Special.GetEntityTypeFromTypeIdAndModelId(3, GameVersion.MagicCarpet2)!.Model.Name, Is.EqualTo("Gate"));
+            Assert.That(TypeId.Special.GetEntityTypeFromTypeIdAndModelId(3, GameVersion.MagicCarpet2)!.Model.Name, Is.EqualTo("ExitGate"));
             // MC1 names are unchanged
             Assert.That(TypeId.Creature.GetEntityTypeFromTypeIdAndModelId(1, GameVersion.MagicCarpet1)!.Model.Name, Is.EqualTo("Vulture"));
 

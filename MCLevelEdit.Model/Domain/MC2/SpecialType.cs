@@ -2,10 +2,10 @@ namespace MCLevelEdit.Model.Domain.MC2;
 
 public enum Special
 {
-    Unknown1 = 1,
-    Unknown2 = 2,
-    Gate = 3,
-    Unknown4 = 4,
+    WallGate = 1,
+    CaveDoor = 2,
+    ExitGate = 3,
+    ExitGate2 = 4,
     Scroll = 5
 }
 

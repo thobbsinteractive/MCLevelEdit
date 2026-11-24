@@ -44,7 +44,7 @@ public enum Effect
     VillagerBuilding = 45,
     RollingRock = 49,
     RidgeNode = 50,
-    Unknown51 = 51,
+    RidgeMover = 51,
     CrabEgg = 52,
     Auxiliary = 54,
     Unknown57 = 57,
@@ -56,11 +56,12 @@ public enum Effect
     Unknown67 = 67,
     Unknown71 = 71,
     FireSpheres = 76,
-    Unknown80 = 80,
-    Event = 82,
-    Unknown83 = 83,
-    Unknown84 = 84,
-    Unknown85 = 85,
+    TunnelNode = 80,
+    TunnelCarver = 81,
+    CaveRoom = 82,
+    CaveMound = 83,
+    Stalactite = 84,
+    Stalagmite = 85,
     Unknown86 = 86
 }
 
