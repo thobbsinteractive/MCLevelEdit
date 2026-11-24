@@ -1,6 +1,7 @@
 ﻿using MCLevelEdit.Model.Domain.MC1; // MC1 effect IDs for paths, walls, canyons etc. are the same in MC2
 using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Model.Domain.Validation;
+using MCLevelEdit.Model.Domain.Validation.MC1;
 
 namespace MCLevelEdit.Model.Domain;
 
@@ -169,38 +170,38 @@ public class Map
     {
         ValidationResults = new List<ValidationResult>();
 
-        ValidationResults.Add(MapRules.HasPlayerSpawn(this.Entities));
-        var spawnValidation = MapRules.HasCorrectNumberOfWizardSpawns(this);
-        foreach (var spawnResult in spawnValidation)
-            ValidationResults.Add(spawnResult);
+        // shared by both games
+        ValidationResults.Add(SharedMapRules.HasPlayerSpawn(this.Entities));
 
-        var wizardValidation = MapRules.HasValidWizardParamters(this);
-        foreach (var wizardResult in wizardValidation)
-            ValidationResults.Add(wizardResult);
+        foreach (var result in ValidateGameRules())
+            ValidationResults.Add(result);
 
-        // The basic-spells check is for MC1 spell jars; MC2 levels use vases
-        if (GameVersion == GameVersion.MagicCarpet1)
-        {
-            var spellValidation = MapRules.HasBasicSpells(this);
-            foreach (var spellResult in spellValidation)
-                ValidationResults.Add(spellResult);
-        }
+        return ValidationResults;
+    }
+
+    /// <summary>The rules of this level's game: Magic Carpet (and Hidden Worlds) here, Magic Carpet 2 in <see cref="MC2.Mc2Map"/>.</summary>
+    protected virtual IEnumerable<ValidationResult> ValidateGameRules()
+    {
+        foreach (var result in Mc1MapRules.HasCorrectNumberOfWizardSpawns(this))
+            yield return result;
+        foreach (var result in Mc1MapRules.HasValidWizardParamters(this))
+            yield return result;
+        foreach (var result in Mc1MapRules.HasBasicSpells(this))
+            yield return result;
 
         var entities = VisibleEntities.ToList();
         foreach (Entity entity in entities)
         {
-            ValidationResults.Add(EntityRules.HasSwitch(entity, entities));
-            ValidationResults.Add(EntityRules.BuildingHasSwidAndDisIdAndParent(entity));
-            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Wall));
-            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Path));
-            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Canyon));
-            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.RidgeNode));
-            ValidationResults.Add(EntityRules.HasUniqueCoordinates(entity, entities));
-            ValidationResults.Add(EntityRules.CheckConnectedWalls(entity, entities));
-            ValidationResults.Add(EntityRules.TeleportDestinationCoordinatesAreDifferentToStart(entity));
+            yield return Mc1EntityRules.HasSwitch(entity, entities);
+            yield return Mc1EntityRules.BuildingHasSwidAndDisIdAndParent(entity);
+            yield return Mc1EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Wall);
+            yield return Mc1EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Path);
+            yield return Mc1EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Canyon);
+            yield return Mc1EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.RidgeNode);
+            yield return Mc1EntityRules.HasUniqueCoordinates(entity, entities);
+            yield return Mc1EntityRules.CheckConnectedWalls(entity, entities);
+            yield return Mc1EntityRules.TeleportDestinationCoordinatesAreDifferentToStart(entity);
         }
-        
-        return ValidationResults;
     }
 
     private int GetIndexOf(Entity entity)

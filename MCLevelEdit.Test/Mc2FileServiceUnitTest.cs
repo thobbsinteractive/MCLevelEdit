@@ -123,6 +123,46 @@ namespace MCLevelEdit.Test
             AssertRoundTrip(path);
         }
 
+        [TestCase("mc2_000008.dat")]
+        [TestCase("mc2_00073f.dat")]
+        [TestCase("mc2_00169b.dat")]
+        public void Mc2LevelsHaveAPlayerExit(string name)
+        {
+            var map = LoadMc2(ResourcePath(name));
+
+            map.ValidateEntities();
+
+            Assert.That(map.ValidationResults.Where(r => r.Result != Model.Enums.Result.Pass).Select(r => r.Message),
+                Has.None.Contains("Exit"));
+            Assert.That(map.ValidationResults.Select(r => r.Message), Has.Some.EqualTo("HasPlayerExit"));
+            Assert.That(map.ValidationResults.Select(r => r.Message), Has.Some.EqualTo("HasPlayerSpawn"));
+        }
+
+        [Test]
+        public void Mc2LevelWithoutAnExitFails()
+        {
+            var map = LoadMc2(ResourcePath("mc2_00073f.dat"));
+            var exit = map.Entities.Single(e => e.EntityType.TypeId == TypeId.Switch && e.EntityType.Model.Id == (int)Switch.ExitLevel);
+            map.Entities.Remove(exit);
+
+            map.ValidateEntities();
+
+            Assert.That(map.ValidationResults.Where(r => r.Result == Model.Enums.Result.Fail).Select(r => r.Message),
+                Has.Some.Contains("Player Exit"));
+            Assert.That(map.ValidationResults.Where(r => r.Result == Model.Enums.Result.Warning).Select(r => r.Message),
+                Has.Some.Contains("ExitGate has no ExitLevel switch"));
+        }
+
+        [Test]
+        public void Mc2LevelsDoNotRunMc1Rules()
+        {
+            var map = LoadMc2(ResourcePath("mc2_00073f.dat"));
+
+            map.ValidateEntities();
+
+            Assert.That(map.ValidationResults.Select(r => r.Message), Has.None.Contains(nameof(Model.Domain.Validation.MC1.Mc1EntityRules.HasUniqueCoordinates)));
+        }
+
         [Test]
         public void Mc2WizardSpellsSurviveTheEditorAndApplyEdits()
         {
