@@ -1,12 +1,18 @@
 ﻿namespace MCLevelEdit.Application.Utils;
 
+using MCLevelEdit.Model.Domain;
 using System;
 
+/// <summary>
+/// Orthographic view of the terrain from any direction: the camera turns about the vertical axis (yaw) and looks
+/// down at an angle (pitch). The defaults, yaw 45 and pitch 35.26 (atan(1/sqrt 2)), are the classic isometric view.
+/// The whole map is fitted into the output image; panning and zooming are left to the canvas. The projection is in
+/// <see cref="TerrainView"/>, which the renderer returns, so what is drawn over the image can use it too.
+/// </summary>
 public static class IsometricTerrainRender
 {
-    private const float InvSqrt2 = 0.70710678f;
-    private const float InvSqrt6 = 0.40824829f;
-    private const float InvSqrt3 = 0.57735027f;
+    public const float DefaultYawDegrees = 45.0f;
+    public const float DefaultPitchDegrees = 35.264389f;
 
     private struct Vertex
     {
@@ -32,7 +38,27 @@ public static class IsometricTerrainRender
         int outputWidth = 256,
         int outputHeight = 256,
         float heightScale = 1.0f,
-        float margin = 4.0f)
+        float margin = 4.0f,
+        float yawDegrees = DefaultYawDegrees,
+        float pitchDegrees = DefaultPitchDegrees)
+    {
+        return Render(heightMap, texture, mapWidth, mapHeight, out _, outputWidth, outputHeight, heightScale, margin,
+            yawDegrees, pitchDegrees);
+    }
+
+    /// <summary>The image, and in <paramref name="view"/> how it was projected and which tile is at each pixel.</summary>
+    public static byte[] Render(
+        byte[] heightMap,
+        byte[] texture,
+        int mapWidth,
+        int mapHeight,
+        out TerrainView view,
+        int outputWidth = 256,
+        int outputHeight = 256,
+        float heightScale = 1.0f,
+        float margin = 4.0f,
+        float yawDegrees = DefaultYawDegrees,
+        float pitchDegrees = DefaultPitchDegrees)
     {
         if (mapWidth < 2 || mapHeight < 2)
             throw new ArgumentException("Height map must be at least 2x2.");
@@ -40,7 +66,9 @@ public static class IsometricTerrainRender
         if (texture.Length < mapWidth * mapHeight * 4)
             throw new ArgumentException("Invalid RGBA texture.");
 
-        // Project all terrain vertices and find bounds.
+        view = new TerrainView(heightMap, mapWidth, mapHeight, outputWidth, outputHeight, heightScale, yawDegrees, pitchDegrees);
+
+        // Project all terrain vertices (TerrainView.ProjectRaw) and find bounds.
         var vertices = new Vertex[mapHeight, mapWidth];
 
         float minX = float.MaxValue;
@@ -52,20 +80,10 @@ public static class IsometricTerrainRender
         {
             for (int x = 0; x < mapWidth; x++)
             {
-                float z = heightMap[(y * mapHeight) + x] * heightScale;
+                var (px, py, depth) = view.ProjectRaw(x, y, view.HeightAt(x, y));
 
-                float px = (x - y) * InvSqrt2;
-                float py = (x + y - 2.0f * z) * InvSqrt6;
-                float depth = (x + y + z) * InvSqrt3;
-
-                float u = x * (mapWidth - 1.0f)
-                            / (mapWidth - 1.0f);
-
-                float v = y * (mapHeight - 1.0f)
-                            / (mapHeight - 1.0f);
-
-                vertices[y, x] = new Vertex(
-                    px, py, depth, u, v);
+                // the texel of the tile at its vertex
+                vertices[y, x] = new Vertex(px, py, depth, x, y);
 
                 minX = Math.Min(minX, px);
                 minY = Math.Min(minY, py);
@@ -82,13 +100,9 @@ public static class IsometricTerrainRender
             (outputWidth - 2 * margin) / rangeX,
             (outputHeight - 2 * margin) / rangeY);
 
-        float offsetX =
-            (outputWidth - rangeX * scale) * 0.5f
-            - minX * scale;
-
-        float offsetY =
-            (outputHeight - rangeY * scale) * 0.5f
-            - minY * scale;
+        view.Scale = scale;
+        view.OffsetX = (outputWidth - rangeX * scale) * 0.5f - minX * scale;
+        view.OffsetY = (outputHeight - rangeY * scale) * 0.5f - minY * scale;
 
         // Transform vertices to screen coordinates.
         for (int y = 0; y < mapHeight; y++)
@@ -97,8 +111,8 @@ public static class IsometricTerrainRender
             {
                 var v = vertices[y, x];
 
-                v.X = v.X * scale + offsetX;
-                v.Y = v.Y * scale + offsetY;
+                v.X = v.X * scale + view.OffsetX;
+                v.Y = v.Y * scale + view.OffsetY;
 
                 vertices[y, x] = v;
             }
@@ -126,11 +140,11 @@ public static class IsometricTerrainRender
                 // Two triangles per grid cell.
                 DrawTriangle(a, b, c,
                     texture, mapWidth, mapHeight,
-                    output, depthBuffer, outputWidth, outputHeight);
+                    output, depthBuffer, view.TileAt, outputWidth, outputHeight);
 
                 DrawTriangle(b, d, c,
                     texture, mapWidth, mapHeight,
-                    output, depthBuffer, outputWidth, outputHeight);
+                    output, depthBuffer, view.TileAt, outputWidth, outputHeight);
             }
         }
 
@@ -144,6 +158,7 @@ public static class IsometricTerrainRender
         int textureHeight,
         byte[] output,
         float[] depthBuffer,
+        int[] tileAt,
         int width,
         int height)
     {
@@ -212,6 +227,9 @@ public static class IsometricTerrainRender
 
                 int ty = Math.Clamp(
                     (int)MathF.Round(v), 0, textureHeight - 1);
+
+                // the tile shown here, for picking it with the mouse
+                tileAt[index] = ty * textureWidth + tx;
 
                 int texIndex = (ty * textureWidth + tx) * 4;
                 int outIndex = index * 4;

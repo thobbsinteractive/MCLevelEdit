@@ -20,6 +20,13 @@ public interface IMapService
     List<Entity> GetEntitiesByTypeId(TypeId typeId);
     int AddEntity(Entity entity);
     bool UpdateEntity(Entity entity);
+    /// <summary>
+    /// Updates the entity; with <paramref name="deferTerrain"/> a wall, path or building leaves the terrain as it is
+    /// (while it is being dragged) until <see cref="CommitTerrain"/>.
+    /// </summary>
+    bool UpdateEntity(Entity entity, bool deferTerrain);
+    /// <summary>Builds the terrain again if an update deferred it (the end of a drag).</summary>
+    void CommitTerrain();
     bool DeleteEntity(Entity entity);
     bool UpdateManaTotal(uint manaTotal);
     bool UpdateManaTarget(byte manaTarget);

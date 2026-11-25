@@ -202,24 +202,49 @@ public class TerrainService : ITerrainService, IEnableLogger
         _ => Pallet
     };
 
-    public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Map map, Layer layer)
+    public async Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Map map, Layer layer,
+        float yawDegrees = IsometricTerrainRender.DefaultYawDegrees, float pitchDegrees = IsometricTerrainRender.DefaultPitchDegrees)
+    {
+        return (await DrawTerrainViewAsync(bitmap, map, layer, yawDegrees, pitchDegrees)).Bitmap;
+    }
+
+    public Task<(WriteableBitmap Bitmap, TerrainView View)> DrawTerrainViewAsync(WriteableBitmap bitmap, Map map, Layer layer,
+        float yawDegrees = IsometricTerrainRender.DefaultYawDegrees, float pitchDegrees = IsometricTerrainRender.DefaultPitchDegrees)
     {
         return Task.Run(() =>
         {
-            return DrawBitmap(bitmap, map, layer);
+            var texture = new WriteableBitmap(
+                new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
+                new Vector(96, 96),
+                PixelFormat.Rgba8888,
+                AlphaFormat.Unpremul);
+
+            DrawBitmap(texture, map, layer);
+            return DrawIsometricView(map.GeneratedTerrain.MapHeightmap_11B4E0, texture, (int)bitmap.Size.Width, (int)bitmap.Size.Height,
+                yawDegrees, pitchDegrees);
         });
     }
 
-    public WriteableBitmap DrawIsometric(byte[] heightMap, WriteableBitmap texture, int outputWidth, int outputHeight)
+    public WriteableBitmap DrawIsometric(byte[] heightMap, WriteableBitmap texture, int outputWidth, int outputHeight,
+        float yawDegrees = IsometricTerrainRender.DefaultYawDegrees, float pitchDegrees = IsometricTerrainRender.DefaultPitchDegrees)
+    {
+        return DrawIsometricView(heightMap, texture, outputWidth, outputHeight, yawDegrees, pitchDegrees).Bitmap;
+    }
+
+    private (WriteableBitmap Bitmap, TerrainView View) DrawIsometricView(byte[] heightMap, WriteableBitmap texture, int outputWidth,
+        int outputHeight, float yawDegrees, float pitchDegrees)
     {
         byte[] rgba = IsometricTerrainRender.Render(
             heightMap,
             GetRgbaBytes(texture),
             256,
             256,
+            out TerrainView view,
             outputWidth,
             outputHeight,
-            heightScale: 0.10f
+            heightScale: 0.10f,
+            yawDegrees: yawDegrees,
+            pitchDegrees: pitchDegrees
         );
 
         var bitmap = new WriteableBitmap(
@@ -230,17 +255,17 @@ public class TerrainService : ITerrainService, IEnableLogger
 
         using (var fb = bitmap.Lock())
         {
-            for (int y = 0; y < outputWidth; y++)
+            for (int y = 0; y < outputHeight; y++)
             {
                 Marshal.Copy(
                     rgba,
-                    y * outputHeight * 4,
+                    y * outputWidth * 4,
                     IntPtr.Add(fb.Address, y * fb.RowBytes),
                     outputWidth * 4);
             }
         }
 
-        return bitmap;
+        return (bitmap, view);
     }
 
     public WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Map map, Layer layer)

@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Application.Utils;
 using MCLevelEdit.Model.Abstractions;
@@ -17,8 +18,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Effect = MCLevelEdit.Model.Domain.MC1.Effect;
+using Vector = Avalonia.Vector;
 
 namespace MCLevelEdit.ViewModels;
 
@@ -46,6 +50,13 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private bool _pathToolSelected;
     private bool _isInEntitySelectionMode;
 
+    // how the preview was drawn, to place the entities over it and pick tiles in it (null before the first preview)
+    private TerrainView? _terrainView;
+
+    private double _viewYaw = IsometricTerrainRender.DefaultYawDegrees;
+    private bool _viewTopDown = false;
+
+
     public WriteableBitmap Preview 
     {
         set { this.RaiseAndSetIfChanged(ref _preview, value); }
@@ -71,6 +82,30 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             RefreshPreviewAsync();
         }
         get { return _selectedLayer == Layer.Height; }
+    }
+
+    /// <summary>The preview's view: turned about the vertical axis (degrees, 0-359).</summary>
+    public double ViewYaw
+    {
+        set { this.RaiseAndSetIfChanged(ref _viewYaw, value); }
+        get { return _viewYaw; }
+    }
+
+    /// <summary>The preview's view: straight down on the map, else isometric.</summary>
+    public bool ViewTopDown
+    {
+        set { this.RaiseAndSetIfChanged(ref _viewTopDown, value); }
+        get { return _viewTopDown; }
+    }
+
+    // looking straight down, or the isometric angle (atan(1 / sqrt 2))
+    private float ViewPitchDegrees => _viewTopDown ? 90.0f : IsometricTerrainRender.DefaultPitchDegrees;
+
+    /// <summary>Back to the isometric view.</summary>
+    public void ResetView()
+    {
+        ViewYaw = IsometricTerrainRender.DefaultYawDegrees;
+        ViewTopDown = false;
     }
 
     public bool ShowSwitchConnections
@@ -116,9 +151,16 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 _selectedEntityViewModel.X = (byte)newlocation.X;
                 _selectedEntityViewModel.Y = (byte)newlocation.Y;
 
-                UpdateEntity(_selectedEntityViewModel);
+                // the entity moves with the cursor, the terrain (walls, paths, buildings) is built once it is dropped
+                UpdateEntity(_selectedEntityViewModel, deferTerrain: true);
             }
         }
+    }
+
+    /// <summary>The drag is over (the button released or the capture lost): the terrain is built with the entity where it was dropped.</summary>
+    public void OnCursorDragEnded()
+    {
+        _mapService.CommitTerrain();
     }
 
     public void OnCursorClicked(Point position, bool left, bool right)
@@ -175,8 +217,58 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     private Point GetCursorPointFromCanvasPoint(Point value)
     {
-        return new Point(Double.Round(value.X / Globals.SQUARE_SIZE, MidpointRounding.ToZero),
-            Double.Round(value.Y / Globals.SQUARE_SIZE, MidpointRounding.ToZero));
+        var view = _terrainView;
+        if (view is null)
+            return new Point(Double.Round(value.X / Globals.SQUARE_SIZE, MidpointRounding.ToZero),
+                Double.Round(value.Y / Globals.SQUARE_SIZE, MidpointRounding.ToZero));
+
+        // the tile the preview shows under the cursor (the nearest one in front, behind hills too); off the terrain
+        // the cursor stays where it was
+        var tile = view.TileAtPixel(value.X / CanvasScaleX(view), value.Y / CanvasScaleY(view));
+        return tile is null ? _cursorPosition : new Point(tile.Value.X, tile.Value.Y);
+    }
+
+    // the preview image is drawn over the whole canvas (MAX_MAP_SIZE * SQUARE_SIZE square)
+    private static double CanvasScaleX(TerrainView view) => (double)(Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE) / view.OutputWidth;
+    private static double CanvasScaleY(TerrainView view) => (double)(Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE) / view.OutputHeight;
+
+    /// <summary>
+    /// The middle of a map tile (or any map point, in tiles) on the canvas, on the terrain as the preview shows it:
+    /// turned and tilted with it. Map points off the map (lines that wrap) are placed at the height of the tile they
+    /// wrap to.
+    /// </summary>
+    private Point TileToCanvas(double x, double y)
+    {
+        var view = _terrainView;
+        if (view is null)
+            return new Point((x * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2));
+        var (px, py) = view.Project((float)x, (float)y);
+        return new Point(px * CanvasScaleX(view), py * CanvasScaleY(view));
+    }
+
+    /// <summary>A square on the ground, half the size across in tiles from the middle of the tile, as the preview shows it.</summary>
+    private List<Point> GroundSquare(double x, double y, double half)
+    {
+        return new List<Point>
+        {
+            TileToCanvas(x - half, y - half),
+            TileToCanvas(x + half, y - half),
+            TileToCanvas(x + half, y + half),
+            TileToCanvas(x - half, y + half),
+        };
+    }
+
+    /// <summary>A circle on the ground round the middle of a tile, the radius in tiles, as the preview shows it.</summary>
+    private List<Point> GroundCircle(double x, double y, double radius)
+    {
+        const int segments = 32;
+        var points = new List<Point>(segments);
+        for (int i = 0; i < segments; i++)
+        {
+            double angle = 2 * Math.PI * i / segments;
+            points.Add(TileToCanvas(x + radius * Math.Cos(angle), y + radius * Math.Sin(angle)));
+        }
+        return points;
     }
 
     public string CursorPositionStr
@@ -207,6 +299,11 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             ShowSwitchConnections = !ShowSwitchConnections;
         });
+        // the preview redrawn once the view's angles stop changing (a slider sends every step of a drag)
+        this.WhenAnyValue(x => x.ViewYaw, x => x.ViewTopDown)
+            .Skip(1)
+            .Throttle(TimeSpan.FromMilliseconds(150))
+            .Subscribe(_ => RefreshPreviewAsync());
         _eventAggregator.RegisterEvent("OnToolSelected", (sender, args) =>
         {
             var modelId = (int?)args?.Item;
@@ -267,7 +364,9 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             Line _verticalSelectionTop;
             Line _verticalSelectionBottom;
 
-            var rect = new Rect(entity.X * Globals.SQUARE_SIZE - 3, entity.Y * Globals.SQUARE_SIZE - 3, Globals.SQUARE_SIZE + 3, Globals.SQUARE_SIZE + 3);
+            // the boxes round the middle of the tile as the preview shows it, the lines along its row and column of the map
+            var centre = TileToCanvas(entity.X, entity.Y);
+            var rect = new Rect(centre.X - (Globals.SQUARE_SIZE / 2) - 3, centre.Y - (Globals.SQUARE_SIZE / 2) - 3, Globals.SQUARE_SIZE + 3, Globals.SQUARE_SIZE + 3);
             var brush = new SolidColorBrush(Color.FromRgb(255, 255, 255), 1);
             var transBrush = new SolidColorBrush(Color.FromRgb(255, 255, 255), 0.5);
 
@@ -289,10 +388,11 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 ZIndex = 200
             };
 
+            // the lines from the edges of the map to the tile, in canvas coordinates
             _horizontalSelectionLeft = new Line()
             {
-                StartPoint = new Point((-entity.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), 7),
-                EndPoint = new Point(0, 7),
+                StartPoint = TileToCanvas(0, entity.Y),
+                EndPoint = centre,
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 200
@@ -300,8 +400,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
             _horizontalSelectionRight = new Line()
             {
-                StartPoint = new Point(14, 7),
-                EndPoint = new Point((256 * Globals.SQUARE_SIZE) - (entity.X * Globals.SQUARE_SIZE), 7),
+                StartPoint = centre,
+                EndPoint = TileToCanvas(Globals.MAX_MAP_SIZE - 1, entity.Y),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 200
@@ -309,8 +409,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
             _verticalSelectionTop = new Line()
             {
-                StartPoint = new Point(7, (-entity.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                EndPoint = new Point(7, 0),
+                StartPoint = TileToCanvas(entity.X, 0),
+                EndPoint = centre,
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 200
@@ -318,8 +418,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
             _verticalSelectionBottom = new Line()
             {
-                StartPoint = new Point(7, 14),
-                EndPoint = new Point(7, (256 * Globals.SQUARE_SIZE) - (entity.Y * Globals.SQUARE_SIZE)),
+                StartPoint = centre,
+                EndPoint = TileToCanvas(entity.X, Globals.MAX_MAP_SIZE - 1),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 200
@@ -329,14 +429,6 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             Canvas.SetTop(_rectSelection, rect.Y);
             Canvas.SetLeft(_outerRectSelection, rect.X - 11);
             Canvas.SetTop(_outerRectSelection, rect.Y - 11);
-            Canvas.SetLeft(_horizontalSelectionLeft, rect.X);
-            Canvas.SetTop(_horizontalSelectionLeft, rect.Y);
-            Canvas.SetLeft(_horizontalSelectionRight, rect.X);
-            Canvas.SetTop(_horizontalSelectionRight, rect.Y);
-            Canvas.SetLeft(_verticalSelectionTop, rect.X);
-            Canvas.SetTop(_verticalSelectionTop, rect.Y);
-            Canvas.SetLeft(_verticalSelectionBottom, rect.X);
-            Canvas.SetTop(_verticalSelectionBottom, rect.Y);
 
             _selectionCursorShapes.Add(_rectSelection);
             _selectionCursorShapes.Add(_outerRectSelection);
@@ -361,8 +453,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
             var line = new Line()
             {
-                StartPoint = new Point((origin.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), origin.Y * Globals.SQUARE_SIZE),
-                EndPoint = new Point(end.X * Globals.SQUARE_SIZE, (end.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                StartPoint = TileToCanvas(origin.X, origin.Y),
+                EndPoint = TileToCanvas(end.X, end.Y),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 200
@@ -504,7 +596,9 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             List<Shape> shapes = new List<Shape>();
 
-            var rect = new Rect(entityViewModel.X * Globals.SQUARE_SIZE, entityViewModel.Y * Globals.SQUARE_SIZE, Globals.SQUARE_SIZE, Globals.SQUARE_SIZE);
+            // the marker on the middle of the tile as the preview shows it (it keeps its size on the screen)
+            var centre = TileToCanvas(entityViewModel.X, entityViewModel.Y);
+            var rect = new Rect(centre.X - (Globals.SQUARE_SIZE / 2), centre.Y - (Globals.SQUARE_SIZE / 2), Globals.SQUARE_SIZE, Globals.SQUARE_SIZE);
             var brush = new SolidColorBrush(entityViewModel.Colour, 1);
             var rectangle = new Rectangle()
             {
@@ -521,16 +615,14 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
             if (entityViewModel.SwitchSize > 0)
             {
-                var circle = new Ellipse()
+                // the switch's area: a circle on the ground, turned and tilted with the preview
+                var circle = new Polygon()
                 {
-                    Width = ((entityViewModel.SwitchSize * Globals.SQUARE_SIZE) * 2) + Globals.SQUARE_SIZE,
-                    Height = ((entityViewModel.SwitchSize * Globals.SQUARE_SIZE) * 2) + Globals.SQUARE_SIZE,
+                    Points = GroundCircle(entityViewModel.X, entityViewModel.Y, entityViewModel.SwitchSize + 0.5),
                     Stroke = brush,
                     StrokeThickness = 1,
                     ZIndex = 110
                 };
-                Canvas.SetLeft(circle, rect.X - (entityViewModel.SwitchSize * Globals.SQUARE_SIZE));
-                Canvas.SetTop(circle, rect.Y - (entityViewModel.SwitchSize * Globals.SQUARE_SIZE));
                 _cvEntity.Children.Add(circle);
                 shapes.Add(circle);
             }
@@ -560,8 +652,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             {
                 var line = new Line()
                 {
-                    StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                    EndPoint = new Point((connectedEntity.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (connectedEntity.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                    StartPoint = TileToCanvas(entityViewModel.X, entityViewModel.Y),
+                    EndPoint = TileToCanvas(connectedEntity.X, connectedEntity.Y),
                     Stroke = brush,
                     StrokeThickness = 1,
                     ZIndex = 98
@@ -582,18 +674,15 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
             for (int i = 1; i < wizard.CastleLevel + 1; i++)
             {
-                int width, height;
-                GetCastleWidthForWizard(i, out width, out height);
-                var castle = new Rectangle()
+                // the square of each castle level on the ground (its half width in tiles and the middle tile), turned
+                // and tilted with the preview
+                var castle = new Polygon()
                 {
-                    Width = width,
-                    Height = height,
+                    Points = GroundSquare(entityViewModel.X, entityViewModel.Y, CalculateCastleWidth(i) + 0.5),
                     Stroke = brush,
                     StrokeThickness = 2,
                     ZIndex = 99
                 };
-                Canvas.SetLeft(castle, rect.X - (width / 2) + (Globals.SQUARE_SIZE / 2));
-                Canvas.SetTop(castle, rect.Y - (height / 2) + (Globals.SQUARE_SIZE / 2));
 
                 _cvEntity.Children.Add(castle);
                 shapes.Add(castle);
@@ -607,10 +696,11 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             SolidColorBrush brush = new SolidColorBrush(Color.FromRgb(255, 128, 255), 1);
 
+            // the destination (Child, Parent) as the preview shows it: the line to it and two circles on the ground
             var destinationLine = new Line()
             {
-                StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                EndPoint = new Point((entityViewModel.Child * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Parent * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                StartPoint = TileToCanvas(entityViewModel.X, entityViewModel.Y),
+                EndPoint = TileToCanvas(entityViewModel.Child, entityViewModel.Parent),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 250
@@ -618,30 +708,24 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             _cvEntity.Children.Add(destinationLine);
             shapes.Add(destinationLine);
 
-            var circle1 = new Ellipse()
+            var circle1 = new Polygon()
             {
-                Width = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
-                Height = (Globals.SQUARE_SIZE) * 2 + Globals.SQUARE_SIZE,
+                Points = GroundCircle(entityViewModel.Child, entityViewModel.Parent, 1.5),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 250
             };
-            Canvas.SetLeft(circle1, (entityViewModel.Child * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
-            Canvas.SetTop(circle1, (entityViewModel.Parent * Globals.SQUARE_SIZE) - Globals.SQUARE_SIZE);
 
             _cvEntity.Children.Add(circle1);
             shapes.Add(circle1);
 
-            var circle2 = new Ellipse()
+            var circle2 = new Polygon()
             {
-                Width = Globals.SQUARE_SIZE,
-                Height = Globals.SQUARE_SIZE,
+                Points = GroundCircle(entityViewModel.Child, entityViewModel.Parent, 0.5),
                 Stroke = brush,
                 StrokeThickness = 2,
                 ZIndex = 250
             };
-            Canvas.SetLeft(circle2, entityViewModel.Child * Globals.SQUARE_SIZE);
-            Canvas.SetTop(circle2, entityViewModel.Parent * Globals.SQUARE_SIZE);
 
             _cvEntity.Children.Add(circle2);
             shapes.Add(circle2);
@@ -670,8 +754,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                     var line1 = new Line()
                     {
-                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        StartPoint = TileToCanvas(entityViewModel.X, entityViewModel.Y),
+                        EndPoint = TileToCanvas(endPoint.X, endPoint.Y),
                         Stroke = brush,
                         StrokeThickness = Globals.SQUARE_SIZE / 4,
                         ZIndex = 80
@@ -689,8 +773,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                     var line2 = new Line()
                     {
-                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        StartPoint = TileToCanvas(entityViewModel.X, entityViewModel.Y),
+                        EndPoint = TileToCanvas(endPoint.X, endPoint.Y),
                         Stroke = brush,
                         StrokeThickness = Globals.SQUARE_SIZE / 4,
                         ZIndex = 80
@@ -724,8 +808,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                     var line1 = new Line()
                     {
-                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        StartPoint = TileToCanvas(entityViewModel.X, entityViewModel.Y),
+                        EndPoint = TileToCanvas(endPoint.X, endPoint.Y),
                         Stroke = brush,
                         StrokeThickness = Globals.SQUARE_SIZE / 4,
                         ZIndex = 99
@@ -743,8 +827,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
                     var line2 = new Line()
                     {
-                        StartPoint = new Point((entityViewModel.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (entityViewModel.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
-                        EndPoint = new Point((endPoint.X * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2), (endPoint.Y * Globals.SQUARE_SIZE) + (Globals.SQUARE_SIZE / 2)),
+                        StartPoint = TileToCanvas(entityViewModel.X, entityViewModel.Y),
+                        EndPoint = TileToCanvas(endPoint.X, endPoint.Y),
                         Stroke = brush,
                         StrokeThickness = Globals.SQUARE_SIZE / 4,
                         ZIndex = 99
@@ -754,12 +838,6 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 }
             }
         }
-    }
-
-    private void GetCastleWidthForWizard(int castleLevel, out int width, out int height)
-    {
-        width = (Globals.SQUARE_SIZE) * CalculateCastleWidth(castleLevel) * 2 + Globals.SQUARE_SIZE;
-        height = (Globals.SQUARE_SIZE) * CalculateCastleWidth(castleLevel) * 2 + Globals.SQUARE_SIZE;
     }
 
     private int CalculateCastleWidth(int castleLevel)
@@ -817,6 +895,28 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         RefreshEntities();
     }
 
+    public WriteableBitmap CreateBitmap(byte[] rgba, int width, int height)
+    {
+        var bitmap = new WriteableBitmap(
+            new PixelSize(width, height),
+            new Vector(96, 96),
+            PixelFormat.Rgba8888,
+            AlphaFormat.Unpremul);
+
+        using (var fb = bitmap.Lock())
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Marshal.Copy(
+                    rgba,
+                    y * width * 4,
+                    IntPtr.Add(fb.Address, y * fb.RowBytes),
+                    width * 4);
+            }
+        }
+        return bitmap;
+    }
+
     protected void RefreshPreviewAsync()
     {
         lock (_lockPreview)
@@ -829,13 +929,24 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 if (map.Terrain is not null)
                 {
                     this.Log().Debug("Drawing Terrain...");
-                    var preview = new WriteableBitmap(new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
+                    var preview = new WriteableBitmap(new PixelSize(512, 512),
                         new Avalonia.Vector(96, 96),
                         PixelFormat.Rgba8888);
 
-                    BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(0, 0, 0, 0), preview);
+                    BitmapUtils.SetBackground(new Rect(0, 0, 512, 512), new Color(0, 0, 0, 0), preview);
 
-                    Preview = await _terrainService.DrawBitmapAsync(preview, map, _selectedLayer);
+                    var (bitmap, view) = await _terrainService.DrawTerrainViewAsync(preview, map, _selectedLayer, (float)_viewYaw, ViewPitchDegrees);
+                    Preview = bitmap;
+
+                    // the entities over it placed again with its view, on the UI thread (they are controls)
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        _terrainView = view;
+                        if (_cvEntity is null)
+                            return;
+                        RefreshEntities();
+                        OnEntitySelected(_selectedEntityViewModel);
+                    });
                 }
 
                 this.Log().Debug("Preview refreshed");

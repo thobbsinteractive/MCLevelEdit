@@ -123,14 +123,23 @@ namespace MCLevelEdit.Views
 
         private void OnPazMap_PointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
         {
+            EndDrag();
+        }
+
+        // the terrain is built again once a dragged entity is dropped, not at each step of the drag
+        private void EndDrag()
+        {
+            if (_ptCursorDragStart is null)
+                return;
             _ptCursorDragStart = null;
+            VmMapEditor?.OnCursorDragEnded();
         }
 
         private void OnPazMap_PointerReleased(object? sender, PointerReleasedEventArgs e)
         {
             if (e.InitialPressMouseButton == MouseButton.Left || e.InitialPressMouseButton == MouseButton.Right)
             {
-                _ptCursorDragStart = null;
+                EndDrag();
                 _ptCursor = GetCursorPoint(e);
                 if (VmMapEditor != null)
                 {

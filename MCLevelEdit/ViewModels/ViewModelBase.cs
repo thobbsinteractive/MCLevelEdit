@@ -61,9 +61,10 @@ public class ViewModelBase : ReactiveObject
         _eventAggregator.RaiseEvent("DeleteEntity", this, new PubSubEventArgs<object>(entityView));
     }
 
-    protected void UpdateEntity(EntityViewModel entityView)
+    /// <param name="deferTerrain">leave the terrain as it is until IMapService.CommitTerrain (while dragging)</param>
+    protected void UpdateEntity(EntityViewModel entityView, bool deferTerrain = false)
     {
-        _mapService.UpdateEntity(entityView.ToEntity());
+        _mapService.UpdateEntity(entityView.ToEntity(), deferTerrain);
         _eventAggregator.RaiseEvent("UpdateEntity", this, new PubSubEventArgs<object>(entityView));
     }
 }

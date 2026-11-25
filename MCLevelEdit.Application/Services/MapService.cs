@@ -140,9 +140,19 @@ public class MapService : IMapService, IEnableLogger
         map.Terrain = _terrainService.BuildFeatures(map.GeneratedTerrain, map);
     }
 
+    // an update left the terrain to be built again (an entity being dragged), CommitTerrain builds it
+    private bool _terrainPending;
+
+    public void CommitTerrain()
+    {
+        if (_terrainPending)
+            RebuildFeatures();
+    }
+
     /// <summary>Builds the walls, paths and buildings into the generated terrain again, after one changed.</summary>
     private void RebuildFeatures()
     {
+        _terrainPending = false;
         var map = MapRepository.Map;
         if (map.GeneratedTerrain is null)
             return;
@@ -187,14 +197,21 @@ public class MapService : IMapService, IEnableLogger
         }
     }
 
-    public bool UpdateEntity(Entity entity)
+    public bool UpdateEntity(Entity entity) => UpdateEntity(entity, false);
+
+    public bool UpdateEntity(Entity entity, bool deferTerrain)
     {
         try
         {
             bool wasFeature = ChangesTerrain(MapRepository.Map.GetEntity(entity.Id));
             MapRepository.Map.UpdateEntity(entity);
             if (wasFeature || ChangesTerrain(entity))
-                RebuildFeatures();
+            {
+                if (deferTerrain)
+                    _terrainPending = true;
+                else
+                    RebuildFeatures();
+            }
             return true;
         }
         catch (Exception ex)

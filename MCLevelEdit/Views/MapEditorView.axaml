@@ -35,6 +35,34 @@
            Grid.Column="4"
            Grid.Row="0"
            Content="{Binding #pazMap.ZoomX, StringFormat='Zoom: {0:0.00}'}"/>
+    <!-- the view of the terrain preview: turn (yaw), from straight above or isometric, Iso back to the isometric view -->
+    <StackPanel Grid.Column="5"
+                Grid.Row="0"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Spacing="4"
+                Margin="4,0">
+      <TextBlock Text="Turn"
+                 VerticalAlignment="Center"/>
+      <Slider Name="sldViewYaw"
+              Width="120"
+              Minimum="0"
+              Maximum="359"
+              VerticalAlignment="Center"
+              Margin="0,-8"
+              ToolTip.Tip="{Binding ViewYaw, StringFormat='Turn: {0:0}°'}"
+              Value="{Binding ViewYaw}"/>
+      <CheckBox Name="chkViewTopDown"
+                Content="Top Down"
+                VerticalAlignment="Center"
+                ToolTip.Tip="View the map from straight above, else isometric"
+                IsChecked="{Binding ViewTopDown}"/>
+      <Button Name="btnViewIso"
+              Content="Iso"
+              ToolTip.Tip="Back to the isometric view"
+              Command="{Binding ResetView}"/>
+    </StackPanel>
     <Button Name="btnPanLeft"
         Margin="1"
         Grid.Column="6"
