@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.PanAndZoom;
 using Avalonia.Input;
 using MCLevelEdit.ViewModels;
 using System;
@@ -28,6 +29,7 @@ namespace MCLevelEdit.Views
                 pazMap.PointerPressed += OnPazMap_PointerPressed;
                 pazMap.PointerReleased += OnPazMap_PointerReleased;
                 pazMap.PointerMoved += OnPazMap_PointerMoved;
+                pazMap.LayoutUpdated += OnPazMap_LayoutUpdated;
             }
 
             if (btnPanLeft != null)
@@ -169,10 +171,31 @@ namespace MCLevelEdit.Views
                 return new Point();
         }
 
+        // ZoomBorder fits its content (by its Stretch) every time it is laid out again (ArrangeOverride calls AutoFit):
+        // a new preview image or an entity shape added to the canvas put the zoom and pan back each time. It fits once,
+        // when first laid out and on Reset, with Stretch None the rest of the time.
+        private StretchMode _fitStretch = StretchMode.Uniform;
+        private bool _fitPending;
+
         private void ResetView()
         {
-            pazMap?.ResetMatrix();
-            pazMap?.AutoFit();
+            if (pazMap is null)
+                return;
+            if (pazMap.Stretch != StretchMode.None)
+                _fitStretch = pazMap.Stretch;
+            pazMap.Stretch = _fitStretch;
+            pazMap.ResetMatrix();
+            pazMap.AutoFit();
+            _fitPending = true;
+        }
+
+        // once laid out with the fit, the Stretch is None until the next Reset
+        private void OnPazMap_LayoutUpdated(object? sender, EventArgs e)
+        {
+            if (!_fitPending || pazMap is null || pazMap.Bounds.Width <= 0 || pazMap.Bounds.Height <= 0)
+                return;
+            _fitPending = false;
+            pazMap.Stretch = StretchMode.None;
         }
     }
 }

@@ -50,18 +50,31 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private bool _pathToolSelected;
     private bool _isInEntitySelectionMode;
 
-    // how the preview was drawn, to place the entities over it and pick tiles in it (null before the first preview)
+    // the isometric view in place of the map: shown, how many quarter turns it is turned, its image, the newest drawing
+    // asked for
+    private bool _showIsometric = false;
+    private int _isometricQuarterTurns = 0;
+    private WriteableBitmap? _isometricPreview;
+    private int _isometricVersion;
+    private readonly object _lockIsometric = new object();
+
+    // while the isometric view is shown, how it was drawn: the entities are placed over it and tiles picked in it with
+    // this (null for the map from above)
     private TerrainView? _terrainView;
 
-    private double _viewYaw = IsometricTerrainRender.DefaultYawDegrees;
-    private bool _viewTopDown = false;
 
-
-    public WriteableBitmap Preview 
+    public WriteableBitmap Preview
     {
-        set { this.RaiseAndSetIfChanged(ref _preview, value); }
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _preview, value);
+            this.RaisePropertyChanged(nameof(CanvasImage));
+        }
         get { return _preview; }
     }
+
+    /// <summary>What the map's canvas shows under the entities: the map from above, or the isometric view.</summary>
+    public WriteableBitmap? CanvasImage => _showIsometric && _terrainView is not null ? _isometricPreview : _preview;
 
     public Canvas CvEntity
     {
@@ -84,29 +97,61 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         get { return _selectedLayer == Layer.Height; }
     }
 
-    /// <summary>The preview's view: turned about the vertical axis (degrees, 0-359).</summary>
-    public double ViewYaw
+    /// <summary>The isometric view, drawn over the whole canvas of the map in its place (panned and zoomed with it).</summary>
+    public WriteableBitmap? IsometricPreview
     {
-        set { this.RaiseAndSetIfChanged(ref _viewYaw, value); }
-        get { return _viewYaw; }
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _isometricPreview, value);
+            this.RaisePropertyChanged(nameof(CanvasImage));
+        }
+        get { return _isometricPreview; }
     }
 
-    /// <summary>The preview's view: straight down on the map, else isometric.</summary>
-    public bool ViewTopDown
+    /// <summary>
+    /// The isometric view in place of the map from above, with the entities on it (true), or the map from above
+    /// (false). It is drawn only while it is shown.
+    /// </summary>
+    public bool ShowIsometric
     {
-        set { this.RaiseAndSetIfChanged(ref _viewTopDown, value); }
-        get { return _viewTopDown; }
+        set
+        {
+            if (_showIsometric == value)
+                return;
+            this.RaiseAndSetIfChanged(ref _showIsometric, value);
+            if (!value)
+            {
+                // back to the map from above: the entities and the cursor on its grid again
+                _terrainView = null;
+                this.RaisePropertyChanged(nameof(CanvasImage));
+                PlaceEntitiesAgain();
+            }
+            RefreshIsometricAsync();
+        }
+        get { return _showIsometric; }
     }
 
-    // looking straight down, or the isometric angle (atan(1 / sqrt 2))
-    private float ViewPitchDegrees => _viewTopDown ? 90.0f : IsometricTerrainRender.DefaultPitchDegrees;
-
-    /// <summary>Back to the isometric view.</summary>
-    public void ResetView()
+    /// <summary>
+    /// The isometric view's turn for its slider, in quarter turns (0-3): only these fixed angles, 90 degrees apart,
+    /// from the first view at 45 degrees.
+    /// </summary>
+    public double IsometricQuarterTurns
     {
-        ViewYaw = IsometricTerrainRender.DefaultYawDegrees;
-        ViewTopDown = false;
+        set
+        {
+            int turns = Math.Clamp((int)Math.Round(value), 0, 3);
+            if (turns == _isometricQuarterTurns)
+                return;
+            _isometricQuarterTurns = turns;
+            this.RaisePropertyChanged(nameof(IsometricQuarterTurns));
+            this.RaisePropertyChanged(nameof(IsometricAngle));
+            RefreshIsometricAsync();
+        }
+        get { return _isometricQuarterTurns; }
     }
+
+    /// <summary>How far the isometric view is turned from the first one, in degrees (0, 90, 180, 270).</summary>
+    public int IsometricAngle => _isometricQuarterTurns * 90;
 
     public bool ShowSwitchConnections
     {
@@ -222,20 +267,19 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             return new Point(Double.Round(value.X / Globals.SQUARE_SIZE, MidpointRounding.ToZero),
                 Double.Round(value.Y / Globals.SQUARE_SIZE, MidpointRounding.ToZero));
 
-        // the tile the preview shows under the cursor (the nearest one in front, behind hills too); off the terrain
-        // the cursor stays where it was
+        // the isometric view maximised: the tile it shows under the cursor (the nearest in front, so not one behind a
+        // hill); off the terrain the cursor stays where it was
         var tile = view.TileAtPixel(value.X / CanvasScaleX(view), value.Y / CanvasScaleY(view));
         return tile is null ? _cursorPosition : new Point(tile.Value.X, tile.Value.Y);
     }
 
-    // the preview image is drawn over the whole canvas (MAX_MAP_SIZE * SQUARE_SIZE square)
+    // the image is drawn over the whole canvas (MAX_MAP_SIZE * SQUARE_SIZE square)
     private static double CanvasScaleX(TerrainView view) => (double)(Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE) / view.OutputWidth;
     private static double CanvasScaleY(TerrainView view) => (double)(Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE) / view.OutputHeight;
 
     /// <summary>
-    /// The middle of a map tile (or any map point, in tiles) on the canvas, on the terrain as the preview shows it:
-    /// turned and tilted with it. Map points off the map (lines that wrap) are placed at the height of the tile they
-    /// wrap to.
+    /// The middle of a map tile (or any map point, in tiles) on the canvas: on the map from above, or on the terrain of the
+    /// isometric view while it is maximised (points off the map, of lines that wrap, at the height of the tile they wrap to).
     /// </summary>
     private Point TileToCanvas(double x, double y)
     {
@@ -246,7 +290,19 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         return new Point(px * CanvasScaleX(view), py * CanvasScaleY(view));
     }
 
-    /// <summary>A square on the ground, half the size across in tiles from the middle of the tile, as the preview shows it.</summary>
+    /// <summary>The entities and the selection placed again, on the UI thread (the view they are drawn on changed).</summary>
+    private void PlaceEntitiesAgain()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_cvEntity is null)
+                return;
+            RefreshEntities();
+            OnEntitySelected(_selectedEntityViewModel);
+        });
+    }
+
+    /// <summary>A square on the ground, half the size across in tiles from the middle of the tile, as the canvas shows it.</summary>
     private List<Point> GroundSquare(double x, double y, double half)
     {
         return new List<Point>
@@ -258,7 +314,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         };
     }
 
-    /// <summary>A circle on the ground round the middle of a tile, the radius in tiles, as the preview shows it.</summary>
+    /// <summary>A circle on the ground round the middle of a tile, the radius in tiles, as the canvas shows it.</summary>
     private List<Point> GroundCircle(double x, double y, double radius)
     {
         const int segments = 32;
@@ -299,11 +355,6 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             ShowSwitchConnections = !ShowSwitchConnections;
         });
-        // the preview redrawn once the view's angles stop changing (a slider sends every step of a drag)
-        this.WhenAnyValue(x => x.ViewYaw, x => x.ViewTopDown)
-            .Skip(1)
-            .Throttle(TimeSpan.FromMilliseconds(150))
-            .Subscribe(_ => RefreshPreviewAsync());
         _eventAggregator.RegisterEvent("OnToolSelected", (sender, args) =>
         {
             var modelId = (int?)args?.Item;
@@ -929,30 +980,61 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 if (map.Terrain is not null)
                 {
                     this.Log().Debug("Drawing Terrain...");
-                    var preview = new WriteableBitmap(new PixelSize(512, 512),
+                    var preview = new WriteableBitmap(new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
                         new Avalonia.Vector(96, 96),
                         PixelFormat.Rgba8888);
 
-                    BitmapUtils.SetBackground(new Rect(0, 0, 512, 512), new Color(0, 0, 0, 0), preview);
+                    BitmapUtils.SetBackground(new Rect(0, 0, Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE), new Color(0, 0, 0, 0), preview);
 
-                    var (bitmap, view) = await _terrainService.DrawTerrainViewAsync(preview, map, _selectedLayer, (float)_viewYaw, ViewPitchDegrees);
-                    Preview = bitmap;
-
-                    // the entities over it placed again with its view, on the UI thread (they are controls)
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        _terrainView = view;
-                        if (_cvEntity is null)
-                            return;
-                        RefreshEntities();
-                        OnEntitySelected(_selectedEntityViewModel);
-                    });
+                    Preview = await _terrainService.DrawBitmapAsync(preview, map, _selectedLayer);
                 }
 
                 this.Log().Debug("Preview refreshed");
             });
         }
+        RefreshIsometricAsync();
     }
+
+    /// <summary>
+    /// Draws the isometric view again (the terrain, its layer or its turn changed), unless it is hidden, over the whole
+    /// canvas of the map. Its own lock: turning it does not wait for the map from above. Only the newest drawing is
+    /// shown, if an older one finishes after it.
+    /// </summary>
+    protected void RefreshIsometricAsync()
+    {
+        if (!_showIsometric)
+            return;
+
+        lock (_lockIsometric)
+        {
+            float yaw = IsometricTerrainRender.DefaultYawDegrees + IsometricAngle;
+            int version = ++_isometricVersion;
+            Task.Run(async () =>
+            {
+                var map = _mapService.GetMap();
+                if (map.Terrain?.MapHeightmap_11B4E0 is null)
+                    return;
+
+                // the image on the map's canvas with the entities placed over it by its view (and the tiles picked in
+                // it), on the UI thread
+                var (bitmap, view) = await _terrainService.DrawIsometricViewAsync(map, _selectedLayer, IsometricSize, IsometricSize, yaw);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (version != _isometricVersion || !_showIsometric)
+                        return;
+                    _terrainView = view;
+                    IsometricPreview = bitmap;
+                    if (_cvEntity is null)
+                        return;
+                    RefreshEntities();
+                    OnEntitySelected(_selectedEntityViewModel);
+                });
+            });
+        }
+    }
+
+    // the isometric view's image: the size of the map's canvas (MAX_MAP_SIZE * SQUARE_SIZE), drawn on it in place of the map
+    public const int IsometricSize = Globals.MAX_MAP_SIZE * Globals.SQUARE_SIZE;
 
     protected void RefreshEntities()
     {

@@ -13,19 +13,19 @@ public interface ITerrainService
     /// loads. <paramref name="generated"/> itself is not changed (and is returned if there is nothing to build).
     /// </summary>
     Terrain BuildFeatures(Terrain generated, Domain.Map map);
+    /// <summary>Draws the map's terrain from above in the colours of its game (and, for MC2, its map type and fog).</summary>
+    Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Domain.Map map, Layer layer);
     /// <summary>
-    /// Draws the map's terrain in the colours of its game (and, for MC2, its map type and fog), viewed from
-    /// <paramref name="yawDegrees"/> about the vertical and <paramref name="pitchDegrees"/> down from the horizon (1-90).
-    /// The defaults are the isometric view (IsometricTerrainRender.DefaultYawDegrees / DefaultPitchDegrees).
+    /// The same map as <see cref="DrawBitmapAsync"/>, isometric (turned <paramref name="yawDegrees"/> about the vertical, 45
+    /// by default), in an image of the size given.
     /// </summary>
-    Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Domain.Map map, Layer layer,
-        float yawDegrees = 45.0f, float pitchDegrees = 35.264389f);
+    Task<WriteableBitmap> DrawIsometricAsync(Domain.Map map, Layer layer, int outputWidth, int outputHeight, float yawDegrees = 45.0f);
     /// <summary>
-    /// As <see cref="DrawBitmapAsync"/>, with the <see cref="Domain.TerrainView"/> of the image: how map points project
-    /// into it and which tile is at each pixel.
+    /// As <see cref="DrawIsometricAsync"/>, with the <see cref="Domain.TerrainView"/> of the image: where map points are in
+    /// it and which tile is at each pixel (to draw entities over it and pick them).
     /// </summary>
-    Task<(WriteableBitmap Bitmap, Domain.TerrainView View)> DrawTerrainViewAsync(WriteableBitmap bitmap, Domain.Map map, Layer layer,
-        float yawDegrees = 45.0f, float pitchDegrees = 35.264389f);
+    Task<(WriteableBitmap Bitmap, Domain.TerrainView View)> DrawIsometricViewAsync(Domain.Map map, Layer layer, int outputWidth,
+        int outputHeight, float yawDegrees = 45.0f);
     WriteableBitmap DrawIsometric(byte[] heightMap, WriteableBitmap texture, int outputWidth, int outputHeight,
         float yawDegrees = 45.0f, float pitchDegrees = 35.264389f);
     WriteableBitmap DrawBitmap(WriteableBitmap bitmap, Domain.Map map, Layer layer);

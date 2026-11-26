@@ -202,14 +202,22 @@ public class TerrainService : ITerrainService, IEnableLogger
         _ => Pallet
     };
 
-    public async Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Map map, Layer layer,
-        float yawDegrees = IsometricTerrainRender.DefaultYawDegrees, float pitchDegrees = IsometricTerrainRender.DefaultPitchDegrees)
+    public Task<WriteableBitmap> DrawBitmapAsync(WriteableBitmap bitmap, Map map, Layer layer)
     {
-        return (await DrawTerrainViewAsync(bitmap, map, layer, yawDegrees, pitchDegrees)).Bitmap;
+        return Task.Run(() =>
+        {
+            return DrawBitmap(bitmap, map, layer);
+        });
     }
 
-    public Task<(WriteableBitmap Bitmap, TerrainView View)> DrawTerrainViewAsync(WriteableBitmap bitmap, Map map, Layer layer,
-        float yawDegrees = IsometricTerrainRender.DefaultYawDegrees, float pitchDegrees = IsometricTerrainRender.DefaultPitchDegrees)
+    public async Task<WriteableBitmap> DrawIsometricAsync(Map map, Layer layer, int outputWidth, int outputHeight,
+        float yawDegrees = IsometricTerrainRender.DefaultYawDegrees)
+    {
+        return (await DrawIsometricViewAsync(map, layer, outputWidth, outputHeight, yawDegrees)).Bitmap;
+    }
+
+    public Task<(WriteableBitmap Bitmap, TerrainView View)> DrawIsometricViewAsync(Map map, Layer layer, int outputWidth, int outputHeight,
+        float yawDegrees = IsometricTerrainRender.DefaultYawDegrees)
     {
         return Task.Run(() =>
         {
@@ -219,9 +227,11 @@ public class TerrainService : ITerrainService, IEnableLogger
                 PixelFormat.Rgba8888,
                 AlphaFormat.Unpremul);
 
+            // the heights of the terrain as built (walls, paths, castles and buildings raised into it, as the colours
+            // DrawBitmap draws), not of the terrain as generated
             DrawBitmap(texture, map, layer);
-            return DrawIsometricView(map.GeneratedTerrain.MapHeightmap_11B4E0, texture, (int)bitmap.Size.Width, (int)bitmap.Size.Height,
-                yawDegrees, pitchDegrees);
+            return DrawIsometricView(map.Terrain.MapHeightmap_11B4E0, texture, outputWidth, outputHeight, yawDegrees,
+                IsometricTerrainRender.DefaultPitchDegrees);
         });
     }
 

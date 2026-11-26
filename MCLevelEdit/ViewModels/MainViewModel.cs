@@ -361,7 +361,7 @@ public class MainViewModel : ViewModelBase
             try
             {
                 WriteableBitmap preview = new WriteableBitmap(
-                    new PixelSize(512, 512),
+                    new PixelSize(Globals.MAX_MAP_SIZE, Globals.MAX_MAP_SIZE),
                     new Vector(96, 96),
                     PixelFormat.Rgba8888);
 
