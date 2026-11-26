@@ -12,7 +12,7 @@
              x:DataType="vm:MapEditorViewModel">
   <Grid Name="grdMapEditor"
         ColumnDefinitions="200,0,160,160,Auto,*,35,35,35,35,35,60"
-        RowDefinitions="30,*">
+        RowDefinitions="40,*">
     <CheckBox Name="chkShowHeightMap"
               Margin="4,1"
               Grid.Column="0"
