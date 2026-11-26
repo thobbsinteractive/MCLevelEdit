@@ -11,7 +11,7 @@
              x:Class="MCLevelEdit.Views.MapEditorView"
              x:DataType="vm:MapEditorViewModel">
   <Grid Name="grdMapEditor"
-        ColumnDefinitions="200,0,160,160,Auto,*,35,35,35,35,35,60"
+        ColumnDefinitions="200,130,160,160,Auto,*,35,35,35,35,35,60"
         RowDefinitions="40,*">
     <CheckBox Name="chkShowHeightMap"
               Margin="4,1"
@@ -19,6 +19,12 @@
               Grid.Row="0"
               IsChecked="{Binding ShowHeightMap}"
               Content="Show Heightmap"/>
+    <CheckBox Name="chkHideEntities"
+              Grid.Column="1"
+              Grid.Row="0"
+              ToolTip.Tip="Hide the entities from the map (the cursor still selects and places them)"
+              IsChecked="{Binding HideEntities}"
+              Content="Hide Entities"/>
     <CheckBox Name="chkShowConnections"
               Grid.Column="2"
               Grid.Row="0"

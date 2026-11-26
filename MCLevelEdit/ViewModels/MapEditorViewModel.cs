@@ -58,6 +58,9 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private int _isometricVersion;
     private readonly object _lockIsometric = new object();
 
+    // the entities drawn over the map (their shapes on the canvas shown), or hidden
+    private bool _showEntities = true;
+
     // while the isometric view is shown, how it was drawn: the entities are placed over it and tiles picked in it with
     // this (null for the map from above)
     private TerrainView? _terrainView;
@@ -78,8 +81,46 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public Canvas CvEntity
     {
-        set { this.RaiseAndSetIfChanged(ref _cvEntity, value); }
+        set
+        {
+            if (_cvEntity is not null)
+                _cvEntity.Children.CollectionChanged -= OnCanvasChildrenChanged;
+            this.RaiseAndSetIfChanged(ref _cvEntity, value);
+            if (_cvEntity is not null)
+                _cvEntity.Children.CollectionChanged += OnCanvasChildrenChanged;
+        }
         get { return _cvEntity; }
+    }
+
+    /// <summary>
+    /// Whether the entities are hidden from the map: their markers, areas, links and the selection. Hidden they can
+    /// still be selected and placed with the cursor.
+    /// </summary>
+    public bool HideEntities
+    {
+        set
+        {
+            if (_showEntities == !value)
+                return;
+            _showEntities = !value;
+            this.RaisePropertyChanged(nameof(HideEntities));
+            if (_cvEntity is null)
+                return;
+            foreach (var child in _cvEntity.Children)
+                if (child is not Image)
+                    child.IsVisible = _showEntities;
+        }
+        get { return !_showEntities; }
+    }
+
+    // the shapes the entities are drawn with (all the canvas but the map's image) shown or hidden as they are added
+    private void OnCanvasChildrenChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems is null)
+            return;
+        foreach (var item in e.NewItems)
+            if (item is Control control && control is not Image)
+                control.IsVisible = _showEntities;
     }
 
     public EntityViewModel SelectedEntityViewModel
