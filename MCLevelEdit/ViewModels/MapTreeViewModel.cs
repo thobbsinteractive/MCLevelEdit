@@ -116,16 +116,26 @@ public class MapTreeViewModel : ReactiveObject
         if(arg.Item is not null)
         {
             var cursorEvent = ((Point, bool, bool))arg.Item;
+
+            // a right click deselects, wherever it is (NodeSelected with none, so the map and the properties clear too)
+            if (cursorEvent.Item3)
+            {
+                if (SelectedNodes.Count > 0)
+                    SelectedNodes.Clear();
+                return;
+            }
+
             var world = Nodes?.Where(n => n.Name == "World").FirstOrDefault();
             if(world is not null)
             {
-                var entityNode = world?.SubNodes.Select(n => (EntityNode)n).Where(n => n.X == cursorEvent.Item1.X && n.Y == cursorEvent.Item1.Y).FirstOrDefault();
+                var entityNodes = world.SubNodes.OfType<EntityNode>().ToList();
+                var entityNode = entityNodes.Where(n => n.X == cursorEvent.Item1.X && n.Y == cursorEvent.Item1.Y).FirstOrDefault();
 
                 if(entityNode is null)
                 {
                     for (int i = 1; i < SELECTION_RADIUS; i++)
                     {
-                        entityNode = world?.SubNodes.Select(n => (EntityNode)n).Where(n => Vector2.Distance(new Vector2((float)cursorEvent.Item1.X, (float)cursorEvent.Item1.Y), new Vector2((float)n.X, (float)n.Y)) < i).FirstOrDefault();
+                        entityNode = entityNodes.Where(n => Vector2.Distance(new Vector2((float)cursorEvent.Item1.X, (float)cursorEvent.Item1.Y), new Vector2((float)n.X, (float)n.Y)) < i).FirstOrDefault();
                         if (entityNode is not null)
                             break;
                     }
@@ -133,6 +143,15 @@ public class MapTreeViewModel : ReactiveObject
 
                 if (entityNode is not null)
                 {
+                    // the entities on the square the click picked, lowest id first: the first click selects the lowest,
+                    // each next click on the square the next one, back round to the lowest after the last
+                    var onSquare = entityNodes
+                        .Where(n => n.X == entityNode.X && n.Y == entityNode.Y)
+                        .OrderBy(n => int.TryParse(n.Name, out int id) ? id : int.MaxValue)
+                        .ToList();
+                    int current = SelectedNodes.FirstOrDefault() is EntityNode selected ? onSquare.IndexOf(selected) : -1;
+                    entityNode = onSquare[(current + 1) % onSquare.Count];
+
                     SelectedNodes.Clear();
                     SelectedNodes.Add(entityNode);
                 }
