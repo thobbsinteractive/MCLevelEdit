@@ -136,6 +136,10 @@ public class MapTreeViewModel : ReactiveObject
                     SelectedNodes.Clear();
                     SelectedNodes.Add(entityNode);
                 }
+                else if (cursorEvent.Item2 && SelectedNodes.Count > 0)
+                {
+                    SelectedNodes.Clear();
+                }
             }
         }
     }
