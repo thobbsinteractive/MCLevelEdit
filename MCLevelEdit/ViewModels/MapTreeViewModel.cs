@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
@@ -37,6 +38,10 @@ public class MapTreeViewModel : ReactiveObject
     public ObservableCollection<Node> Nodes { get; } = new ObservableCollection<Node>();
     public ObservableCollection<Node> SelectedNodes { get; } = new ObservableCollection<Node>();
 
+    // the selection set from code (SelectEntities): the tree's nodes change without announcing each change, the whole
+    // selection is announced once after
+    private bool _suppressSelectionChanged;
+
     public MapTreeViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService)
     {
         _eventAggregator = eventAggregator;
@@ -66,6 +71,7 @@ public class MapTreeViewModel : ReactiveObject
         _eventAggregator.RegisterEvent("DeleteEntity", DeleteEntityHandler);
         _eventAggregator.RegisterEvent("RefreshWizards", RefreshWizardsHandler);
         _eventAggregator.RegisterEvent("OnCursorClicked", SelectNodeHandler);
+        _eventAggregator.RegisterEvent("SelectEntities", SelectEntitiesHandler);
 
         _entityFilter = 0;
         RefreshData();
@@ -311,6 +317,93 @@ public class MapTreeViewModel : ReactiveObject
 
     private void SelectedNodes_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        _eventAggregator.RaiseEvent("NodeSelected", this, new PubSubEventArgs<object>(SelectedNodes.FirstOrDefault()));
+        if (_suppressSelectionChanged)
+            return;
+
+        // one node (or none): as it always was
+        if (SelectedNodes.Count <= 1)
+        {
+            _eventAggregator.RaiseEvent("NodeSelected", this, new PubSubEventArgs<object>(SelectedNodes.FirstOrDefault()));
+            return;
+        }
+
+        // more than one: only the entities can be selected together (not the World, the Wizards or a wizard), the
+        // others are taken out of the selection once the tree has finished changing it
+        var entityNodes = SelectedNodes.OfType<EntityNode>().ToList();
+        if (entityNodes.Count < SelectedNodes.Count)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                var others = SelectedNodes.Where(n => n is not EntityNode).ToList();
+                if (others.Count == 0 || SelectedNodes.OfType<EntityNode>().Count() == 0)
+                    return;
+                _suppressSelectionChanged = true;
+                foreach (var other in others)
+                    SelectedNodes.Remove(other);
+                _suppressSelectionChanged = false;
+                PublishSelection(SelectedNodes.OfType<EntityNode>().Select(EntityNodeId).ToList());
+            });
+        }
+
+        if (entityNodes.Count == 0)
+            _eventAggregator.RaiseEvent("NodeSelected", this, new PubSubEventArgs<object>(SelectedNodes.FirstOrDefault()));
+        else
+            PublishSelection(entityNodes.Select(EntityNodeId).ToList());
+    }
+
+    private static int EntityNodeId(EntityNode node) => int.TryParse(node.Name, out int id) ? id : -1;
+
+    /// <summary>
+    /// The entities asked to be selected (by the box on the map or the entities table): (ids, add to the selection). The
+    /// tree's nodes are selected for those it lists (its type filter may hide some); all the ids are selected.
+    /// </summary>
+    private void SelectEntitiesHandler(object sender, PubSubEventArgs<object> args)
+    {
+        if (args.Item is not ValueTuple<IList<int>, bool> request)
+            return;
+
+        var ids = request.Item1.Where(id => id > 0).ToList();
+        if (request.Item2)
+            ids = SelectedNodes.OfType<EntityNode>().Select(EntityNodeId).Where(id => id > 0).Concat(ids).Distinct().ToList();
+
+        var world = GetWorldNode();
+        _suppressSelectionChanged = true;
+        SelectedNodes.Clear();
+        if (world is not null)
+        {
+            var idSet = ids.ToHashSet();
+            foreach (var node in world.SubNodes.OfType<EntityNode>().Where(n => idSet.Contains(EntityNodeId(n))))
+                SelectedNodes.Add(node);
+        }
+        _suppressSelectionChanged = false;
+
+        PublishSelection(ids);
+    }
+
+    /// <summary>
+    /// The selection announced: none or one entity as a selected node (NodeSelected, as when one node is clicked), more
+    /// than one as their ids (EntitiesSelected).
+    /// </summary>
+    private void PublishSelection(IList<int> ids)
+    {
+        if (ids.Count > 1)
+        {
+            _eventAggregator.RaiseEvent("EntitiesSelected", this, new PubSubEventArgs<object>(ids));
+            return;
+        }
+
+        Node? node = null;
+        if (ids.Count == 1)
+        {
+            node = GetEntityNodeById(ids[0]);
+            if (node is null)
+            {
+                // an entity the tree's filter hides: a node for it all the same, to select it by
+                var entity = _mapService.GetEntity((ushort)ids[0])?.ToEntityViewModel();
+                if (entity is not null)
+                    node = new EntityNode(this, entity.Id.ToString(), entity.X, entity.Y, GetIconFromEntity(entity), GetEntityNodeTitle(entity), string.Empty, GetEntityNodeToolTip(entity));
+            }
+        }
+        _eventAggregator.RaiseEvent("NodeSelected", this, new PubSubEventArgs<object>(node));
     }
 }

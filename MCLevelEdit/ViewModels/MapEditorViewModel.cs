@@ -38,6 +38,26 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private Layer _selectedLayer = Layer.Game;
     private bool _showSwitchConnections = false;
     private EntityViewModel? _selectedEntityViewModel = null;
+
+    // more than one entity selected together (empty while one or none is: _selectedEntityViewModel), each marked on the
+    // map by its own shape
+    private List<EntityViewModel> _selectedEntityViewModels = new List<EntityViewModel>();
+    private Dictionary<int, Shape> _multiSelectionShapes = new Dictionary<int, Shape>();
+
+    // the box dragged on the map to select the entities in it, and the tile the selection was last dragged to
+    private Rectangle? _selectionBox;
+    private Point _selectionDragLast;
+
+    /// <summary>What a left drag on the map does, decided when the button is pressed.</summary>
+    public enum DragMode
+    {
+        /// <summary>As it always did: the one entity selected moves with the cursor while it is near it.</summary>
+        Default,
+        /// <summary>The entities selected together move with the cursor, the same distance apart.</summary>
+        MoveSelection,
+        /// <summary>A box is drawn; the entities in it are selected when it is let go.</summary>
+        SelectionBox
+    }
     private Point? _pathOrigin = null;
 
     private Dictionary<int, List<Shape>> _entityShapes = new Dictionary<int, List<Shape>>();
@@ -244,12 +264,21 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         set { 
             this.RaiseAndSetIfChanged(ref _showSwitchConnections, value);
             RefreshEntities();
+            RedrawSelection();
         }
         get { return _showSwitchConnections; }
     }
 
     public void OnDeleteSelectedEntity()
     {
+        if (!_isInEntitySelectionMode && _selectedEntityViewModels.Count > 0)
+        {
+            foreach (var entity in _selectedEntityViewModels.ToList())
+                DeleteEntity(entity);
+            ClearMultiSelection();
+            return;
+        }
+
         if (!_isInEntitySelectionMode && _selectedEntityViewModel != null)
         {
             DeleteEntity(_selectedEntityViewModel);
@@ -259,6 +288,13 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
     public void OnMoveSelectedEntity(int moveX, int moveY)
     {
+        if (!_isInEntitySelectionMode && _selectedEntityViewModels.Count > 0)
+        {
+            MoveSelectedEntities(moveX, moveY);
+            _mapService.CommitTerrain();
+            return;
+        }
+
         if (!_isInEntitySelectionMode && _selectedEntityViewModel != null)
         {
             _selectedEntityViewModel.X += (byte)moveX;
@@ -287,6 +323,178 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             }
         }
     }
+
+    /// <summary>
+    /// The left button pressed on the map (a canvas point): what dragging it will do. Near one of the entities selected
+    /// together they move; near the one entity selected it moves as before; anywhere else a box selects.
+    /// </summary>
+    public DragMode BeginDrag(Point canvasPoint)
+    {
+        if (_isInEntitySelectionMode)
+            return DragMode.Default;
+
+        var tile = GetCursorPointFromCanvasPoint(canvasPoint);
+        var vTile = new Vector2((float)tile.X, (float)tile.Y);
+        bool Near(EntityViewModel e) => Vector2.Distance(vTile, new Vector2(e.X, e.Y)) < 4;
+
+        if (_selectedEntityViewModels.Count > 0)
+        {
+            if (_selectedEntityViewModels.Any(Near))
+            {
+                _selectionDragLast = tile;
+                return DragMode.MoveSelection;
+            }
+            return DragMode.SelectionBox;
+        }
+
+        if (_selectedEntityViewModel is not null && Near(_selectedEntityViewModel))
+            return DragMode.Default;
+
+        return DragMode.SelectionBox;
+    }
+
+    /// <summary>
+    /// The entities selected together dragged to a canvas point: each moved by as many tiles as the cursor moved since
+    /// the last time, so they stay the same distance apart. True if they moved.
+    /// </summary>
+    public bool OnSelectionDragged(Point canvasPoint)
+    {
+        var tile = GetCursorPointFromCanvasPoint(canvasPoint);
+        int dx = (int)(tile.X - _selectionDragLast.X);
+        int dy = (int)(tile.Y - _selectionDragLast.Y);
+        if (dx == 0 && dy == 0)
+            return false;
+        _selectionDragLast = tile;
+        // the terrain (walls, paths, buildings) is built once they are dropped
+        MoveSelectedEntities(dx, dy);
+        return true;
+    }
+
+    /// <summary>
+    /// Moves the entities selected together by a number of tiles, all by the same, round the edges of the map to the
+    /// other side where they go past them. The terrain is left to IMapService.CommitTerrain.
+    /// </summary>
+    private void MoveSelectedEntities(int dx, int dy)
+    {
+        if (dx == 0 && dy == 0)
+            return;
+        foreach (var entity in _selectedEntityViewModels.ToList())
+        {
+            entity.X = WrapTile(entity.X + dx);
+            entity.Y = WrapTile(entity.Y + dy);
+            UpdateEntity(entity, deferTerrain: true);
+        }
+    }
+
+    /// <summary>A tile coordinate wrapped round the map (it wraps at its edges).</summary>
+    public static byte WrapTile(int value) => (byte)(((value % Globals.MAX_MAP_SIZE) + Globals.MAX_MAP_SIZE) % Globals.MAX_MAP_SIZE);
+
+    /// <summary>The selection box drawn from where the drag started to where the cursor is (canvas points).</summary>
+    public void UpdateSelectionBox(Point start, Point end)
+    {
+        if (_cvEntity is null)
+            return;
+
+        if (_selectionBox is null)
+        {
+            _selectionBox = new Rectangle()
+            {
+                Stroke = new SolidColorBrush(Color.FromRgb(255, 255, 255), 1),
+                Fill = new SolidColorBrush(Color.FromRgb(255, 255, 255), 0.15),
+                StrokeThickness = 2,
+                StrokeDashArray = new Avalonia.Collections.AvaloniaList<double> { 4, 2 },
+                ZIndex = 300,
+                IsHitTestVisible = false
+            };
+        }
+        // (again, if the entities were drawn again since, which takes all but the map's image off the canvas)
+        if (!_cvEntity.Children.Contains(_selectionBox))
+        {
+            _cvEntity.Children.Add(_selectionBox);
+            // shown even while the entities are hidden
+            _selectionBox.IsVisible = true;
+        }
+
+        var rect = BoxRect(start, end);
+        Canvas.SetLeft(_selectionBox, rect.X);
+        Canvas.SetTop(_selectionBox, rect.Y);
+        _selectionBox.Width = rect.Width;
+        _selectionBox.Height = rect.Height;
+    }
+
+    /// <summary>The selection box taken off the map (the drag ended without it being let go on the map).</summary>
+    public void CancelSelectionBox()
+    {
+        if (_selectionBox is not null)
+            _cvEntity?.Children.Remove(_selectionBox);
+        _selectionBox = null;
+    }
+
+    /// <summary>
+    /// The selection box let go: the entities in it (where the map shows them) selected, added to those selected already
+    /// if asked to; none in it, and not added, deselects.
+    /// </summary>
+    public void EndSelectionBox(Point start, Point end, bool add)
+    {
+        CancelSelectionBox();
+        var rect = BoxRect(start, end);
+        IList<int> ids = _mapService.GetEntities()
+            .Where(e => rect.Contains(TileToCanvas(e.Position.X, e.Position.Y)))
+            .Select(e => e.Id)
+            .ToList();
+        _eventAggregator.RaiseEvent("SelectEntities", this, new PubSubEventArgs<object>((ids, add)));
+    }
+
+    /// <summary>
+    /// Ctrl+click on the map (a canvas point): the entity there added to the selection, or taken out of it. On a square
+    /// of several, each Ctrl+click adds the next not yet selected (lowest id first); once they all are, it takes them all
+    /// out. Off any entity the selection stays as it is. False while picking a switch's entities (a plain click then).
+    /// </summary>
+    public bool OnCursorCtrlClicked(Point canvasPoint)
+    {
+        if (_isInEntitySelectionMode)
+            return false;
+
+        var tile = GetCursorPointFromCanvasPoint(canvasPoint);
+        var entities = _mapService.GetEntities();
+
+        // the square clicked, else the nearest entity's square within the same reach a click has
+        var hit = entities.FirstOrDefault(e => e.Position.X == (int)tile.X && e.Position.Y == (int)tile.Y);
+        if (hit is null)
+        {
+            var vTile = new Vector2((float)tile.X, (float)tile.Y);
+            hit = entities
+                .Select(e => (Entity: e, Distance: Vector2.Distance(vTile, new Vector2(e.Position.X, e.Position.Y))))
+                .Where(x => x.Distance < 4)
+                .OrderBy(x => x.Distance)
+                .Select(x => x.Entity)
+                .FirstOrDefault();
+        }
+        if (hit is null)
+            return true;
+
+        var selected = _selectedEntityViewModels.Count > 0
+            ? _selectedEntityViewModels.Select(e => e.Id).ToList()
+            : _selectedEntityViewModel is not null ? new List<int> { _selectedEntityViewModel.Id } : new List<int>();
+
+        var onSquare = entities
+            .Where(e => e.Position.X == hit.Position.X && e.Position.Y == hit.Position.Y)
+            .Select(e => e.Id)
+            .OrderBy(id => id)
+            .ToList();
+        var next = onSquare.Where(id => !selected.Contains(id)).Cast<int?>().FirstOrDefault();
+        if (next is not null)
+            selected.Add(next.Value);
+        else
+            selected.RemoveAll(onSquare.Contains);
+
+        IList<int> ids = selected;
+        _eventAggregator.RaiseEvent("SelectEntities", this, new PubSubEventArgs<object>((ids, false)));
+        return true;
+    }
+
+    private static Rect BoxRect(Point a, Point b) =>
+        new Rect(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Abs(a.X - b.X), Math.Abs(a.Y - b.Y));
 
     /// <summary>The drag is over (the button released or the capture lost): the terrain is built with the entity where it was dropped.</summary>
     public void OnCursorDragEnded()
@@ -323,6 +531,95 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
         RefreshSelectedSwitch(entity);
         DrawSelectionCursorForEntity(entity);
+    }
+
+    /// <summary>The selection drawn again (the entities or the view they are drawn on changed): the one entity or all of them.</summary>
+    private void RedrawSelection()
+    {
+        if (_cvEntity is null)
+            return;
+        if (_selectedEntityViewModels.Count > 0)
+            DrawMultiSelection();
+        else
+            OnEntitySelected(_selectedEntityViewModel);
+    }
+
+    /// <summary>More than one entity selected (EntitiesSelected, their ids): each marked on the map, none on its own.</summary>
+    private void EntitiesSelectedHandler(object sender, PubSubEventArgs<object> args)
+    {
+        if (args.Item is not IList<int> ids)
+            return;
+        _isInEntitySelectionMode = false;
+
+        var entities = ids
+            .Select(id => _mapService.GetEntity((ushort)id)?.ToEntityViewModel())
+            .OfType<EntityViewModel>()
+            .ToList();
+
+        ClearMultiSelection();
+        if (entities.Count <= 1)
+        {
+            OnEntitySelected(entities.FirstOrDefault());
+            return;
+        }
+
+        OnEntitySelected(null);
+        _selectedEntityViewModels = entities;
+        DrawMultiSelection();
+    }
+
+    private void ClearMultiSelection()
+    {
+        if (_cvEntity is not null)
+            foreach (var shape in _multiSelectionShapes.Values)
+                _cvEntity.Children.Remove(shape);
+        _multiSelectionShapes.Clear();
+        _selectedEntityViewModels = new List<EntityViewModel>();
+    }
+
+    private void DrawMultiSelection()
+    {
+        if (_cvEntity is null)
+            return;
+        foreach (var shape in _multiSelectionShapes.Values)
+            _cvEntity.Children.Remove(shape);
+        _multiSelectionShapes.Clear();
+        foreach (var entity in _selectedEntityViewModels)
+            DrawMultiSelectionShape(entity);
+    }
+
+    /// <summary>The box round one of the entities selected together, where the map shows it (in place of its old one).</summary>
+    private void DrawMultiSelectionShape(EntityViewModel entity)
+    {
+        if (_cvEntity is null)
+            return;
+        if (_multiSelectionShapes.TryGetValue(entity.Id, out var old))
+            _cvEntity.Children.Remove(old);
+
+        var centre = TileToCanvas(entity.X, entity.Y);
+        var box = new Rectangle()
+        {
+            Width = 18,
+            Height = 18,
+            Stroke = new SolidColorBrush(Color.FromRgb(255, 255, 255), 1),
+            StrokeThickness = 2,
+            ZIndex = 200,
+            IsHitTestVisible = false
+        };
+        Canvas.SetLeft(box, centre.X - 9);
+        Canvas.SetTop(box, centre.Y - 9);
+        _multiSelectionShapes[entity.Id] = box;
+        _cvEntity.Children.Add(box);
+    }
+
+    /// <summary>One of the entities selected together changed (moved): the one selected kept up to date, its box moved.</summary>
+    private void UpdateMultiSelection(EntityViewModel entity)
+    {
+        int index = _selectedEntityViewModels.FindIndex(e => e.Id == entity.Id);
+        if (index < 0)
+            return;
+        _selectedEntityViewModels[index] = entity;
+        DrawMultiSelectionShape(entity);
     }
 
     public Point CursorPosition
@@ -384,7 +681,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             if (_cvEntity is null)
                 return;
             RefreshEntities();
-            OnEntitySelected(_selectedEntityViewModel);
+            RedrawSelection();
         });
     }
 
@@ -429,6 +726,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         _eventAggregator.RegisterEvent("DeleteEntity", DeleteEntityHandler);
         _eventAggregator.RegisterEvent("RefreshTerrain", RefreshDataHandler);
         _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
+        _eventAggregator.RegisterEvent("EntitiesSelected", EntitiesSelectedHandler);
         _eventAggregator.RegisterEvent("KeyPressed", KeyPressedHandler);
         _eventAggregator.RegisterEvent("UpdateWizard", UpdateWizardsHandler);
         _eventAggregator.RegisterEvent("SwitchLayer", (sender, args) =>
@@ -481,7 +779,11 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 {
                     RefreshWallsAndPaths();
                 }
-                OnEntitySelected(entityViewModel);
+                // more than one selected: the one changed kept in the selection, else it is the one selected
+                if (_selectedEntityViewModels.Count > 0)
+                    UpdateMultiSelection(entityViewModel);
+                else
+                    OnEntitySelected(entityViewModel);
             }
         }
     }
@@ -634,6 +936,10 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                     RefreshWallsAndPaths();
                 }
                 OnEntitySelected(null);
+                // gone from the entities selected together too
+                if (_multiSelectionShapes.Remove(entityViewModel.Id, out var box))
+                    _cvEntity?.Children.Remove(box);
+                _selectedEntityViewModels.RemoveAll(e => e.Id == entityViewModel.Id);
             }
         }
     }
@@ -642,6 +948,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     {
         bool deselect = true;
         _isInEntitySelectionMode = false;
+        // one node selected (or none): no longer more than one entity
+        ClearMultiSelection();
 
         if (arg.Item is not null)
         {
@@ -1119,7 +1427,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                     if (!_showIsometric || _cvEntity is null)
                         return;
                     RefreshEntities();
-                    OnEntitySelected(_selectedEntityViewModel);
+                    RedrawSelection();
                 });
             });
         }

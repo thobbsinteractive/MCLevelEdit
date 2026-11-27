@@ -33,7 +33,7 @@
               Grid.Row="2"
               ItemsSource="{Binding Nodes}"
               SelectedItems="{Binding SelectedNodes}"
-              SelectionMode="Single">
+              SelectionMode="Multiple">
       <TreeView.ItemTemplate>
         <TreeDataTemplate ItemsSource="{Binding SubNodes}">
           <Border HorizontalAlignment="Left"

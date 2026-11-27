@@ -125,6 +125,17 @@ namespace MCLevelEdit.Views
             ResetView();
         }
 
+        // what the left drag does (decided when it is pressed), where it was pressed (on the canvas and in this view),
+        // whether the selection box is out (the cursor went far enough) and whether the entities selected moved
+        private MapEditorViewModel.DragMode _dragMode = MapEditorViewModel.DragMode.Default;
+        private Point _ptPressCanvas;
+        private Point _ptPressView;
+        private bool _boxActive;
+        private bool _selectionMoved;
+
+        // how far (in pixels on the screen) the cursor goes before a press becomes a selection box, not a click
+        private const double BoxStartDistance = 4;
+
         private void OnPazMap_PointerPressed(object? sender, PointerPressedEventArgs e)
         {
             var point = e.GetCurrentPoint(sender as Control);
@@ -132,6 +143,11 @@ namespace MCLevelEdit.Views
             if (point.Properties.IsLeftButtonPressed)
             {
                 _ptCursorDragStart = new Point(_ptCursor.X, _ptCursor.Y);
+                _ptPressCanvas = GetCursorPoint(e);
+                _ptPressView = e.GetPosition(this);
+                _boxActive = false;
+                _selectionMoved = false;
+                _dragMode = VmMapEditor?.BeginDrag(_ptPressCanvas) ?? MapEditorViewModel.DragMode.Default;
             }
         }
 
@@ -146,6 +162,11 @@ namespace MCLevelEdit.Views
             if (_ptCursorDragStart is null)
                 return;
             _ptCursorDragStart = null;
+            if (_boxActive)
+                VmMapEditor?.CancelSelectionBox();
+            _boxActive = false;
+            _selectionMoved = false;
+            _dragMode = MapEditorViewModel.DragMode.Default;
             VmMapEditor?.OnCursorDragEnded();
         }
 
@@ -153,12 +174,29 @@ namespace MCLevelEdit.Views
         {
             if (e.InitialPressMouseButton == MouseButton.Left || e.InitialPressMouseButton == MouseButton.Right)
             {
+                // a box let go selects what is in it, the entities selected dropped where they were dragged: not clicks
+                bool boxReleased = _boxActive && e.InitialPressMouseButton == MouseButton.Left;
+                bool selectionDropped = _selectionMoved && e.InitialPressMouseButton == MouseButton.Left;
                 EndDrag();
                 _ptCursor = GetCursorPoint(e);
                 if (VmMapEditor != null)
                 {
                     VmMapEditor.CursorPosition = _ptCursor;
-                    VmMapEditor.OnCursorClicked(VmMapEditor.CursorPosition, e.InitialPressMouseButton == MouseButton.Left, e.InitialPressMouseButton == MouseButton.Right);
+                    if (boxReleased)
+                    {
+                        // Ctrl or Shift held: added to those selected already
+                        bool add = e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+                        VmMapEditor.EndSelectionBox(_ptPressCanvas, _ptCursor, add);
+                    }
+                    else if (!selectionDropped)
+                    {
+                        // Ctrl+click: the entity there added to the selection or taken out of it
+                        if (e.InitialPressMouseButton == MouseButton.Left && e.KeyModifiers.HasFlag(KeyModifiers.Control)
+                            && VmMapEditor.OnCursorCtrlClicked(_ptCursor))
+                            return;
+
+                        VmMapEditor.OnCursorClicked(VmMapEditor.CursorPosition, e.InitialPressMouseButton == MouseButton.Left, e.InitialPressMouseButton == MouseButton.Right);
+                    }
                 }
             }
         }
@@ -171,7 +209,25 @@ namespace MCLevelEdit.Views
                 VmMapEditor.CursorPosition = _ptCursor;
 
                 if (_ptCursorDragStart is not null)
-                    VmMapEditor.OnCursorDragged((Point)_ptCursorDragStart, _ptCursor);
+                {
+                    switch (_dragMode)
+                    {
+                        case MapEditorViewModel.DragMode.SelectionBox:
+                            var ptView = e.GetPosition(this);
+                            if (!_boxActive && Math.Abs(ptView.X - _ptPressView.X) + Math.Abs(ptView.Y - _ptPressView.Y) > BoxStartDistance)
+                                _boxActive = true;
+                            if (_boxActive)
+                                VmMapEditor.UpdateSelectionBox(_ptPressCanvas, _ptCursor);
+                            break;
+                        case MapEditorViewModel.DragMode.MoveSelection:
+                            if (VmMapEditor.OnSelectionDragged(_ptCursor))
+                                _selectionMoved = true;
+                            break;
+                        default:
+                            VmMapEditor.OnCursorDragged((Point)_ptCursorDragStart, _ptCursor);
+                            break;
+                    }
+                }
             }
         }
 

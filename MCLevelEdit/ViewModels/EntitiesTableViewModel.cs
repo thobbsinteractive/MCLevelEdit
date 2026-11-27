@@ -68,6 +68,17 @@ namespace MCLevelEdit.ViewModels
         {
             IsSelected = entityViewModels?.Count > 0;
             _selectedEntityViewModels = entityViewModels;
+
+            // the rows selected are the entities selected in the editor too (one as when it is clicked, more together)
+            if (entityViewModels?.Count > 0)
+                SelectInEditor();
+        }
+
+        private void SelectInEditor()
+        {
+            var ids = _selectedEntityViewModels?.Select(e => e.Id).Where(id => id > 0).ToList();
+            if (ids?.Count > 0)
+                _eventAggregator.RaiseEvent("SelectEntities", this, new PubSubEventArgs<object>(((IList<int>)ids, false)));
         }
 
         public void OnCboEntityTypeSelectionChanged(int index)
@@ -80,6 +91,8 @@ namespace MCLevelEdit.ViewModels
         public void OnUnload()
         {
             UpdateEntities();
+            // the entities written back refresh the editor, which clears its selection: the rows selected are selected again
+            SelectInEditor();
         }
 
         public void RefreshData()
