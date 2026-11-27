@@ -1,11 +1,12 @@
 # Magic Carpet Level Editor (MCLevelEdit)
-A C# Level Editor for the Bullfrog Productions game Magic Carpet. 30 years late, but better late than never. It is written in Avalonia and C#. Currently this only works for the original Magic Carpet (but ironically uses the MC2 terrain generation algorithem). In the future versions, Hidden worlds should be possible.
+## Now works with Hidden Worlds and Magic Carpet 2!
+A C# Level Editor for the Bullfrog Productions game Magic Carpet. 30 years late, but better late than never. It is written in Avalonia and C#.
 
 Without Moburma's research and his original repo https://github.com/Moburma/MCLevelEdit this could not have been written. The Level Packager and Loading and Saving code is converted from Moburma's.
 
 Magic Carpet 2 level support is based on the level structures in remc2 (https://github.com/thobbsinteractive/magic-carpet-2-hd), and many MC2 entity and spell names come from turican0's MagicBalls editor (https://github.com/turican0/MagicBalls).
 ### Join us on discord: [https://discord.gg/W68ZWrngER](https://discord.gg/W68ZWrngER)
-![Example Screenshot](MCLevelEdit.png)
+<img width="2859" height="1636" alt="MC2" src="https://github.com/user-attachments/assets/fc7fc38d-f68d-400e-8e73-281b469a02c9" />
 
 Map Key:<br/>
 Red - Creature (enemies but also villagers)<br/>
@@ -31,8 +32,8 @@ https://github.com/thobbsinteractive/MCLevelEdit/releases/latest
 ## Creating a Campaign
 * Using the new "Package Levels" option, you can put together a number of Levels that will run one after the other. This allows you to construct a small campaign. Spells collected will be persisted level to level in Magic Carpet until 27, at this point we believe the spells you start with are hard coded. 
 
-## Editing Magic Carpet 1 Levels
-* If you want to load and edit the Magic Carpet 1 or Hidden Worlds Levels, you can now extract them using the "Unpack Levels" option in the Game menu.
+## Editing Magic Carpet 1 and 2 Levels
+* If you want to load and edit the Magic Carpet 1, Hidden Worlds or Magic Carpet 2 Levels, you can now extract them using the "Unpack Levels" option in the Game menu.
 
 ## Entities and attributes
 For information on game entities and attributes, see [here](https://tcrf.net/Notes:Magic_Carpet_(DOS)) and [here](https://github.com/michaelhoward/MagicCarpetFileFormat/blob/master/magic%20carpet%20file%20format.txt).
@@ -51,8 +52,8 @@ For information on game entities and attributes, see [here](https://tcrf.net/Not
 - [x] Adding decompression and extraction of levels to the PagkageAdapter so you can directly open from the Editor
 
 ## MILESTONE 3
-- [ ] Implement editing and running Hidden Worlds
-- [ ] Reverse engineer the MC1 terrain generation as there are slight differences (snow for instance)
+- [x] Implement editing and running Hidden Worlds
+- [x] Reverse engineer the MC1 terrain generation as there are slight differences (snow for instance)
 
 ## Build Status:
 
