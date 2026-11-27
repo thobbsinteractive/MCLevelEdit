@@ -4,8 +4,8 @@ using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Utils;
 using MCLevelEdit.Views;
-using Microsoft.Extensions.Logging;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using ReactiveUI;
@@ -23,36 +23,46 @@ namespace MCLevelEdit.ViewModels
         protected readonly ISettingsPort _settingsPort;
         protected readonly IGameService _gameService;
 
+        private const string GOG_ROOT = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\";
+        private const string GOG_ARGS = @"-conf ""..\dosboxMC.conf"" -conf ""..\dosboxMC_single.conf"" -noconsole -c ""exit""";
+        private const string CLASSIC_EXE = @"C:\Program Files (x86)\DOSBox-0.74-3\DOSBox.exe";
+        private const string CLASSIC_ARGS = @"-conf ""C:\CARPET\dosboxMC.conf""";
+
+        private static readonly DosGameDefaults Mc1GogDefaults = new(
+            GOG_ROOT + @"DOSBOX\DOSBox.exe",
+            GOG_ARGS,
+            GOG_ROOT + @"CARPET.CD\LEVELS\",
+            GOG_ROOT + @"cloud_saves\CARPET.CD\LEVELS\",
+            GOG_ROOT + @"CARPET.CD\LEVELS\BACKUP\");
+
+        private static readonly DosGameDefaults Mc1ClassicDefaults = new(
+            CLASSIC_EXE,
+            CLASSIC_ARGS,
+            @"C:\CARPET\CARPET.CD\LEVELS\",
+            string.Empty,
+            @"C:\CARPET\CARPET.CD\LEVELS\BACKUP\");
+
+        // Hidden Worlds (the data disk) ships in the same install as Magic Carpet: its levels are DDLEVELS.DAT
+        // in the same LEVELS folder, so the folders match Magic Carpet's. Backups are named after the file
+        // (DDLEVELS.DAT.BK), so sharing the backup folder is safe.
+        // The launch is the same too: the game asks the player whether to play Magic Carpet or Hidden Worlds.
+        private static readonly DosGameDefaults HiddenWorldsGogDefaults = Mc1GogDefaults;
+        private static readonly DosGameDefaults HiddenWorldsClassicDefaults = Mc1ClassicDefaults;
+
+        // Tab order in the dialog
+        private static readonly GameTarget[] TabGames = { GameTarget.MagicCarpet1, GameTarget.HiddenWorlds, GameTarget.MagicCarpet2 };
+
         private string[] _levelPaths;
-        private bool _gameIsClassic = false;
+        private string _mc2ExePath;
+        private int _selectedGameTabIndex;
 
-        private string _defaultClassicArgs = @"-conf ""C:\CARPET\dosboxMC.conf""";
-        private string _defaultClassicExePath = @"C:\Program Files (x86)\DOSBox-0.74-3\DOSBox.exe";
-        private string _defaultClassicLevelsPath = @"C:\CARPET\CARPET.CD\LEVELS\";
-        private string _defaultClassicLevelsBackupPath = @"C:\CARPET\CARPET.CD\LEVELS\BACKUP\";
-
-        private string _defaultGoGArgs = @"-conf ""..\dosboxMC.conf"" -conf ""..\dosboxMC_single.conf"" -noconsole -c ""exit""";
-        private string _defaultGoGExePath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\DOSBOX\DOSBox.exe";
-        private string _defaultGoGLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\";
-        private string _defaultGoGLevelsBackupPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\CARPET.CD\LEVELS\BACKUP\";
-        private string _defaultGoGCloudLevelsPath = @"C:\Program Files (x86)\GOG Galaxy\Games\Magic Carpet Plus\cloud_saves\CARPET.CD\LEVELS\";
-
-        private string _gameExePath;
-        private string _gameExeArgs;
-        private string _gameLevelsPath;
-        private string _gameCloudLevelsPath;
-        private string _gameLevelsBackupPath;
+        public DosGameSettingsViewModel MagicCarpet1 { get; }
+        public DosGameSettingsViewModel HiddenWorlds { get; }
 
         public ICommand RunLevelCommand { get; }
         public ICommand CheckLevelCommand { get; }
-        public ICommand SetDefaultsCommand { get; }
-
         public ICommand SelectLevelsCommand { get; }
-        public ICommand SelectGameFolderCommand { get; }
-        public ICommand SelectLevelsFolderCommand { get; }
-        public ICommand SelectCloudLevelsFolderCommand { get; }
-        public ICommand SelectBackupLevelsFolderCommand { get; }
-
+        public ICommand SelectMc2ExeCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand RestoreCommand { get; }
         public ICommand BackupCommand { get; }
@@ -61,46 +71,45 @@ namespace MCLevelEdit.ViewModels
         public string LevelPathsString => _levelPaths is not null ? string.Join(",", _levelPaths) : string.Empty;
         public bool CanRun => _levelPaths?.Length > 0;
 
+        /// <summary>Tab 0 = Magic Carpet, 1 = Hidden Worlds (both DOSBox), 2 = Magic Carpet 2 (Remc2).</summary>
+        public int SelectedGameTabIndex
+        {
+            get => _selectedGameTabIndex;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedGameTabIndex, value);
+                this.RaisePropertyChanged(nameof(IsMagicCarpet2));
+                this.RaisePropertyChanged(nameof(IsDosGame));
+                this.RaisePropertyChanged(nameof(CanRun));
+            }
+        }
+
+        /// <summary>Shows the tab for a game.</summary>
+        public void SelectGame(GameTarget game) =>
+            SelectedGameTabIndex = System.Math.Max(0, System.Array.IndexOf(TabGames, game));
+
+        public GameTarget SelectedGame => TabGames[System.Math.Clamp(_selectedGameTabIndex, 0, TabGames.Length - 1)];
+        public bool IsMagicCarpet2 => SelectedGame == GameTarget.MagicCarpet2;
+        public bool IsDosGame => !IsMagicCarpet2;
+
+        /// <summary>The DOSBox settings on the selected tab, or null for Magic Carpet 2.</summary>
+        public DosGameSettingsViewModel? SelectedDosGame => SelectedGame switch
+        {
+            GameTarget.HiddenWorlds => HiddenWorlds,
+            GameTarget.MagicCarpet2 => null,
+            _ => MagicCarpet1
+        };
+
+        public string Mc2ExePath
+        {
+            get => _mc2ExePath;
+            set => this.RaiseAndSetIfChanged(ref _mc2ExePath, value);
+        }
+
         public string[] LevelPaths
         {
             get => _levelPaths;
             set => this.RaiseAndSetIfChanged(ref _levelPaths, value);
-        }
-
-        public bool GameIsClassic
-        {
-            get => _gameIsClassic;
-            set => this.RaiseAndSetIfChanged(ref _gameIsClassic, value);
-        }
-
-        public string GameExePath
-        {
-            get => _gameExePath;
-            set => this.RaiseAndSetIfChanged(ref _gameExePath, value);
-        }
-
-        public string GameExeArgs
-        {
-            get => _gameExeArgs;
-            set => this.RaiseAndSetIfChanged(ref _gameExeArgs, value);
-        }
-
-        public string GameLevelsPath
-        {
-            get => _gameLevelsPath;
-            set => this.RaiseAndSetIfChanged(ref _gameLevelsPath, value);
-        }
-
-        public string GameCloudLevelsPath
-        {
-            get => _gameCloudLevelsPath;
-            set => this.RaiseAndSetIfChanged(ref _gameCloudLevelsPath, value);
-        }
-
-        public string GameLevelsBackupPath
-        {
-            get => _gameLevelsBackupPath;
-            set => this.RaiseAndSetIfChanged(ref _gameLevelsBackupPath, value);
         }
 
         public EditGameSettingsViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IGameService gameService)
@@ -113,74 +122,35 @@ namespace MCLevelEdit.ViewModels
 
             LevelPaths = new string[] { _settingsPort.CurrentLevelFilePath };
 
+            MagicCarpet1 = new DosGameSettingsViewModel("Magic Carpet", LevelsFile.MAGIC_CARPET, gameService, settings?.MagicCarpet1, Mc1GogDefaults, Mc1ClassicDefaults);
+            HiddenWorlds = new DosGameSettingsViewModel("Hidden Worlds", LevelsFile.HIDDEN_WORLDS, gameService, settings?.HiddenWorlds, HiddenWorldsGogDefaults, HiddenWorldsClassicDefaults);
+            MagicCarpet1.SaveRequested = SaveLevelPaths;
+            HiddenWorlds.SaveRequested = SaveLevelPaths;
+
             if (settings != null)
             {
-                var gameExePath = settings.GameExeLocation;
-
-                GameIsClassic = settings.IsForClassic;
-
-                if (!string.IsNullOrEmpty(gameExePath))
-                {
-                    GameExePath = gameExePath;
-                }
-
-                var gameArgs = settings.GameArgs;
-
-                if (!string.IsNullOrEmpty(gameArgs))
-                {
-                    GameExeArgs = gameArgs;
-                }
-
-                var gameLevelsBackupPath = settings.GameBackupFolder;
-                if (!string.IsNullOrEmpty(gameLevelsBackupPath))
-                {
-                    GameLevelsBackupPath = gameLevelsBackupPath;
-                }
-
-                var gameLevelFolders = settings.GameLevelFolders;
-
-                if (gameLevelFolders.Any())
-                {
-                    if (gameLevelFolders.Length > 0)
-                        GameLevelsPath = gameLevelFolders[0];
-
-                    if (!settings.IsForClassic && gameLevelFolders.Length > 1)
-                        GameCloudLevelsPath = gameLevelFolders[1];
-                }
-            }
-            else
-            {
-                SetDefaultPaths();
+                SelectedGameTabIndex = System.Math.Max(0, System.Array.IndexOf(TabGames, settings.SelectedGame));
+                Mc2ExePath = settings.Mc2ExeLocation;
             }
 
-            SelectLevelsCommand = ReactiveCommand.CreateFromTask(async () =>
-            {
-                await SelectLevelFiles();
-            });
+            SelectLevelsCommand = ReactiveCommand.CreateFromTask(SelectLevelFiles);
+            SelectMc2ExeCommand = ReactiveCommand.CreateFromTask(SelectMc2Exe);
 
-            SelectGameFolderCommand = ReactiveCommand.CreateFromTask(async () =>
+            RunLevelCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                await SelectGameLauncher();
-            });
-
-            SelectLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () =>
-            {
-                await SelectLevelsFolder();
-            });
-
-            SelectCloudLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () =>
-            {
-                await SelectCloudLevelsFolder();
-            });
-
-            SelectBackupLevelsFolderCommand = ReactiveCommand.CreateFromTask(async () =>
-            {
-                await SelectBackupLevelsFolder();
-            });
-
-            RunLevelCommand = ReactiveCommand.CreateFromTask(async() =>
-            {
-                if (await CheckForGameLaunch() && await SaveLevelPaths() && await BackupLevels())
+                var dosGame = SelectedDosGame;
+                if (dosGame is null)
+                {
+                    if (await CheckForMc2Launch() && await SaveLevelPaths())
+                    {
+                        if (!await _gameService.RunLevelFromSettings(LevelPaths))
+                        {
+                            var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error launching Magic Carpet 2 HD!", ButtonEnum.Ok, Icon.Error);
+                            await box.ShowAsPopupAsync(TopLevel);
+                        }
+                    }
+                }
+                else if (await dosGame.CheckForGameLaunch(LevelPaths) && await SaveLevelPaths() && await dosGame.BackupLevels())
                 {
                     if (!await _gameService.RunLevelFromSettings(LevelPaths))
                     {
@@ -190,14 +160,14 @@ namespace MCLevelEdit.ViewModels
                 }
             });
 
-            CheckLevelCommand = ReactiveCommand.CreateFromTask(async() =>
+            CheckLevelCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                if (await CheckForGameLaunch())
+                var dosGame = SelectedDosGame;
+                if (dosGame is null ? await CheckForMc2Launch() : await dosGame.CheckForGameLaunch(LevelPaths))
                 {
                     var box = MessageBoxManager.GetMessageBoxStandard("Success", $"All paths correct", ButtonEnum.Ok, Icon.Info);
                     await box.ShowAsPopupAsync(TopLevel);
                 }
-
             });
 
             SaveCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -211,199 +181,77 @@ namespace MCLevelEdit.ViewModels
 
             BackupCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                if (await CheckGameLevelPaths())
+                var dosGame = SelectedDosGame;
+                if (dosGame is not null && await dosGame.CheckGameLevelPaths() && await dosGame.BackupLevels())
                 {
-                    if (await BackupLevels())
-                    {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Backup complete", ButtonEnum.Ok, Icon.Info);
-                        await box.ShowAsPopupAsync(TopLevel);
-                    }
+                    var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Backup complete", ButtonEnum.Ok, Icon.Info);
+                    await box.ShowAsPopupAsync(TopLevel);
                 }
             });
 
             RestoreCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                await RestoreLevels();
-            });
-
-            SetDefaultsCommand = ReactiveCommand.CreateFromTask(async () =>
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Restore Defaults", $"Restoring defaults will clear your current settings, Are you sure?", ButtonEnum.YesNo, Icon.Question);
-                var result = await box.ShowAsPopupAsync(TopLevel);
-                if (result == ButtonResult.Yes)
-                {
-                    SetDefaultPaths();
-                    await SaveLevelPaths();
-                }
+                var dosGame = SelectedDosGame;
+                if (dosGame is not null)
+                    await dosGame.RestoreLevels();
             });
         }
 
         public void SetLevelPaths(string[] levelPaths)
         {
             LevelPaths = levelPaths;
-        
+
             this.RaisePropertyChanged(nameof(LevelPathsString));
             this.RaisePropertyChanged(nameof(CanRun));
         }
 
-        private void SetDefaultPaths()
-        {
-            if (this.GameIsClassic)
-            {
-                GameExePath = _defaultClassicExePath;
-                GameExeArgs = _defaultClassicArgs;
-                GameLevelsPath = _defaultClassicLevelsPath;
-                GameCloudLevelsPath = string.Empty;
-                GameLevelsBackupPath = _defaultClassicLevelsBackupPath;
-            }
-            else
-            {
-                GameExePath = _defaultGoGExePath;
-                GameExeArgs = _defaultGoGArgs;
-                GameLevelsPath = _defaultGoGLevelsPath;
-                GameCloudLevelsPath = _defaultGoGCloudLevelsPath;
-                GameLevelsBackupPath = _defaultGoGLevelsBackupPath;
-            }
-        }
-
         private async Task SelectLevelFiles()
         {
-            // Start async operation to open the dialog.
             var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Select Levels to Package and run",
-                AllowMultiple = true
+                AllowMultiple = true,
+                SuggestedStartLocation = await PickerStartFolder.GetAsync(TopLevel.StorageProvider, LevelPaths?.FirstOrDefault())
             });
 
             if (files != null)
             {
-                LevelPaths = files.Select(f => f.Path.LocalPath).ToArray();
-                SetLevelPaths(LevelPaths);
+                SetLevelPaths(files.Select(f => f.Path.LocalPath).ToArray());
             }
         }
 
-        private async Task SelectGameLauncher()
+        private async Task SelectMc2Exe()
         {
-            // Start async operation to open the dialog.
             var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = "Select Magic Carpet Laucher",
-                AllowMultiple = false
+                Title = "Select Magic Carpet 2 HD executable",
+                AllowMultiple = false,
+                SuggestedStartLocation = await PickerStartFolder.GetAsync(TopLevel.StorageProvider, Mc2ExePath)
             });
 
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
             {
-                GameExePath = files[0].Path.LocalPath;
+                Mc2ExePath = files[0].Path.LocalPath;
             }
         }
 
-        private async Task SelectLevelsFolder()
+        private async Task<bool> CheckForMc2Launch()
         {
-            // Start async operation to open the dialog.
-            var folder = await TopLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
-            {
-                Title = "Select Levels Directory",
-                AllowMultiple = false
-            });
+            string? error = null;
+            var levelPath = LevelPaths?.FirstOrDefault();
 
-            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
-            {
-                GameLevelsPath = folder[0].Path.LocalPath;
-            }
-        }
-
-        private async Task SelectCloudLevelsFolder()
-        {
-            // Start async operation to open the dialog.
-            var folder = await TopLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
-            {
-                Title = "Select Levels Directory",
-                AllowMultiple = false
-            });
-
-            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
-            {
-                GameCloudLevelsPath = folder[0].Path.LocalPath;
-            }
-        }
-
-        private async Task SelectBackupLevelsFolder()
-        {
-            // Start async operation to open the dialog.
-            var folder = await TopLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
-            {
-                Title = "Select Backup Directory for Levels",
-                AllowMultiple = false
-            });
-
-            if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))
-            {
-                GameLevelsBackupPath = folder[0].Path.LocalPath;
-            }
-        }
-
-        private async Task<bool> CheckForGameLaunch()
-        {
-            if (_levelPaths?.Length > 0 && File.Exists(LevelPaths[0]))
-            {
-                if (File.Exists(GameExePath))
-                {
-                    return await CheckGameLevelPaths();
-                }
-                else
-                {
-                    this.Log().Error($"Game Exe/lnk not found! Please re-check!");
-                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Game Exe/lnk not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                    await box.ShowAsPopupAsync(TopLevel);
-                }
-            }
+            if (string.IsNullOrWhiteSpace(Mc2ExePath) || !File.Exists(Mc2ExePath))
+                error = "Magic Carpet 2 HD exe not found! Please re-check!";
+            else if (string.IsNullOrWhiteSpace(levelPath) || !File.Exists(levelPath))
+                error = "No Level selected to run! Please re-check!";
+            else if (LevelFormat.DetectFromFileSize(new FileInfo(levelPath).Length) != GameVersion.MagicCarpet2)
+                error = "The selected level is not a Magic Carpet 2 level! Please re-check!";
             else
-            {
-                this.Log().Error($"No Level selected to run! Please re-check!");
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"No Level selected to run! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                await box.ShowAsPopupAsync(TopLevel);
-            }
-            return false;
-        }
+                return true;
 
-        private async Task<bool> CheckGameLevelPaths()
-        {
-            if (Directory.Exists(GameLevelsPath))
-            {
-                if (!string.IsNullOrWhiteSpace(GameLevelsBackupPath))
-                {
-                    if (!GameIsClassic)
-                    {
-                        if (Directory.Exists(GameCloudLevelsPath))
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            this.Log().Error($"LEVELS GOG cloud directory not found! Please re-check!");
-                            var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS GOG cloud directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                            await box.ShowAsPopupAsync(TopLevel);
-                        }
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    this.Log().Error($"Game Levels Backup directory not set! Please re-check!");
-                    var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Game Levels Backup directory not set! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                    await box.ShowAsPopupAsync(TopLevel);
-                }
-            }
-            else
-            {
-                this.Log().Error($"LEVELS directory not found! Please re-check!");
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"LEVELS directory not found! Please re-check!", ButtonEnum.Ok, Icon.Error);
-                await box.ShowAsPopupAsync(TopLevel);
-            }
-
+            this.Log().Error(error);
+            var box = MessageBoxManager.GetMessageBoxStandard("Error", error, ButtonEnum.Ok, Icon.Error);
+            await box.ShowAsPopupAsync(TopLevel);
             return false;
         }
 
@@ -411,11 +259,10 @@ namespace MCLevelEdit.ViewModels
         {
             var settings = new Settings()
             {
-                IsForClassic = this.GameIsClassic,
-                GameExeLocation = this.GameExePath,
-                GameArgs = this.GameExeArgs,
-                GameBackupFolder = this.GameLevelsBackupPath,
-                GameLevelFolders = string.IsNullOrEmpty(this.GameCloudLevelsPath) ? new string[] { this.GameLevelsPath } : new string[] { this.GameLevelsPath, this.GameCloudLevelsPath }
+                SelectedGame = SelectedGame,
+                MagicCarpet1 = MagicCarpet1.ToSettings(),
+                HiddenWorlds = HiddenWorlds.ToSettings(),
+                Mc2ExeLocation = Mc2ExePath ?? string.Empty
             };
 
             if (!_settingsPort.SaveSettings(settings))
@@ -424,42 +271,6 @@ namespace MCLevelEdit.ViewModels
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error saving settings! Do you want to continue?", ButtonEnum.OkCancel, Icon.Warning);
                 var result = await box.ShowAsPopupAsync(TopLevel);
                 return result == ButtonResult.Ok;
-            }
-            return true;
-        }
-
-        private async Task<bool> BackupLevels()
-        {
-            if (!await _gameService.BackupLevelFiles(this.GameLevelsPath, this.GameLevelsBackupPath))
-            {
-                this.Log().Error($"Error backing up Levels!");
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error backing up Levels! Please check and validate your paths", ButtonEnum.Ok, Icon.Warning);
-                var result = await box.ShowAsPopupAsync(TopLevel);
-                return false;
-            }
-            return true;
-        }
-
-        private async Task<bool> RestoreLevels()
-        {
-            var paths = new string[] { this.GameLevelsPath };
-
-            if (!GameIsClassic)
-            {
-                paths = new string[] { this.GameLevelsPath, this.GameCloudLevelsPath };
-            }
-
-            if (!await _gameService.RestoringLevelFiles(this.GameLevelsBackupPath, paths))
-            {
-                this.Log().Error($"Error restoring you game files Levels!");
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error restoring you game files Levels!", ButtonEnum.Ok, Icon.Error);
-                await box.ShowAsPopupAsync(TopLevel);
-                return false;
-            }
-            else
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Success", $"Restore Success!", ButtonEnum.Ok, Icon.Info);
-                await box.ShowAsPopupAsync(TopLevel);
             }
             return true;
         }

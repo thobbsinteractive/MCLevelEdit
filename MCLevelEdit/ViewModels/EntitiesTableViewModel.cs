@@ -17,11 +17,7 @@ namespace MCLevelEdit.ViewModels
         protected IList<EntityViewModel>? _selectedEntityViewModels;
         protected int _entityFilter;
 
-        public new List<KeyValuePair<int, string>> TypeIds { get; } =
-            Enum.GetValues(typeof(TypeId))
-            .Cast<int>()
-            .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
-            .ToList();
+        public new IList<KeyValuePair<int, string>> TypeIds => EntityTypeLists.TypeIdsWithAll;
 
         public IAvaloniaList<EntityViewModel> Entities { get; } = new AvaloniaList<EntityViewModel>();
         public ICommand AddNewEntityCommand { get; }
@@ -65,7 +61,6 @@ namespace MCLevelEdit.ViewModels
                 RefreshData();
             });
 
-            TypeIds.Insert(0, new KeyValuePair<int, string>(0, ""));
             _entityFilter = 0;
         }
 
@@ -73,6 +68,17 @@ namespace MCLevelEdit.ViewModels
         {
             IsSelected = entityViewModels?.Count > 0;
             _selectedEntityViewModels = entityViewModels;
+
+            // the rows selected are the entities selected in the editor too (one as when it is clicked, more together)
+            if (entityViewModels?.Count > 0)
+                SelectInEditor();
+        }
+
+        private void SelectInEditor()
+        {
+            var ids = _selectedEntityViewModels?.Select(e => e.Id).Where(id => id > 0).ToList();
+            if (ids?.Count > 0)
+                _eventAggregator.RaiseEvent("SelectEntities", this, new PubSubEventArgs<object>(((IList<int>)ids, false)));
         }
 
         public void OnCboEntityTypeSelectionChanged(int index)
@@ -85,6 +91,8 @@ namespace MCLevelEdit.ViewModels
         public void OnUnload()
         {
             UpdateEntities();
+            // the entities written back refresh the editor, which clears its selection: the rows selected are selected again
+            SelectInEditor();
         }
 
         public void RefreshData()

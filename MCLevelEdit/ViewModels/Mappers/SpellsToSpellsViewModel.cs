@@ -7,7 +7,8 @@ namespace MCLevelEdit.ViewModels.Mappers;
 
 public static class SpellsToSpellsViewModel
 {
-    public static SpellsViewModel ToSpellsViewModel(this Spells spells)
+    /// <param name="hiddenWorlds">Hidden Worlds has Homing Meteor where Magic Carpet has Wall of Fire.</param>
+    public static SpellsViewModel ToSpellsViewModel(this Spells spells, bool hiddenWorlds = false)
     {
         return new SpellsViewModel()
         {
@@ -31,7 +32,10 @@ public static class SpellsToSpellsViewModel
             BeyondSight = new AbilitiesViewModel(spells.BeyondSight, 18, "Beyond Sight", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/beyondsight.png"))), new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/beyondsight-white.png")))),
             Duel = new AbilitiesViewModel(spells.Duel, 19, "Duel", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/duel.png"))), new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/duel-white.png")))),
             Teleport = new AbilitiesViewModel(spells.Teleport, 20, "Teleport", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/teleport.png"))), new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/teleport-white.png")))),
-            WallofFire = new AbilitiesViewModel(spells.WallofFire, 21, "Wall of Fire", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/walloffire.png"))), new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/walloffire-white.png")))),
+            WallofFire = hiddenWorlds
+                // Same slot, different spell. There is no Homing Meteor icon, so it uses Meteor's
+                ? new AbilitiesViewModel(spells.WallofFire, 21, "Homing Meteor", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/meteor.png"))), new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/meteor-white.png"))))
+                : new AbilitiesViewModel(spells.WallofFire, 21, "Wall of Fire", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/walloffire.png"))), new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/walloffire-white.png")))),
             ReverseAcceleration = new AbilitiesViewModel(spells.ReverseAcceleration, 22, "Reverse Acceleration", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/reverse.png"))), new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/reverse-white.png")))),
             GlobalDeath = new AbilitiesViewModel(spells.GlobalDeath, 23, "Global Death", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/globaldeath.png"))), new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/globaldeath-white.png")))),
             RapidFireball = new AbilitiesViewModel(spells.RapidFireball, 24, "Rapid Fireball", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/rapidfireball.png"))), new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/Spells/rapidfireball-white.png"))))

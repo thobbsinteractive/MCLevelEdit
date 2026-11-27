@@ -1,51 +1,39 @@
-﻿namespace MCLevelEdit.Model.Domain.Extensions;
+﻿using MCLevelEdit.Model.Repository;
 
+namespace MCLevelEdit.Model.Domain.Extensions;
+
+/// <summary>
+/// Entity type lookups. When no game is given, the game of the map that is currently open is used.
+/// </summary>
 public static class EntityTypeExtensions
 {
-    public static EntityType GetEntityFromTypeId(this TypeId typeId)
-    {
-        switch (typeId)
-        {
-            case TypeId.Scenery:
-                return new SceneryType(Scenery.Tree);
-            case TypeId.Spawn:
-                return new SpawnType(Spawn.Flyer1);
-            case TypeId.Creature:
-                return new CreatureType(Creature.Vulture);
-            case TypeId.Effect:
-                return new EffectType(Effect.Explosion);
-            case TypeId.Weather:
-                return new WeatherType(Weather.Wind);
-            case TypeId.Spell:
-                return new SpellType(Spell.Fireball);
-            case TypeId.Switch:
-                return new SwitchType(Switch.HiddenInside);
-        }
-        return null;
-    }
+    private static GameVersion CurrentGame => MapRepository.Map?.GameVersion ?? GameVersion.MagicCarpet1;
 
-    public static EntityType GetEntityTypeFromTypeIdAndModelId(this TypeId typeId, int modelId)
+    /// <summary>A default entity of the given type (its first kind), or null if the game has no such type.</summary>
+    public static EntityType? GetEntityFromTypeId(this TypeId typeId, GameVersion? game = null) =>
+        EntityCatalog.GetKinds(game ?? CurrentGame, typeId)?.Values.FirstOrDefault();
+
+    /// <summary>
+    /// Like <see cref="GetEntityTypeFromTypeIdAndModelId"/>, but never returns null: entity types the
+    /// editor has no name for yet are kept with their raw IDs so they survive a load and save.
+    /// </summary>
+    public static EntityType GetEntityTypeOrUnknown(this TypeId typeId, int modelId, GameVersion? game = null) =>
+        typeId.GetEntityTypeFromTypeIdAndModelId(modelId, game)
+        ?? new EntityType(typeId, modelId, $"Type{(int)typeId}-{modelId}") { Game = game ?? CurrentGame };
+
+    public static EntityType? GetEntityTypeFromTypeIdAndModelId(this TypeId typeId, int modelId, GameVersion? game = null)
     {
-        if (modelId > -1)
-        {
-            switch (typeId)
-            {
-                case TypeId.Scenery:
-                    return EntityTypes.I.Sceneries[modelId];
-                case TypeId.Spawn:
-                    return EntityTypes.I.Spawns[modelId];
-                case TypeId.Creature:
-                    return EntityTypes.I.Creatures[modelId];
-                case TypeId.Weather:
-                    return EntityTypes.I.Weathers[modelId];
-                case TypeId.Effect:
-                    return EntityTypes.I.Effects[modelId];
-                case TypeId.Switch:
-                    return EntityTypes.I.Switches[modelId];
-                case TypeId.Spell:
-                    return EntityTypes.I.Spells[modelId];
-            }
-        }
-        return null;
+        if (modelId < 0)
+            return null;
+
+        var version = game ?? CurrentGame;
+        var kinds = EntityCatalog.GetKinds(version, typeId);
+        if (kinds is null)
+            return null;
+
+        // Model IDs the editor has no name for yet are kept as-is so they survive a load and save.
+        return kinds.TryGetValue(modelId, out var entityType)
+            ? entityType
+            : new EntityType(typeId, modelId, $"Unknown{modelId}") { Game = version };
     }
 }

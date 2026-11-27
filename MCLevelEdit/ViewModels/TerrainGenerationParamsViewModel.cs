@@ -97,6 +97,15 @@ namespace MCLevelEdit.ViewModels
             set { SetProperty(ref _rkSte, value); }
         }
 
+        private byte _basicHeight = 0;
+
+        /// <summary>Cave levels: the roof height the cave ceiling is built down from.</summary>
+        public byte BasicHeight
+        {
+            get { return _basicHeight; }
+            set { SetProperty(ref _basicHeight, value); }
+        }
+
         public void SetParameters(TerrainGenerationParamsViewModel terrainGenerationParameters)
         {
             MapType = terrainGenerationParameters.MapType;
@@ -112,6 +121,7 @@ namespace MCLevelEdit.ViewModels
             BhLin = terrainGenerationParameters.BhLin;
             BhFlt = terrainGenerationParameters.BhFlt;
             RkSte = terrainGenerationParameters.RkSte;
+            BasicHeight = terrainGenerationParameters.BasicHeight;
         }
     }
 }

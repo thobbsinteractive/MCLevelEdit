@@ -18,6 +18,21 @@ namespace MCLevelEdit.ViewModels
         private EditWorldViewModel _editWorldViewModel;
         private EditEntityViewModel _editEntityViewModel;
         private EditSwitchViewModel _editSwitchViewModel;
+        private bool _showEditEntities;
+        private EditEntitiesViewModel? _editEntitiesViewModel;
+
+        /// <summary>The properties of more than one entity selected together.</summary>
+        public EditEntitiesViewModel? EditEntitiesViewModel
+        {
+            get => _editEntitiesViewModel;
+            set => this.RaiseAndSetIfChanged(ref _editEntitiesViewModel, value);
+        }
+
+        public bool ShowEditEntities
+        {
+            get => _showEditEntities;
+            set => this.RaiseAndSetIfChanged(ref _showEditEntities, value);
+        }
 
         public EditWizardsViewModel EditWizardsViewModel
         {
@@ -83,6 +98,35 @@ namespace MCLevelEdit.ViewModels
         {
             EditWorldViewModel = new EditWorldViewModel(eventAggregator, mapService);
             _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
+            _eventAggregator.RegisterEvent("EntitiesSelected", EntitiesSelectedHandler);
+            _eventAggregator.RegisterEvent("UpdateEntity", (sender, args) =>
+            {
+                // one of the entities selected together moved on the map: its fields kept up to date
+                if (ShowEditEntities && args.Item is EntityViewModel entity)
+                    EditEntitiesViewModel?.OnEntityUpdated(entity);
+            });
+        }
+
+        /// <summary>More than one entity selected (their ids): the properties they share, to change them all.</summary>
+        public void EntitiesSelectedHandler(object sender, PubSubEventArgs<object> arg)
+        {
+            if (arg.Item is not System.Collections.Generic.IList<int> ids)
+                return;
+
+            var entities = ids
+                .Select(id => _mapService.GetEntity((ushort)id)?.ToEntityViewModel())
+                .OfType<EntityViewModel>()
+                .ToList();
+            if (entities.Count < 2)
+                return;
+
+            ShowEditTerrain = false;
+            ShowEditEntity = false;
+            ShowEditWizard = false;
+            ShowEditWizards = false;
+            ShowEditSwitch = false;
+            EditEntitiesViewModel = new EditEntitiesViewModel(_eventAggregator, _mapService, _terrainService, entities);
+            ShowEditEntities = true;
         }
 
         public void NodeSelectedHandler(object sender, PubSubEventArgs<object> arg)
@@ -92,6 +136,7 @@ namespace MCLevelEdit.ViewModels
             ShowEditWizard = false;
             ShowEditWizards = false;
             ShowEditSwitch = false;
+            ShowEditEntities = false;
             var wizards = _mapService.GetActiveWizards();
 
             if (arg.Item is not null)

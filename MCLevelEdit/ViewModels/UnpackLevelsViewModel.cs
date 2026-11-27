@@ -3,6 +3,7 @@ using Avalonia.Platform.Storage;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Utils;
 using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -114,6 +115,7 @@ namespace MCLevelEdit.ViewModels
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Select Levels.Dat file to unpack",
+                SuggestedStartLocation = await PickerStartFolder.GetAsync(topLevel.StorageProvider, LevelsDatPath)
             });
 
             if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
@@ -132,7 +134,8 @@ namespace MCLevelEdit.ViewModels
             var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
             {
                 Title = "Select File Extract Directory",
-                AllowMultiple = false
+                AllowMultiple = false,
+                SuggestedStartLocation = await PickerStartFolder.GetAsync(topLevel.StorageProvider, OutputPath, isFolder: true)
             });
 
             if (folder != null && folder.Count == 1 && Directory.Exists(folder[0].Path.LocalPath))

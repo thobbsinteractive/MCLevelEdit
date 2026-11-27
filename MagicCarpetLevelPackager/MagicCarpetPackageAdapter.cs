@@ -10,7 +10,6 @@ namespace MagicCarpetLevelPackager
     {
         public const int MAX_LEVELS = 70;
         public const int HEADER_SIZE_BYTES = 8;
-        public const int LEVEL_FILE_SIZE = 38812;
         public const int LEVELS_TAB_FILE_SIZE = 4000;
         public const string LEVELS_DAT = "LEVELS.DAT";
         public const string LEVELS_TAB = "LEVELS.TAB";
@@ -41,8 +40,16 @@ namespace MagicCarpetLevelPackager
                 throw new ArgumentNullException(nameof(outputDirectory));
             }
 
+            // All levels in a package must be the same size: 38812 for Magic Carpet 1, 26116 for Magic Carpet 2
+            var levelFileSizes = existingLevelFiles.Select(f => new FileInfo(f).Length).Distinct().ToArray();
+            if (levelFileSizes.Length != 1)
+            {
+                throw new ArgumentException("All level files must be the same size (the same game).");
+            }
+            int levelFileSize = (int)levelFileSizes[0];
+
             // Define Header for DAT file
-            byte[] levelsFileBytes = new byte[(LEVEL_FILE_SIZE * existingLevelFiles.Count()) + HEADER_SIZE_BYTES];
+            byte[] levelsFileBytes = new byte[(levelFileSize * existingLevelFiles.Count()) + HEADER_SIZE_BYTES];
 
             WriteToArray(new byte[] { 0x42, 0x55, 0x4C, 0x4C, 0x46, 0x52, 0x4F, 0x47 }, levelsFileBytes, 0); // BULLFROG
 
@@ -52,7 +59,7 @@ namespace MagicCarpetLevelPackager
             {
                 var levelBytes = File.ReadAllBytes(filePath);
                 WriteToArray(levelBytes, levelsFileBytes, fileIndex);
-                fileIndex += LEVEL_FILE_SIZE;
+                fileIndex += levelFileSize;
                 Console.WriteLine($"Added File: {filePath}");
             }
 
@@ -65,7 +72,7 @@ namespace MagicCarpetLevelPackager
 
             foreach (var filePath in existingLevelFiles)
             {
-                levelIndex += LEVEL_FILE_SIZE;
+                levelIndex += levelFileSize;
                 WriteToArray(BitConverter.GetBytes(levelIndex), tabFileBytes, fileIndex);
                 fileIndex += 4;
                 Console.WriteLine($"Added File Address: {fileIndex}");

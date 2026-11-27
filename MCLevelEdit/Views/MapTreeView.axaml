@@ -9,7 +9,7 @@
              x:DataType="vm:MapTreeViewModel">
   <Grid Name="gdTree"
         ColumnDefinitions="*"
-        RowDefinitions="40,*,50">
+        RowDefinitions="40,Auto,*,50">
     <Grid.Resources>
       <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
     </Grid.Resources>
@@ -21,12 +21,19 @@
               HorizontalAlignment="Stretch"
               DisplayMemberBinding="{Binding ., Converter={StaticResource keyValuePairToNameConverter}}"
               ItemsSource="{Binding TypeIds}"/>
+    <!-- The game the open map is for -->
+    <TextBlock Grid.Row="1"
+               Grid.Column="0"
+               Margin="10,5,10,0"
+               FontWeight="Bold"
+               ToolTip.Tip="The game this level is for"
+               Text="{Binding GameName}"/>
     <TreeView Margin="10"
               Grid.Column="0"
-              Grid.Row="1"
+              Grid.Row="2"
               ItemsSource="{Binding Nodes}"
               SelectedItems="{Binding SelectedNodes}"
-              SelectionMode="Single">
+              SelectionMode="Multiple">
       <TreeView.ItemTemplate>
         <TreeDataTemplate ItemsSource="{Binding SubNodes}">
           <Border HorizontalAlignment="Left"
@@ -60,7 +67,7 @@
     </TreeView>
     <Button Name="btnEdit"
         Grid.Column="0"
-        Grid.Row="2"
+        Grid.Row="3"
         Margin="5"
         HorizontalAlignment="Stretch"
         VerticalContentAlignment="Center"

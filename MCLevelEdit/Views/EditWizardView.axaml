@@ -13,6 +13,7 @@
         RowDefinitions="40,30,30,30,30,40,*">
     <Grid.Resources>
       <c:UInt8ToStringConverter x:Key="uInt8ToStringConverter"/>
+      <c:Int16ToStringConverter x:Key="int16ToStringConverter"/>
     </Grid.Resources>
     <Label Grid.Column="0"
            Grid.Row="0"
@@ -54,13 +55,27 @@
     </TextBox>
     <Label Grid.Column="0"
        Grid.Row="4"
+       IsVisible="{Binding IsMc1}"
        HorizontalAlignment="Left">
       Castle Level:
     </Label>
     <TextBox Name="txtCastleLevel"
              Grid.Column="1"
              Grid.Row="4"
+             IsVisible="{Binding IsMc1}"
              Text="{Binding CastleLevel, Converter={StaticResource uInt8ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+       Grid.Row="4"
+       IsVisible="{Binding IsMc2}"
+       HorizontalAlignment="Left">
+      Life:
+    </Label>
+    <TextBox Name="txtLife"
+             Grid.Column="1"
+             Grid.Row="4"
+             IsVisible="{Binding IsMc2}"
+             Text="{Binding Life, Converter={StaticResource int16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="5"
@@ -70,11 +85,41 @@
            VerticalAlignment="Center">
       Wizard Spells
     </Label>
-    <view:EditSpells Name="esSpells"
-                     Grid.Row="6"
-                     Grid.Column="0"
-                     Grid.ColumnSpan="2"
-                     HorizontalAlignment="Center"
-                     DataContext="{Binding Spells}"/>
+    <Panel Grid.Row="6"
+           Grid.Column="0"
+           Grid.ColumnSpan="2"
+           IsVisible="{Binding IsMc1}">
+      <view:EditSpells Name="esSpells"
+                       HorizontalAlignment="Center"
+                       DataContext="{Binding Spells}"/>
+    </Panel>
+    <!-- Magic Carpet 2: 26 spells, each with starting / level / blocked -->
+    <Grid Grid.Row="6"
+          Grid.Column="0"
+          Grid.ColumnSpan="2"
+          RowDefinitions="Auto,*"
+          IsVisible="{Binding IsMc2}">
+      <Grid Grid.Row="0" ColumnDefinitions="*,40,40,40" Margin="0,0,0,2">
+        <TextBlock Grid.Column="0" FontWeight="Bold" Text="Spell"/>
+        <TextBlock Grid.Column="1" FontWeight="Bold" Text="Start" ToolTip.Tip="Wizard starts with this spell"/>
+        <TextBlock Grid.Column="2" FontWeight="Bold" Text="Lvl" ToolTip.Tip="Spell level, 0 to 2 (the game treats anything higher as 2)"/>
+        <TextBlock Grid.Column="3" FontWeight="Bold" Text="Block" ToolTip.Tip="Wizard can never have this spell"/>
+      </Grid>
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding Mc2Spells}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:Mc2SpellViewModel">
+              <Grid ColumnDefinitions="*,40,40,40" Height="28">
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Name}"/>
+                <CheckBox Grid.Column="1" IsChecked="{Binding StartsWith}"/>
+                <TextBox Grid.Column="2" MinWidth="0" Padding="2" VerticalAlignment="Center"
+                         Text="{Binding Level, Converter={StaticResource uInt8ToStringConverter}}"/>
+                <CheckBox Grid.Column="3" IsChecked="{Binding Blocked}"/>
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Grid>
   </Grid>
 </UserControl>

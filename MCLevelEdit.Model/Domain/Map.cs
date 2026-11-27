@@ -1,16 +1,52 @@
-﻿using MagicCarpet2Terrain.Model;
+﻿using MCLevelEdit.Model.Domain.MC1; // MC1 effect IDs for paths, walls, canyons etc. are the same in MC2
+using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Model.Domain.Validation;
+using MCLevelEdit.Model.Domain.Validation.MC1;
 
 namespace MCLevelEdit.Model.Domain;
 
 public class Map
 {
     public string FilePath {  get; set; }
+    /// <summary>The game this level is for. Magic Carpet 2 levels are <see cref="MC2.Mc2Map"/>.</summary>
+    public virtual GameVersion GameVersion => GameVersion.MagicCarpet1;
+    public int MaxEntities => LevelFormat.GetMaxEntities(GameVersion);
+
+    /// <summary>
+    /// Whether this Magic Carpet format level is for Hidden Worlds. The level file can't say, so the editor
+    /// keeps it while the level is open: set it with <see cref="SetHiddenWorlds"/>. Always false for MC2 levels.
+    /// </summary>
+    public bool IsHiddenWorlds { get; private set; }
+
+    /// <summary>The game this level is for, and runs in. Magic Carpet 2 levels override it.</summary>
+    public virtual GameTarget Game => IsHiddenWorlds ? GameTarget.HiddenWorlds : GameTarget.MagicCarpet1;
+
+    /// <summary>The game whose terrain generation this level uses. Magic Carpet 2 levels override it.</summary>
+    public virtual TerrainGame TerrainGame => IsHiddenWorlds ? TerrainGame.HiddenWorlds : TerrainGame.MagicCarpet1;
+
+    /// <summary>Marks the level as Hidden Worlds (or Magic Carpet) and renames its spell jars to match.</summary>
+    public void SetHiddenWorlds(bool hiddenWorlds)
+    {
+        if (GameVersion != GameVersion.MagicCarpet1)
+            return;
+
+        IsHiddenWorlds = hiddenWorlds;
+
+        var spells = EntityCatalog.GetMc1EntityTypes(hiddenWorlds).Spells;
+        foreach (var entity in Entities)
+        {
+            if (entity.EntityType?.TypeId == TypeId.Spell && spells.TryGetValue(entity.EntityType.Model.Id, out var spellType))
+                entity.EntityType = spellType;
+        }
+    }
     public uint ManaTotal { get; set; }
     public byte ManaTarget { get; set; }
     public IList<ValidationResult> ValidationResults { get; set; } = new List<ValidationResult>();
     public IList<Entity> Entities { get; set; } = new List<Entity>();
+    /// <summary>The terrain as the game has it when the level starts: <see cref="GeneratedTerrain"/> with the buildings built.</summary>
     public Terrain Terrain { get; set; } = new Terrain();
+    /// <summary>The terrain as generated, before the buildings change it. Null until the terrain is generated.</summary>
+    public Terrain GeneratedTerrain { get; set; }
     public Wizard[] Wizards { get; set; } = new[] {
         new Wizard()
         {
@@ -86,6 +122,9 @@ public class Map
         }
     };
 
+    /// <summary>Entities shown in the editor: everything except inert type 0 leftovers.</summary>
+    public IEnumerable<Entity> VisibleEntities => Entities.Where(e => !e.IsInert());
+
     public IList<Entity> GetEntitiesByPosition(Position postion)
     {
         return Entities.Where(e => e.Position == postion).ToList();
@@ -100,7 +139,7 @@ public class Map
 
     public int AddEntity(Entity entity)
     {
-        if (this.Entities.Count < Globals.MAX_ENTITIES)
+        if (this.Entities.Count < MaxEntities)
         {
             entity.Id = GetNextId();
             this.Entities.Add(entity);
@@ -131,33 +170,38 @@ public class Map
     {
         ValidationResults = new List<ValidationResult>();
 
-        ValidationResults.Add(MapRules.HasPlayerSpawn(this.Entities));
-        var spawnValidation = MapRules.HasCorrectNumberOfWizardSpawns(this);
-        foreach (var spawnResult in spawnValidation)
-            ValidationResults.Add(spawnResult);
+        // shared by both games
+        ValidationResults.Add(SharedMapRules.HasPlayerSpawn(this.Entities));
 
-        var wizardValidation = MapRules.HasValidWizardParamters(this);
-        foreach (var wizardResult in wizardValidation)
-            ValidationResults.Add(wizardResult);
+        foreach (var result in ValidateGameRules())
+            ValidationResults.Add(result);
 
-        var spellValidation = MapRules.HasBasicSpells(this);
-        foreach (var spellResult in spellValidation)
-            ValidationResults.Add(spellResult);
-
-        foreach (Entity entity in this.Entities)
-        {
-            ValidationResults.Add(EntityRules.HasSwitch(entity, Entities));
-            ValidationResults.Add(EntityRules.BuildingHasSwidAndDisIdAndParent(entity));
-            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Wall));
-            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Path));
-            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Canyon));
-            ValidationResults.Add(EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.RidgeNode));
-            ValidationResults.Add(EntityRules.HasUniqueCoordinates(entity, Entities));
-            ValidationResults.Add(EntityRules.CheckConnectedWalls(entity, Entities));
-            ValidationResults.Add(EntityRules.TeleportDestinationCoordinatesAreDifferentToStart(entity));
-        }
-        
         return ValidationResults;
+    }
+
+    /// <summary>The rules of this level's game: Magic Carpet (and Hidden Worlds) here, Magic Carpet 2 in <see cref="MC2.Mc2Map"/>.</summary>
+    protected virtual IEnumerable<ValidationResult> ValidateGameRules()
+    {
+        foreach (var result in Mc1MapRules.HasCorrectNumberOfWizardSpawns(this))
+            yield return result;
+        foreach (var result in Mc1MapRules.HasValidWizardParamters(this))
+            yield return result;
+        foreach (var result in Mc1MapRules.HasBasicSpells(this))
+            yield return result;
+
+        var entities = VisibleEntities.ToList();
+        foreach (Entity entity in entities)
+        {
+            yield return Mc1EntityRules.HasSwitch(entity, entities);
+            yield return Mc1EntityRules.BuildingHasSwidAndDisIdAndParent(entity);
+            yield return Mc1EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Wall);
+            yield return Mc1EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Path);
+            yield return Mc1EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.Canyon);
+            yield return Mc1EntityRules.PathEntityCannotSameChildAndParent(entity, (int)Effect.RidgeNode);
+            yield return Mc1EntityRules.HasUniqueCoordinates(entity, entities);
+            yield return Mc1EntityRules.CheckConnectedWalls(entity, entities);
+            yield return Mc1EntityRules.TeleportDestinationCoordinatesAreDifferentToStart(entity);
+        }
     }
 
     private int GetIndexOf(Entity entity)
@@ -178,7 +222,7 @@ public class Map
             return 1;
 
         var entityIds = this.Entities.Select(e => e.Id).OrderBy(e => e).ToList();
-        var allIds = Enumerable.Range(1, Globals.MAX_ENTITIES + 1).ToArray();
+        var allIds = Enumerable.Range(1, MaxEntities + 1).ToArray();
         var freeIds = allIds.Except(entityIds).ToList();
 
         return freeIds.FirstOrDefault();

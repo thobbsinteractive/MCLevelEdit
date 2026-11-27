@@ -1,4 +1,4 @@
-﻿namespace MCLevelEdit.Model.Domain;
+﻿namespace MCLevelEdit.Model.Domain.MC1;
 
 public enum Effect
 {

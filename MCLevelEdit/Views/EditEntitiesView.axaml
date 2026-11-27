@@ -1,0 +1,159 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             xmlns:c="clr-namespace:MCLevelEdit.Converter"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="400"
+             x:Class="MCLevelEdit.Views.EditEntitiesView"
+             x:DataType="vm:EditEntitiesViewModel">
+  <!-- more than one entity selected: a field shows the value they share, or is empty where they differ; a value entered
+       (once the field is left) is given to them all. The position is the first entity's: changed, they all move by as much -->
+  <Grid Margin="5"
+        ColumnDefinitions="1*,2*"
+        RowDefinitions="40,Auto,30,30,30,30,30,30,30,30,30,30,*">
+    <Grid.Resources>
+      <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
+    </Grid.Resources>
+    <Label Grid.Column="0"
+           Grid.Row="0"
+           Grid.ColumnSpan="2"
+           FontWeight="Bold"
+           HorizontalAlignment="Left"
+           Content="{Binding Title}"/>
+    <TextBlock Grid.Column="0"
+               Grid.Row="1"
+               Grid.ColumnSpan="2"
+               Margin="4,0,4,6"
+               TextWrapping="Wrap"
+               Foreground="Gray"
+               Text="{Binding Ids, StringFormat='Ids: {0}'}"/>
+    <Label Grid.Column="0"
+           Grid.Row="2"
+           HorizontalAlignment="Left">
+      Type:
+    </Label>
+    <ComboBox Name="cboEntityType"
+              Grid.Row="2"
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Stretch"
+              PlaceholderText="(different)"
+              ToolTip.Tip="The type of them all: chosen, they all become it"
+              SelectedIndex="{Binding TypeIdx}"
+              DisplayMemberBinding="{Binding ., Converter={StaticResource keyValuePairToNameConverter}}"
+              ItemsSource="{Binding Source={x:Static vm:EditEntitiesViewModel.TypeIds}}"/>
+    <Label Grid.Column="0"
+           Grid.Row="3"
+           HorizontalAlignment="Left">
+      Model:
+    </Label>
+    <ComboBox Name="cboEntityModelType"
+              Grid.Row="3"
+              Grid.Column="1"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Stretch"
+              PlaceholderText="(different)"
+              ToolTip.Tip="The model of them all: only when they are all of the same type"
+              IsEnabled="{Binding SameType}"
+              SelectedIndex="{Binding ModelIdx}"
+              DisplayMemberBinding="{Binding ., Converter={StaticResource keyValuePairToNameConverter}}"
+              ItemsSource="{Binding ModelTypes}"/>
+    <Label Grid.Column="0"
+           Grid.Row="4"
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding XTip}">
+      PosX:
+    </Label>
+    <TextBox x:Name="txtPosX"
+             Grid.Row="4"
+             Grid.Column="1"
+             ToolTip.Tip="{Binding XTip}"
+             Text="{Binding X, UpdateSourceTrigger=LostFocus}"/>
+    <Label Grid.Column="0"
+           Grid.Row="5"
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding YTip}">
+      PosY:
+    </Label>
+    <TextBox x:Name="txtPosY"
+             Grid.Row="5"
+             Grid.Column="1"
+             ToolTip.Tip="{Binding YTip}"
+             Text="{Binding Y, UpdateSourceTrigger=LostFocus}"/>
+    <Label Grid.Column="0"
+           Grid.Row="6"
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding DisIdTip}">
+      DisId:
+    </Label>
+    <TextBox x:Name="txtDisId"
+             Grid.Row="6"
+             Grid.Column="1"
+             Watermark="(different)"
+             ToolTip.Tip="{Binding DisIdTip}"
+             Text="{Binding DisId, UpdateSourceTrigger=LostFocus}"/>
+    <Label Grid.Column="0"
+           Grid.Row="7"
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding SwitchSizeTip}">
+      Switch Size:
+    </Label>
+    <TextBox x:Name="txtSwitchSize"
+             Grid.Row="7"
+             Grid.Column="1"
+             Watermark="(different)"
+             ToolTip.Tip="{Binding SwitchSizeTip}"
+             Text="{Binding SwitchSize, UpdateSourceTrigger=LostFocus}"/>
+    <Label Grid.Column="0"
+           Grid.Row="8"
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding SwitchIdTip}">
+      Switch Id:
+    </Label>
+    <TextBox x:Name="txtSwitchId"
+             Grid.Row="8"
+             Grid.Column="1"
+             Watermark="(different)"
+             ToolTip.Tip="{Binding SwitchIdTip}"
+             Text="{Binding SwitchId, UpdateSourceTrigger=LostFocus}"/>
+    <Label Grid.Column="0"
+           Grid.Row="9"
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding ParentTip}">
+      Parent:
+    </Label>
+    <TextBox x:Name="txtParent"
+             Grid.Row="9"
+             Grid.Column="1"
+             Watermark="(different)"
+             ToolTip.Tip="{Binding ParentTip}"
+             Text="{Binding Parent, UpdateSourceTrigger=LostFocus}"/>
+    <Label Grid.Column="0"
+           Grid.Row="10"
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding ChildTip}">
+      Child:
+    </Label>
+    <TextBox x:Name="txtChild"
+             Grid.Row="10"
+             Grid.Column="1"
+             Watermark="(different)"
+             ToolTip.Tip="{Binding ChildTip}"
+             Text="{Binding Child, UpdateSourceTrigger=LostFocus}"/>
+    <Label Grid.Column="0"
+           Grid.Row="11"
+           HorizontalAlignment="Left"
+           IsVisible="{Binding HasPar3}"
+           ToolTip.Tip="{Binding Par3Tip}">
+      Par3:
+    </Label>
+    <TextBox x:Name="txtPar3"
+             Grid.Row="11"
+             Grid.Column="1"
+             Watermark="(different)"
+             IsVisible="{Binding HasPar3}"
+             ToolTip.Tip="{Binding Par3Tip}"
+             Text="{Binding Par3, UpdateSourceTrigger=LostFocus}"/>
+  </Grid>
+</UserControl>
