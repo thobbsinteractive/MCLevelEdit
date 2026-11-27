@@ -10,6 +10,7 @@ using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Enums;
+using MCLevelEdit.Utils;
 using MCLevelEdit.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -34,6 +35,7 @@ public class MainViewModel : ViewModelBase
 
     protected readonly ISettingsPort _settingsPort;
     protected readonly IGameService _gameService;
+    protected readonly IRecoveryService _recoveryService;
 
     public int FailCount
     {
@@ -55,6 +57,8 @@ public class MainViewModel : ViewModelBase
 
     public ICommand NewFileCommand { get; }
     public ICommand NewRandomFileCommand { get; }
+    public ICommand NewMc2FileCommand { get; }
+    public ICommand NewMc2RandomFileCommand { get; }
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
     public ICommand SaveFileAsCommand { get; }
@@ -87,10 +91,14 @@ public class MainViewModel : ViewModelBase
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
     public Interaction<AboutWindowViewModel, AboutWindowViewModel?> ShowAboutDialog { get; }
 
-    public MainViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IMapService mapService, ITerrainService terrainService, IGameService gameService) : base(eventAggregator, mapService, terrainService)
+    public MainViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IMapService mapService, ITerrainService terrainService, IGameService gameService, IRecoveryService recoveryService) : base(eventAggregator, mapService, terrainService)
     {
         _settingsPort = settingsPort;
         _gameService = gameService;
+        _recoveryService = recoveryService;
+
+        // Registered first so the type dropdowns switch game before other views refresh their entities
+        _eventAggregator.RegisterEvent("RefreshEntities", (sender, args) => EntityTypeLists.Refresh());
 
         _mapService.CreateNewMap(true);
         NodePropertiesViewModel = new NodePropertiesViewModel(eventAggregator, mapService, terrainService);
@@ -122,20 +130,41 @@ public class MainViewModel : ViewModelBase
         });
 
 
-        NewFileCommand = ReactiveCommand.CreateFromTask(async () =>
+        // The menu passes the game as the CommandParameter (Hidden Worlds uses MagicCarpet1)
+        // Magic Carpet and Hidden Worlds: the menu passes the game; both use the Magic Carpet level format
+        NewFileCommand = ReactiveCommand.CreateFromTask<GameTarget>(async game =>
         {
             if (await PromptSaveAndOrContinue())
             {
-                await mapService.CreateNewMap();
+                await mapService.CreateNewMap(false, game: GameVersion.MagicCarpet1, hiddenWorlds: game == GameTarget.HiddenWorlds);
                 MainWindow.I.Title = GetTitle("NewLevel.DAT");
             }
         });
 
-        NewRandomFileCommand = ReactiveCommand.CreateFromTask(async () =>
+        NewRandomFileCommand = ReactiveCommand.CreateFromTask<GameTarget>(async game =>
         {
             if (await PromptSaveAndOrContinue())
             {
-                await mapService.CreateNewMap(true);
+                await mapService.CreateNewMap(true, game: GameVersion.MagicCarpet1, hiddenWorlds: game == GameTarget.HiddenWorlds);
+                MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            }
+        });
+
+        // Magic Carpet 2: the menu passes the map type (Day/Night/Cave) as the CommandParameter
+        NewMc2FileCommand = ReactiveCommand.CreateFromTask<MagicCarpet2Terrain.Model.MapType>(async mapType =>
+        {
+            if (await PromptSaveAndOrContinue())
+            {
+                await mapService.CreateNewMap(false, game: GameVersion.MagicCarpet2, mapType: mapType);
+                MainWindow.I.Title = GetTitle("NewLevel.DAT");
+            }
+        });
+
+        NewMc2RandomFileCommand = ReactiveCommand.CreateFromTask<MagicCarpet2Terrain.Model.MapType>(async mapType =>
+        {
+            if (await PromptSaveAndOrContinue())
+            {
+                await mapService.CreateNewMap(true, game: GameVersion.MagicCarpet2, mapType: mapType);
                 MainWindow.I.Title = GetTitle("NewLevel.DAT");
             }
         });
@@ -174,6 +203,7 @@ public class MainViewModel : ViewModelBase
         {
             if (await PromptSaveAndOrContinue())
             {
+                CrashGuard.ClosedNormally = true;
                 if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
                 {
                     desktopApp.Shutdown();
@@ -257,17 +287,30 @@ public class MainViewModel : ViewModelBase
     {
         if (await SaveFile(false) && !string.IsNullOrWhiteSpace(_settingsPort.CurrentLevelFilePath) && File.Exists(_settingsPort.CurrentLevelFilePath))
         {
+            // Run the open level in its own game, whatever game is selected in Game Settings
+            var game = _mapService.GetMap().Game;
             var settings = _settingsPort.LoadSettings();
-            if (settings == null || string.IsNullOrWhiteSpace(settings.GameExeLocation))
+            if (settings == null || string.IsNullOrWhiteSpace(settings.GetExeLocation(game)))
             {
-                await ShowGameSettingsDialog.Handle(Locator.Current.GetService<EditGameSettingsViewModel>());
+                // Not set up yet: open Game Settings on this game's tab
+                var settingsViewModel = Locator.Current.GetService<EditGameSettingsViewModel>()!;
+                settingsViewModel.SelectGame(game);
+                await ShowGameSettingsDialog.Handle(settingsViewModel);
             }
-            else
+            else if (!await _gameService.RunLevelFromSettings(new string[] { _settingsPort.CurrentLevelFilePath }, game))
             {
-                await _gameService.RunLevelFromSettings(new string[] { _settingsPort.CurrentLevelFilePath });
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to run the level in {GetGameName(game)}! Please check its paths in Game Settings.", ButtonEnum.Ok, Icon.Error);
+                await box.ShowAsync();
             }
         }
     }
+
+    private static string GetGameName(GameTarget game) => game switch
+    {
+        GameTarget.MagicCarpet2 => "Magic Carpet 2 HD",
+        GameTarget.HiddenWorlds => "Magic Carpet Hidden Worlds",
+        _ => "Magic Carpet"
+    };
 
     public void OnKeyPressed(Key key)
     {
@@ -277,7 +320,8 @@ public class MainViewModel : ViewModelBase
         }
         if (key  == Key.F5) 
         {
-            RunLevel();
+            // not waited on: an error is reported here, not lost
+            RunLevel().ContinueWith(t => CrashGuard.OnError(t.Exception!.GetBaseException()), TaskContinuationOptions.OnlyOnFaulted);
         }
 
         _eventAggregator.RaiseEvent("KeyPressed", this, new PubSubEventArgs<object>(key));
@@ -325,7 +369,7 @@ public class MainViewModel : ViewModelBase
                     new Vector(96, 96),
                     PixelFormat.Rgba8888);
 
-                var bmp = await _terrainService.DrawBitmapAsync(preview, map.Terrain, layer);
+                var bmp = await _terrainService.DrawBitmapAsync(preview, map, layer);
 
                 bmp.Save(filePath);
             }
@@ -383,7 +427,7 @@ public class MainViewModel : ViewModelBase
             if (!string.IsNullOrWhiteSpace(map.FilePath))
             {
                 suggestedFileName = Path.GetFileName(map.FilePath);
-                storageFolder = await topLevel.StorageProvider.TryGetFolderFromPathAsync(Path.GetDirectoryName(map.FilePath));
+                storageFolder = await PickerStartFolder.GetAsync(topLevel.StorageProvider, map.FilePath);
                 suggestedExtension = Path.GetExtension(map.FilePath);
             }
 
@@ -429,7 +473,9 @@ public class MainViewModel : ViewModelBase
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Open Map File",
-            AllowMultiple = false
+            AllowMultiple = false,
+            // The folder of the level that is open
+            SuggestedStartLocation = await PickerStartFolder.GetAsync(topLevel.StorageProvider, _mapService.GetMap()?.FilePath ?? _settingsPort.CurrentLevelFilePath)
         });
 
         if (files != null && files.Count == 1 && File.Exists(files[0].Path.LocalPath))
@@ -437,8 +483,10 @@ public class MainViewModel : ViewModelBase
             string filePath = files[0].Path.LocalPath;
             if (!await _mapService.LoadMapFromFileAsync(filePath))
             {
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to load the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                // the level that was open is still open, and still saves to its own file (not over the one that failed)
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to load the map file {filePath}! The level you had open is still open.", ButtonEnum.Ok, Icon.Error);
                 await box.ShowAsync();
+                return;
             }
 
             _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
@@ -451,10 +499,79 @@ public class MainViewModel : ViewModelBase
         RefreshData();
     }
 
+    /// <summary>
+    /// At start: a recovery file left from before (the editor did not close normally) offered to the person. Opened, it
+    /// is a level not yet saved (Save asks where, suggesting the file it came from); not opened, it is set aside, not
+    /// deleted.
+    /// </summary>
+    public async Task CheckForRecoveryAsync()
+    {
+        var info = _recoveryService.FindRecovery();
+        if (info is null)
+        {
+            _recoveryService.RecoveryHandled();
+            return;
+        }
+
+        bool opened = false;
+        bool discarded = false;
+        try
+        {
+            string level = !string.IsNullOrWhiteSpace(info.OriginalFilePath) ? $" '{Path.GetFileName(info.OriginalFilePath)}'" : string.Empty;
+            var box = MessageBoxManager.GetMessageBoxStandard("Recover Level",
+                $"The editor did not close properly last time. A copy of the level{level} was saved at {info.SavedAt:g}.\n\n" +
+                "Do you want to open it?\n\n(No sets it aside as Recovery_Discarded.DAT in " +
+                $"{Path.GetDirectoryName(info.FilePath)}.)",
+                ButtonEnum.YesNo, Icon.Question);
+            var result = await box.ShowAsPopupAsync(TopLevel.GetTopLevel(MainWindow.I));
+
+            if (result != ButtonResult.Yes)
+            {
+                _recoveryService.DiscardRecovery();
+                discarded = true;
+                return;
+            }
+
+            if (!await _mapService.LoadMapFromFileAsync(info.FilePath))
+            {
+                var error = MessageBoxManager.GetMessageBoxStandard("Error",
+                    $"Unable to open the recovery file! It has been set aside as Recovery_Discarded.DAT in {Path.GetDirectoryName(info.FilePath)}.",
+                    ButtonEnum.Ok, Icon.Error);
+                await error.ShowAsync();
+                return;
+            }
+            opened = true;
+
+            var map = _mapService.GetMap();
+            if (info.HiddenWorlds && !map.IsHiddenWorlds)
+            {
+                map.SetHiddenWorlds(true);
+                await _mapService.RecalculateTerrain(map.Terrain.GenerationParameters);
+            }
+            // not saved over the file it came from without asking
+            map.FilePath = info.OriginalFilePath ?? string.Empty;
+            _settingsPort.CurrentLevelFilePath = string.Empty;
+
+            _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
+            _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
+            _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+            MainWindow.I.Title = GetTitle($"Recovered {Path.GetFileName(info.OriginalFilePath ?? "NewLevel.DAT")}");
+            RefreshData();
+        }
+        finally
+        {
+            // not opened (it failed, or an error came part way): set aside before the editor starts saving its own
+            // recovery copies over it
+            if (!opened && !discarded)
+                _recoveryService.DiscardRecovery();
+            _recoveryService.RecoveryHandled();
+        }
+    }
+
     private string GetTitle(string filePath)
     {
         string title = !string.IsNullOrWhiteSpace(filePath)? Path.GetFileName(filePath) : string.Empty;
-        return $"Magic Carpet 1 Level Editor: {title}";
+        return $"Magic Carpet Level Editor: {title}";
     }
 
     private void RefreshData()

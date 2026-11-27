@@ -17,8 +17,9 @@ namespace MCLevelEdit
             services.RegisterLazySingleton<ISettingsPort>(() => new SettingsAdapter());
             services.RegisterLazySingleton<ITerrainService>(() => new TerrainService());
             services.RegisterLazySingleton<IGameService>(() => new GameService(resolver.GetService<ISettingsPort>()));
+            services.RegisterLazySingleton<IRecoveryService>(() => new RecoveryService(resolver.GetService<IFilePort>()));
             services.RegisterLazySingleton<IMapService>(() => new MapService(resolver.GetService<EventAggregator<object>>(), resolver.GetService<ITerrainService>(), resolver.GetService<IFilePort>()));
-            services.RegisterLazySingleton(() => new MainViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<ISettingsPort>(), resolver.GetService<IMapService>(), resolver.GetService<ITerrainService>(), resolver.GetService<IGameService>()));
+            services.RegisterLazySingleton(() => new MainViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<ISettingsPort>(), resolver.GetService<IMapService>(), resolver.GetService<ITerrainService>(), resolver.GetService<IGameService>(), resolver.GetService<IRecoveryService>()));
             services.Register(() => new EntitiesTableViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<IMapService>(), resolver.GetService<ITerrainService>()));
             services.Register(() => new EditGameSettingsViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<ISettingsPort>(), resolver.GetService<IGameService>()));
             services.Register(() => new UnpackLevelsViewModel(resolver.GetService<EventAggregator<object>>(), resolver.GetService<IGameService>()));

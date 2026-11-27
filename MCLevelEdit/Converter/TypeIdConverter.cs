@@ -13,8 +13,8 @@ public class TypeIdConverter : IValueConverter
     {
         if (value is not null)
         {
-            var entityType = ((TypeId)value).GetEntityFromTypeId();
-            return new KeyValuePair<int, string>(key: (int)entityType.TypeId, value: Enum.GetName(typeof(TypeId), entityType.TypeId));
+            var typeId = (TypeId)value;
+            return new KeyValuePair<int, string>(key: (int)typeId, value: Enum.GetName(typeof(TypeId), typeId) ?? $"Type{(int)typeId}");
         }
         return null;
     }

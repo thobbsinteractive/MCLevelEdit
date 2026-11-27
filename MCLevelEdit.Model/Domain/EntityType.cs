@@ -8,7 +8,10 @@ public enum TypeId
     Weather = 7,
     Effect = 10,
     Switch = 11,
-    Spell = 12
+    Spell = 12,
+    // Magic Carpet 2 only
+    Special = 14,
+    Vase = 15
 }
 
 public class EntityType
@@ -18,13 +21,10 @@ public class EntityType
 
     protected ModelType[] _modelTypes;
 
-    public virtual ModelType[] ModelTypes
-    {
-        get
-        {
-            return new ModelType[] { };
-        }
-    }
+    /// <summary>The game whose entity table this type belongs to.</summary>
+    public GameVersion Game { get; init; } = GameVersion.MagicCarpet1;
+
+    public virtual ModelType[] ModelTypes => EntityCatalog.GetModelTypes(Game, _typeId);
 
     public TypeId TypeId
     {
@@ -58,6 +58,7 @@ public class EntityType
     {
         return new EntityType(_typeId)
         {
+            Game = Game,
             Model = _model.Copy()
         };
     }

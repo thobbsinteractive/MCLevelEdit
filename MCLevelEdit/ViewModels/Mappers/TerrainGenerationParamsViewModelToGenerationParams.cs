@@ -8,7 +8,7 @@ public static class TerrainGenerationParamsViewModelToGenerationParams
     {
         return new GenerationParameters()
         {
-            MapType = MapType.Day,
+            MapType = terrainGenerationParamsViewModel.MapType,
             Seed = terrainGenerationParamsViewModel.Seed,
             Offset = terrainGenerationParamsViewModel.Offset,
             Raise = terrainGenerationParamsViewModel.Raise,
@@ -20,7 +20,8 @@ public static class TerrainGenerationParamsViewModelToGenerationParams
             SnFlt = terrainGenerationParamsViewModel.SnFlt,
             BhLin = terrainGenerationParamsViewModel.BhLin,
             BhFlt = terrainGenerationParamsViewModel.BhFlt,
-            RkSte = terrainGenerationParamsViewModel.RkSte
+            RkSte = terrainGenerationParamsViewModel.RkSte,
+            BasicHeight = terrainGenerationParamsViewModel.BasicHeight
         };
     }
 }

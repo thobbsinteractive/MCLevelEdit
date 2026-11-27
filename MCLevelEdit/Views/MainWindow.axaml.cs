@@ -1,5 +1,6 @@
 ﻿using Avalonia.Input;
 using Avalonia.ReactiveUI;
+using MCLevelEdit.Utils;
 using MCLevelEdit.ViewModels;
 using ReactiveUI;
 using System;
@@ -33,6 +34,21 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         this.KeyDown += OnKeyDown;
 
         this.Closing += OnClosing;
+        this.Opened += OnOpened;
+    }
+
+    // once shown: a level saved for recovery last time (the editor did not close properly) offered to open
+    private async void OnOpened(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (MainViewModel is not null)
+                await MainViewModel.CheckForRecoveryAsync();
+        }
+        catch (Exception ex)
+        {
+            CrashGuard.OnError(ex);
+        }
     }
 
     private async void OnClosing(object? sender, Avalonia.Controls.WindowClosingEventArgs e)
@@ -40,10 +56,19 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         if (!_userClosed)
         {
             e.Cancel = true;
-            if (await MainViewModel.PromptSaveAndOrContinue())
+            try
             {
-                _userClosed = true;
-                this.Close();
+                if (await MainViewModel.PromptSaveAndOrContinue())
+                {
+                    _userClosed = true;
+                    CrashGuard.ClosedNormally = true;
+                    this.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                // the window stays open, with the level
+                CrashGuard.OnError(ex);
             }
         }
     }

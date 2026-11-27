@@ -11,14 +11,20 @@
              x:Class="MCLevelEdit.Views.MapEditorView"
              x:DataType="vm:MapEditorViewModel">
   <Grid Name="grdMapEditor"
-        ColumnDefinitions="200,0,160,160,Auto,*,35,35,35,35,35,60"
-        RowDefinitions="30,*">
+        ColumnDefinitions="200,130,160,160,Auto,*,35,35,35,35,35,60"
+        RowDefinitions="40,*">
     <CheckBox Name="chkShowHeightMap"
               Margin="4,1"
               Grid.Column="0"
               Grid.Row="0"
               IsChecked="{Binding ShowHeightMap}"
               Content="Show Heightmap"/>
+    <CheckBox Name="chkHideEntities"
+              Grid.Column="1"
+              Grid.Row="0"
+              ToolTip.Tip="Hide the entities from the map (the cursor still selects and places them)"
+              IsChecked="{Binding HideEntities}"
+              Content="Hide Entities"/>
     <CheckBox Name="chkShowConnections"
               Grid.Column="2"
               Grid.Row="0"
@@ -35,6 +41,42 @@
            Grid.Column="4"
            Grid.Row="0"
            Content="{Binding #pazMap.ZoomX, StringFormat='Zoom: {0:0.00}'}"/>
+    <!-- the viewport shown or hidden; the isometric view in place of the map from above, and while it is shown (on the
+         canvas or in the viewport) its turn: a slider that stops only at the four fixed angles -->
+    <StackPanel Grid.Column="5"
+                Grid.Row="0"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Spacing="4"
+                Margin="4,0">
+      <CheckBox Name="chkShowViewport"
+                VerticalAlignment="Center"
+                Content="Viewport"
+                ToolTip.Tip="Show the viewport: the view the map does not show (the isometric view, or the map from above)"
+                IsChecked="{Binding ShowViewport}"/>
+      <CheckBox Name="chkShowIsometric"
+                VerticalAlignment="Center"
+                Content="Isometric View"
+                ToolTip.Tip="Show the terrain isometric in place of the map from above, with the entities on it"
+                IsChecked="{Binding ShowIsometric}"/>
+      <Slider Name="sldIsometricTurn"
+              Width="100"
+              Minimum="0"
+              Maximum="3"
+              TickFrequency="1"
+              IsSnapToTickEnabled="True"
+              TickPlacement="BottomRight"
+              VerticalAlignment="Center"
+              Margin="0,-8"
+              ToolTip.Tip="Turn the isometric view (0°, 90°, 180°, 270°)"
+              IsVisible="{Binding CanTurnIsometric}"
+              Value="{Binding IsometricQuarterTurns}"/>
+      <TextBlock Width="32"
+                 VerticalAlignment="Center"
+                 Text="{Binding IsometricAngle, StringFormat='{}{0}°'}"
+                 IsVisible="{Binding CanTurnIsometric}"/>
+    </StackPanel>
     <Button Name="btnPanLeft"
         Margin="1"
         Grid.Column="6"
@@ -96,6 +138,7 @@
             Grid.Row="0"
             Content="Reset"/>
     <paz:ZoomBorder Name="pazMap"
+                    RenderOptions.BitmapInterpolationMode="None"
                     Background="LightBlue"
                     Grid.Column="0"
                     Grid.ColumnSpan="12"
@@ -109,6 +152,7 @@
                     MaxZoomY="4"
                     Focusable="True"
                     EnableConstrains="True">
+      <!-- the map from above, or the isometric view in its place (CanvasImage), with the entities over it -->
       <Canvas Name="cvEntities"
               MinHeight="2048"
               MinWidth="2048">
@@ -118,8 +162,29 @@
                ZIndex="0"
                Height="2048"
                Width="2048"
-               Source="{Binding Preview}"/>
+               Source="{Binding CanvasImage}"/>
       </Canvas>
     </paz:ZoomBorder>
+    <!-- the viewport over the map's bottom right corner: the view the canvas does not show; clicked, the two swap -->
+    <Border Name="bdrViewport"
+            Grid.Column="0"
+            Grid.ColumnSpan="12"
+            Grid.Row="1"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Margin="8"
+            Width="256"
+            Height="256"
+            Background="LightBlue"
+            BorderBrush="DimGray"
+            BorderThickness="2"
+            Cursor="Hand"
+            ToolTip.Tip="Click to swap the viewport and the map"
+            IsVisible="{Binding ShowViewport}">
+      <Image Name="imgViewport"
+             Stretch="Uniform"
+             RenderOptions.BitmapInterpolationMode="MediumQuality"
+             Source="{Binding ViewportImage}"/>
+    </Border>
   </Grid>
 </UserControl>

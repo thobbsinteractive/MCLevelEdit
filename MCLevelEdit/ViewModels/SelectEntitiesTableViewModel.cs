@@ -43,11 +43,7 @@ namespace MCLevelEdit.ViewModels
         protected EventAggregator<object> _eventAggregator;
         protected int _entityFilter;
 
-        public new List<KeyValuePair<int, string>> TypeIds { get; } =
-            Enum.GetValues(typeof(TypeId))
-            .Cast<int>()
-            .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
-            .ToList();
+        public new IList<KeyValuePair<int, string>> TypeIds => EntityTypeLists.TypeIdsWithAll;
 
         public IAvaloniaList<SelectableEntityViewModel> Entities { get; } = new AvaloniaList<SelectableEntityViewModel>();
         public IAvaloniaList<SelectableEntityViewModel> DisplayedEntities { get; } = new AvaloniaList<SelectableEntityViewModel>();
@@ -77,7 +73,6 @@ namespace MCLevelEdit.ViewModels
             }
             RefreshData();
 
-            TypeIds.Insert(0, new KeyValuePair<int, string>(0, ""));
             _entityFilter = 0;
         }
 

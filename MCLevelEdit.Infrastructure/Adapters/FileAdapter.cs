@@ -9,6 +9,16 @@ public class FileAdapter : IFilePort
 {
     public const int FILE_SIZE = 38812;
 
+    // Magic Carpet 1 / Hidden Worlds terrain fields (remc1 Type_Mc1Level_2F503). Unlike MC2 there is no RkSte,
+    // and LRiver comes straight after River.
+    private const int MC1_RIVER = 0x14;
+    private const int MC1_LRIVER = 0x18;
+    private const int MC1_SOURCE = 0x1C;
+    private const int MC1_SNLIN = 0x20;
+    private const int MC1_SNFLT = 0x24;
+    private const int MC1_BHLIN = 0x28;
+    private const int MC1_BHFLT = 0x2C;
+
     public Task<bool> SaveMapAsync(Map map, string fileName)
     {
         return Task.Run<bool>(() => {
@@ -18,6 +28,12 @@ public class FileAdapter : IFilePort
 
     public bool SaveMap(Map map, string fileName)
     {
+        if (map is MCLevelEdit.Model.Domain.MC2.Mc2Map mc2Map)
+        {
+            WriteFileSafely(fileName, Mc2LevelFormat.Write(mc2Map));
+            return true;
+        }
+
         var levfile = new byte[FILE_SIZE];
         var counter = 0;
         var numWizards = map.Wizards.Where(w => w.IsActive).Count();
@@ -35,13 +51,14 @@ public class FileAdapter : IFilePort
         WriteUShortToArray(map.Terrain.GenerationParameters.Offset, levfile, 8);
         WriteUInt32ToArray(map.Terrain.GenerationParameters.Raise, levfile, 12);
         WriteUShortToArray(map.Terrain.GenerationParameters.Gnarl, levfile, 16);
-        WriteUShortToArray(map.Terrain.GenerationParameters.River, levfile, 20);
-        WriteUShortToArray(map.Terrain.GenerationParameters.Source, levfile, 24);
-        WriteUShortToArray(map.Terrain.GenerationParameters.SnLin, levfile, 28);
-        WriteUShortToArray(map.Terrain.GenerationParameters.SnFlt, levfile, 32);
-        WriteUShortToArray(map.Terrain.GenerationParameters.BhLin, levfile, 36);
-        WriteUShortToArray(map.Terrain.GenerationParameters.BhFlt, levfile, 40);
-        WriteUShortToArray(map.Terrain.GenerationParameters.RkSte, levfile, 44);
+        WriteUShortToArray(map.Terrain.GenerationParameters.River, levfile, MC1_RIVER);
+        WriteUShortToArray(map.Terrain.GenerationParameters.LRiver, levfile, MC1_LRIVER);
+        WriteUShortToArray(map.Terrain.GenerationParameters.Source, levfile, MC1_SOURCE);
+        WriteUShortToArray(map.Terrain.GenerationParameters.SnLin, levfile, MC1_SNLIN);
+        WriteUShortToArray(map.Terrain.GenerationParameters.SnFlt, levfile, MC1_SNFLT);
+        WriteUShortToArray(map.Terrain.GenerationParameters.BhLin, levfile, MC1_BHLIN);
+        WriteUShortToArray(map.Terrain.GenerationParameters.BhFlt, levfile, MC1_BHFLT);
+        // MC1 levels have no RkSte (Magic Carpet 2 added it)
 
         int fpos = 1090; // Move on to Thing data
         var entityCount = Globals.MAX_ENTITIES;
@@ -208,9 +225,35 @@ public class FileAdapter : IFilePort
             clevelPos += 1;
         }
 
-        File.WriteAllBytes(fileName, levfile);
+        WriteFileSafely(fileName, levfile);
 
         return true;
+    }
+
+    /// <summary>
+    /// Writes a file whole to a temporary file beside it first, then puts it in place of the old one: a write that fails
+    /// part way (a full disk, the editor closing) leaves the old file as it was, not half written.
+    /// </summary>
+    private static void WriteFileSafely(string fileName, byte[] bytes)
+    {
+        string tempFile = fileName + ".saving";
+        try
+        {
+            File.WriteAllBytes(tempFile, bytes);
+            File.Move(tempFile, fileName, overwrite: true);
+        }
+        finally
+        {
+            try
+            {
+                if (File.Exists(tempFile))
+                    File.Delete(tempFile);
+            }
+            catch
+            {
+                // left behind; the next save writes over it
+            }
+        }
     }
 
     public Task<Map> LoadMapAsync(string fileName)
@@ -223,14 +266,21 @@ public class FileAdapter : IFilePort
     public Map LoadMap(string fileName)
     {
         var levfile = File.ReadAllBytes(fileName);
-        Map map = new Map();
-        var counter = 0;
-        var Wnumber = 1;
 
         if (levfile[0] == 82 && levfile[1] == 78 && levfile[2] == 67)
         {
             throw new Exception("Compressed level detected! You must uncompress this file first");
         }
+
+        if (LevelFormat.DetectFromFileSize(levfile.Length) == GameVersion.MagicCarpet2)
+        {
+            var mc2Map = Mc2LevelFormat.Read(levfile);
+            mc2Map.FilePath = fileName;
+            return mc2Map;
+        }
+
+        Map map = new Map();
+        var counter = 0;
 
         map.FilePath = fileName;
         map.ManaTotal = BitConverter.ToUInt32(levfile, 0);
@@ -243,13 +293,14 @@ public class FileAdapter : IFilePort
             Offset = BitConverter.ToUInt16(levfile, 8),
             Raise = BitConverter.ToUInt32(levfile, 12),
             Gnarl = BitConverter.ToUInt16(levfile, 16),
-            River = BitConverter.ToUInt16(levfile, 20),
-            Source = (byte)BitConverter.ToUInt16(levfile, 24),
-            SnLin = BitConverter.ToUInt16(levfile, 28),
-            SnFlt = (byte)BitConverter.ToUInt16(levfile, 32),
-            BhLin = (byte)BitConverter.ToUInt16(levfile, 36),
-            BhFlt = (byte)BitConverter.ToUInt16(levfile, 40),
-            RkSte = (byte)BitConverter.ToUInt16(levfile, 44)
+            River = BitConverter.ToUInt16(levfile, MC1_RIVER),
+            LRiver = BitConverter.ToUInt16(levfile, MC1_LRIVER),
+            Source = (byte)BitConverter.ToUInt16(levfile, MC1_SOURCE),
+            SnLin = BitConverter.ToUInt16(levfile, MC1_SNLIN),
+            SnFlt = (byte)BitConverter.ToUInt16(levfile, MC1_SNFLT),
+            BhLin = (byte)BitConverter.ToUInt16(levfile, MC1_BHLIN),
+            BhFlt = (byte)BitConverter.ToUInt16(levfile, MC1_BHFLT)
+            // MC1 levels have no RkSte (Magic Carpet 2 added it)
         };
 
         int fpos = 1090; // Move on to Thing data
@@ -276,7 +327,7 @@ public class FileAdapter : IFilePort
             ushort Parent = BitConverter.ToUInt16(levfile, fpos + 14);
             ushort Child = BitConverter.ToUInt16(levfile, fpos + 16);
 
-            var entityType = entityTypeId.GetEntityTypeFromTypeIdAndModelId(modelId);
+            var entityType = entityTypeId.GetEntityTypeFromTypeIdAndModelId(modelId, GameVersion.MagicCarpet1);
 
             if (entityType != null)
             {

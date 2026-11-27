@@ -1,7 +1,9 @@
-﻿using Avalonia;
+﻿using MCLevelEdit.Model.Domain.MC1; // MC1 effect IDs for paths, walls, canyons etc. are the same in MC2
+using Avalonia;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using MCLevelEdit.Model.Repository;
 using MCLevelEdit.ViewModels.Extensions;
 using ReactiveUI;
 using System.Linq;
@@ -101,6 +103,11 @@ public class EntityToolBarViewModel : ViewModelBase
             this.RaiseAndSetIfChanged(ref _effectsSelected, value);
         }
     }
+
+    /// <summary>True when the open level is Magic Carpet 1 (weather and spell jars only exist there).</summary>
+    public bool IsMc1 => MapRepository.Map.GameVersion == GameVersion.MagicCarpet1;
+
+    public string SpellsToolTip => IsMc1 ? "Add Spell Jar" : "Add Spell Vase";
 
     public bool SpellsSelected
     {
@@ -214,6 +221,11 @@ public class EntityToolBarViewModel : ViewModelBase
     public EntityToolBarViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
     {
         _eventAggregator.RegisterEvent("OnCursorClicked", CursorClickedHandler);
+        _eventAggregator.RegisterEvent("RefreshEntities", (sender, args) =>
+        {
+            this.RaisePropertyChanged(nameof(IsMc1));
+            this.RaisePropertyChanged(nameof(SpellsToolTip));
+        });
         CursorSelected = true;
 
         CursorSelectedCommand = ReactiveCommand.Create(() =>
@@ -247,7 +259,8 @@ public class EntityToolBarViewModel : ViewModelBase
         {
             ClearSelection();
             SpellsSelected = true;
-            OnEntityTypeSelected(TypeId.Spell);
+            // MC2 spells sit in vases rather than MC1 spell jars
+            OnEntityTypeSelected(IsMc1 ? TypeId.Spell : TypeId.Vase);
         });
 
         SwitchesSelectedCommand = ReactiveCommand.Create(() =>

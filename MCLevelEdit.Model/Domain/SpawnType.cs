@@ -1,10 +1,9 @@
-﻿using System.Drawing;
+﻿namespace MCLevelEdit.Model.Domain;
 
-namespace MCLevelEdit.Model.Domain;
-
+/// <summary>Wizard spawn points. Identical in Magic Carpet 1 and 2.</summary>
 public enum Spawn
 {
-    Flyer1 = 4,
+    Flyer1 = 4, // the player
     Flyer2 = 5,
     Flyer3 = 6,
     Flyer4 = 7,
@@ -16,7 +15,11 @@ public enum Spawn
 
 public class SpawnType : EntityType
 {
-    public SpawnType(Spawn spawn) : base(TypeId.Spawn, ((int)spawn), spawn.ToString()) { }
+    public SpawnType(Spawn spawn, GameVersion game = GameVersion.MagicCarpet1)
+        : base(TypeId.Spawn, (int)spawn, spawn.ToString())
+    {
+        Game = game;
+    }
 
     public override ModelType[] ModelTypes
     {
@@ -24,9 +27,8 @@ public class SpawnType : EntityType
         {
             if (_modelTypes is null)
             {
-                _modelTypes = Enum.GetValues(typeof(Spawn))
-                    .Cast<int>()
-                    .Select(x => new ModelType() { Id = x, Name = Enum.GetName(typeof(Spawn), x) })
+                _modelTypes = Enum.GetValues<Spawn>()
+                    .Select(x => new ModelType() { Id = (int)x, Name = x.ToString() })
                     .ToArray();
             }
 

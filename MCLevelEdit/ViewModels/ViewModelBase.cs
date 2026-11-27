@@ -16,11 +16,7 @@ public class ViewModelBase : ReactiveObject
     protected readonly ITerrainService _terrainService;
     protected readonly EventAggregator<object> _eventAggregator;
 
-    public static KeyValuePair<int, string>[] TypeIds { get; } =
-        Enum.GetValues(typeof(TypeId))
-        .Cast<int>()
-        .Select(x => new KeyValuePair<int, string>(key: x, value: Enum.GetName(typeof(TypeId), x)))
-        .ToArray();
+    public static IList<KeyValuePair<int, string>> TypeIds => EntityTypeLists.TypeIds;
 
     public ViewModelBase(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService)
     {
@@ -65,9 +61,10 @@ public class ViewModelBase : ReactiveObject
         _eventAggregator.RaiseEvent("DeleteEntity", this, new PubSubEventArgs<object>(entityView));
     }
 
-    protected void UpdateEntity(EntityViewModel entityView)
+    /// <param name="deferTerrain">leave the terrain as it is until IMapService.CommitTerrain (while dragging)</param>
+    protected void UpdateEntity(EntityViewModel entityView, bool deferTerrain = false)
     {
-        _mapService.UpdateEntity(entityView.ToEntity());
+        _mapService.UpdateEntity(entityView.ToEntity(), deferTerrain);
         _eventAggregator.RaiseEvent("UpdateEntity", this, new PubSubEventArgs<object>(entityView));
     }
 }
