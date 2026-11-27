@@ -1,31 +1,9 @@
 ﻿using MCLevelEdit.Model.Enums;
 
-namespace MCLevelEdit.Model.Domain.Validation
+namespace MCLevelEdit.Model.Domain.Validation.MC1
 {
-    public static class MapRules
+    public static class Mc1MapRules
     {
-        public static ValidationResult HasPlayerSpawn(IList<Entity> entities)
-        {
-            if (entities is not null && entities.Any() &&
-                entities.Where(e => e.EntityType.TypeId == TypeId.Spawn &&
-                e.EntityType.Model.Id == (int)Spawn.Flyer1).Count() > 0)
-            {
-                if (entities.Where(e => e.EntityType.TypeId == TypeId.Spawn &&
-                    e.EntityType.Model.Id == (int)Spawn.Flyer1).Count() == 1)
-                {
-                    return new ValidationResult(0, Result.Pass, nameof(HasPlayerSpawn));
-                }
-                else
-                {
-                    return new ValidationResult(0, Result.Fail, "Too many Player Spawns!");
-                }
-            }
-            else
-            {
-                return new ValidationResult(0, Result.Fail, "Player Spawn is required!");
-            }
-        }
-
         public static IList<ValidationResult> HasCorrectNumberOfWizardSpawns(Map map)
         {
             var ValidationResults = new List<ValidationResult>();

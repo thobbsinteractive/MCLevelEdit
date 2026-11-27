@@ -10,7 +10,7 @@
              x:DataType="vm:EditEntityViewModel">
   <Grid Margin="5"
         ColumnDefinitions="1*,2*"
-        RowDefinitions="40,30,30,30,30,30,30,30,30,30,*">
+        RowDefinitions="40,30,30,30,30,30,30,30,30,30,30,*">
     <Grid.Resources>
       <c:TypeIdConverter x:Key="typeIdConverter"/>
       <c:KeyValuePairToNameConverter x:Key="keyValuePairToNameConverter"/>
@@ -55,73 +55,101 @@
     </ComboBox>
     <Label Grid.Column="0"
            Grid.Row="3"
-           HorizontalAlignment="Left">
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding EntityView.XTip}">
       PosX:
     </Label>
     <TextBox x:Name="txtPosX"
+             ToolTip.Tip="{Binding EntityView.XTip}"
              Grid.Row="3"
              Grid.Column="1"
              Text="{Binding EntityView.X, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="4"
-           HorizontalAlignment="Left">
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding EntityView.YTip}">
       PosY:
     </Label>
     <TextBox x:Name="txtPosY"
+             ToolTip.Tip="{Binding EntityView.YTip}"
          Grid.Row="4"
          Grid.Column="1"
          Text="{Binding EntityView.Y, Converter={StaticResource uInt8ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="5"
-           HorizontalAlignment="Left">
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding EntityView.DisIdTip}">
       DisId:
     </Label>
     <TextBox x:Name="txtDisId"
+             ToolTip.Tip="{Binding EntityView.DisIdTip}"
         Grid.Row="5"
         Grid.Column="1"
         Text="{Binding EntityView.DisId, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="6"
-           HorizontalAlignment="Left">
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding EntityView.SwitchSizeTip}">
       Switch Size:
     </Label>
     <TextBox x:Name="txtSwitchSize"
+             ToolTip.Tip="{Binding EntityView.SwitchSizeTip}"
              Grid.Row="6"
              Grid.Column="1"
              Text="{Binding EntityView.SwitchSize, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="7"
-           HorizontalAlignment="Left">
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding EntityView.SwitchIdTip}">
       Switch Id:
     </Label>
     <TextBox x:Name="txtSwitchId"
+             ToolTip.Tip="{Binding EntityView.SwitchIdTip}"
              Grid.Row="7"
              Grid.Column="1"
              Text="{Binding EntityView.SwitchId, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="8"
-           HorizontalAlignment="Left">
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding EntityView.ParentTip}">
       Parent:
     </Label>
     <TextBox x:Name="txtParent"
+             ToolTip.Tip="{Binding EntityView.ParentTip}"
          Grid.Row="8"
          Grid.Column="1"
          Text="{Binding EntityView.Parent, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
     <Label Grid.Column="0"
            Grid.Row="9"
-           HorizontalAlignment="Left">
+           HorizontalAlignment="Left"
+           ToolTip.Tip="{Binding EntityView.ChildTip}">
       Child:
     </Label>
     <TextBox x:Name="txtChild"
+             ToolTip.Tip="{Binding EntityView.ChildTip}"
              Grid.Row="9"
              Grid.Column="1"
              Text="{Binding EntityView.Child, Converter={StaticResource uInt16ToStringConverter}}">
+    </TextBox>
+    <Label Grid.Column="0"
+           Grid.Row="10"
+           HorizontalAlignment="Left"
+           IsVisible="{Binding EntityView.HasPar3}"
+           ToolTip.Tip="{Binding EntityView.Par3Tip}">
+      Par3:
+    </Label>
+    <TextBox x:Name="txtPar3"
+             ToolTip.Tip="{Binding EntityView.Par3Tip}"
+             Grid.Row="10"
+             Grid.Column="1"
+             IsVisible="{Binding EntityView.HasPar3}"
+             Text="{Binding EntityView.Par3, Converter={StaticResource uInt16ToStringConverter}}">
     </TextBox>
   </Grid>
 </UserControl>

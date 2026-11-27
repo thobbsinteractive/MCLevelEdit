@@ -24,5 +24,11 @@ namespace MCLevelEdit.ViewModels
 
         [ObservableProperty]
         private SpellsViewModel _spells = new SpellsViewModel();
+
+        // Magic Carpet 2 only
+        [ObservableProperty]
+        private short _life;
+
+        public System.Collections.Generic.List<Mc2SpellViewModel> Mc2Spells { get; set; } = new();
     }
 }

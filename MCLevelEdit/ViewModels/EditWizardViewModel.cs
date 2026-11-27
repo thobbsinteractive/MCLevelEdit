@@ -1,7 +1,9 @@
 ﻿using MCLevelEdit.Application.Model;
 using MCLevelEdit.Model.Abstractions;
+using MCLevelEdit.Model.Domain;
 using MCLevelEdit.ViewModels.Mappers;
 using ReactiveUI;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MCLevelEdit.ViewModels;
@@ -62,12 +64,34 @@ public class EditWizardViewModel : ReactiveObject
         get => _wizard.Spells;
     }
 
+    public bool IsMc1 { get; }
+    public bool IsMc2 => !IsMc1;
+
+    /// <summary>Magic Carpet 2 only.</summary>
+    public short Life
+    {
+        get => _wizard.Life;
+        set
+        {
+            _wizard.Life = value;
+            this.RaisePropertyChanged(nameof(Life));
+            Update();
+        }
+    }
+
+    /// <summary>Magic Carpet 2 only: the 26 spells with starting, level and blocked settings.</summary>
+    public List<Mc2SpellViewModel> Mc2Spells => _wizard.Mc2Spells;
+
     public EditWizardViewModel(EventAggregator<object> eventAggregator, IMapService mapService, string wizardName)
     {
         _eventAggregator = eventAggregator;
         _mapService = mapService;
         var map = _mapService.GetMap();
-        _wizard = map.Wizards.Where(w => w.Name.Equals(wizardName)).Select(w => w.ToWizardViewModel()).First();
+        IsMc1 = map.GameVersion == GameVersion.MagicCarpet1;
+        _wizard = map.Wizards.Where(w => w.Name.Equals(wizardName)).Select(w => w.ToWizardViewModel(map.IsHiddenWorlds)).First();
+
+        foreach (var spell in _wizard.Mc2Spells)
+            spell.Changed += SpellsUpdatedEvent;
 
         _wizard.Spells.Fireball.SpellsUpdatedEvent += SpellsUpdatedEvent;
         _wizard.Spells.Possess.SpellsUpdatedEvent += SpellsUpdatedEvent;

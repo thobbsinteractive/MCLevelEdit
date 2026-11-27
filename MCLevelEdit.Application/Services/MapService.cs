@@ -1,8 +1,10 @@
-﻿using MagicCarpet2Terrain.Model;
+﻿using MCLevelEdit.Model.Domain.MC1; // MC1 effect IDs for paths, walls, canyons etc. are the same in MC2
+using MagicCarpet2Terrain.Model;
 using MCLevelEdit.Application.Model;
 using MCLevelEdit.Infrastructure.Interfaces;
 using MCLevelEdit.Model.Abstractions;
 using MCLevelEdit.Model.Domain;
+using Mc2Wizard = MCLevelEdit.Model.Domain.MC2.Mc2Wizard;
 using MCLevelEdit.Model.Enums;
 using MCLevelEdit.Model.Repository;
 using Splat;
@@ -24,15 +26,18 @@ public class MapService : IMapService, IEnableLogger
 
     public async Task<bool> LoadMapFromFileAsync(string filePath)
     {
+        // the level open now, put back if the new one cannot be loaded (else the work on it would be lost)
+        var previousMap = MapRepository.Map;
         try
         {
             MapRepository.Map = await _filePort.LoadMapAsync(filePath);
-            MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(MapRepository.Map.Terrain.GenerationParameters);
+            await GenerateTerrain(MapRepository.Map.Terrain.GenerationParameters);
             MapRepository.Map.ValidateEntities();
         }
         catch (Exception ex)
         {
             this.Log().Error(ex, $"Error loading level {filePath}:\n{ex.Message}");
+            MapRepository.Map = previousMap;
             return false;
         }
         return true;
@@ -42,14 +47,18 @@ public class MapService : IMapService, IEnableLogger
     {
         try
         {
-            if (MapRepository.Map.ManaTotal == 0)
+            // Magic Carpet 2 levels have no mana total and set their goals through objectives
+            if (MapRepository.Map.GameVersion == GameVersion.MagicCarpet1)
             {
-                MapRepository.Map.ManaTotal = CalculateMana();
-            }
+                if (MapRepository.Map.ManaTotal == 0)
+                {
+                    MapRepository.Map.ManaTotal = CalculateMana();
+                }
 
-            if (MapRepository.Map.ManaTarget == 0)
-            {
-                MapRepository.Map.ManaTarget = 35;
+                if (MapRepository.Map.ManaTarget == 0)
+                {
+                    MapRepository.Map.ManaTarget = 35;
+                }
             }
             MapRepository.Map.ValidateEntities();
 
@@ -81,15 +90,26 @@ public class MapService : IMapService, IEnableLogger
         return true;
     }
 
-    public async Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE)
+    public async Task<bool> CreateNewMap(bool randomTerrain = false, ushort size = Globals.MAX_MAP_SIZE, GameVersion game = GameVersion.MagicCarpet1, MapType mapType = MapType.Day, bool hiddenWorlds = false)
     {
         try
         {
-            MapRepository.Map = new Map();
+            // Hidden Worlds levels use the Magic Carpet 1 format
+            MapRepository.Map = game == GameVersion.MagicCarpet2 ? new MCLevelEdit.Model.Domain.MC2.Mc2Map() : new Map();
+            MapRepository.Map.SetHiddenWorlds(hiddenWorlds);
             _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
             _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
             if (randomTerrain)
                 MapRepository.Map.Terrain.GenerationParameters = _terrainService.GetRandomGeneratorParamters();
+
+            // Only Magic Carpet 2 levels have a map type
+            var gp = MapRepository.Map.Terrain.GenerationParameters;
+            gp.MapType = game == GameVersion.MagicCarpet2 ? mapType : MapType.Day;
+            if (gp.MapType == MapType.Cave && gp.BasicHeight == 0)
+            {
+                // The cave roof: with none, the whole cave is solid rock. MC2's own caves use around 114-154.
+                gp.BasicHeight = (byte)Random.Shared.Next(110, 161);
+            }
 
             return await RecalculateTerrain(MapRepository.Map.Terrain.GenerationParameters);
         }
@@ -104,7 +124,7 @@ public class MapService : IMapService, IEnableLogger
     {
         try
         {
-            MapRepository.Map.Terrain = await _terrainService.CalculateMc2Terrain(generationParameters);
+            await GenerateTerrain(generationParameters);
             _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
         }
         catch (Exception ex)
@@ -114,6 +134,37 @@ public class MapService : IMapService, IEnableLogger
         }
         return true;
     }
+
+    /// <summary>Generates the map's terrain, then builds its walls, paths and buildings into it.</summary>
+    private async Task GenerateTerrain(GenerationParameters generationParameters)
+    {
+        var map = MapRepository.Map;
+        map.GeneratedTerrain = await _terrainService.CalculateTerrain(generationParameters, map.TerrainGame);
+        map.Terrain = _terrainService.BuildFeatures(map.GeneratedTerrain, map);
+    }
+
+    // an update left the terrain to be built again (an entity being dragged), CommitTerrain builds it
+    private bool _terrainPending;
+
+    public void CommitTerrain()
+    {
+        if (_terrainPending)
+            RebuildFeatures();
+    }
+
+    /// <summary>Builds the walls, paths and buildings into the generated terrain again, after one changed.</summary>
+    private void RebuildFeatures()
+    {
+        _terrainPending = false;
+        var map = MapRepository.Map;
+        if (map.GeneratedTerrain is null)
+            return;
+        map.Terrain = _terrainService.BuildFeatures(map.GeneratedTerrain, map);
+        _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+    }
+
+    /// <summary>Whether the entity is a wall, path or building, which can change the terrain when the level loads.</summary>
+    private static bool ChangesTerrain(Entity? entity) => TerrainService.ShapesTerrain(entity) || entity?.EntityType?.TypeId == TypeId.Spawn;
 
     public Map GetMap()
     {
@@ -137,7 +188,10 @@ public class MapService : IMapService, IEnableLogger
     {
         try
         {
-            return MapRepository.Map.AddEntity(entity);
+            int id = MapRepository.Map.AddEntity(entity);
+            if (ChangesTerrain(entity))
+                RebuildFeatures();
+            return id;
         }
         catch (Exception ex)
         {
@@ -146,11 +200,21 @@ public class MapService : IMapService, IEnableLogger
         }
     }
 
-    public bool UpdateEntity(Entity entity)
+    public bool UpdateEntity(Entity entity) => UpdateEntity(entity, false);
+
+    public bool UpdateEntity(Entity entity, bool deferTerrain)
     {
         try
         {
+            bool wasFeature = ChangesTerrain(MapRepository.Map.GetEntity(entity.Id));
             MapRepository.Map.UpdateEntity(entity);
+            if (wasFeature || ChangesTerrain(entity))
+            {
+                if (deferTerrain)
+                    _terrainPending = true;
+                else
+                    RebuildFeatures();
+            }
             return true;
         }
         catch (Exception ex)
@@ -164,7 +228,10 @@ public class MapService : IMapService, IEnableLogger
     {
         try
         {
+            bool wasFeature = ChangesTerrain(MapRepository.Map.GetEntity(entity.Id));
             MapRepository.Map.DeleteEntity(entity);
+            if (wasFeature)
+                RebuildFeatures();
             return true;
         }
         catch (Exception ex)
@@ -176,19 +243,19 @@ public class MapService : IMapService, IEnableLogger
 
     public List<Entity> GetEntities()
     {
-        return MapRepository.Map.Entities.ToList();
+        return MapRepository.Map.VisibleEntities.ToList();
     }
 
     public List<Entity> GetEntitiesByCoords(int x, int y)
     {
-        return MapRepository.Map.Entities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();
+        return MapRepository.Map.VisibleEntities.Where(e => e.Position.X == x && e.Position.Y == y).ToList();
     }
 
     public List<Entity> GetEntitiesBySwitchId(ushort switchId, int excludeId = 0)
     {
         if (switchId > 0 && MapRepository.Map.Entities.Count > 0)
         {
-            return MapRepository.Map.Entities.Where(e => e.Id != excludeId && e.SwitchId == switchId && e.DisId < ushort.MaxValue).ToList();
+            return MapRepository.Map.VisibleEntities.Where(e => e.Id != excludeId && e.SwitchId == switchId && e.DisId < ushort.MaxValue).ToList();
         }
         else
             return new List<Entity>();
@@ -239,6 +306,7 @@ public class MapService : IMapService, IEnableLogger
                 numWizards--;
         }
 
+        RebuildFeatures();
         return true;
     }
 
@@ -258,7 +326,18 @@ public class MapService : IMapService, IEnableLogger
                 wizardToUpdate.Agression = wizard.Agression;
                 wizardToUpdate.Perception = wizard.Perception;
                 wizardToUpdate.Reflexes = wizard.Reflexes;
+
                 wizardToUpdate.CastleLevel = wizard.CastleLevel;
+
+                // MC2 wizards also carry spell settings and Life (only taken when all 26 spells are supplied)
+                if (wizardToUpdate is Mc2Wizard mc2Target && wizard is Mc2Wizard mc2Source
+                    && mc2Source.StartingSpells?.Length == LevelFormat.MC2_SPELL_COUNT)
+                {
+                    mc2Target.Life = mc2Source.Life;
+                    mc2Target.StartingSpells = mc2Source.StartingSpells;
+                    mc2Target.SpellLevels = mc2Source.SpellLevels;
+                    mc2Target.BlockedSpells = mc2Source.BlockedSpells;
+                }
 
                 if (wizardToUpdate.Spells != null)
                 {
@@ -287,6 +366,8 @@ public class MapService : IMapService, IEnableLogger
                     wizardToUpdate.Spells.GlobalDeath = wizard.Spells.GlobalDeath;
                     wizardToUpdate.Spells.RapidFireball = wizard.Spells.RapidFireball;
                 }
+                // its castle level, spells or being active can change its castle
+                RebuildFeatures();
             }
             return true;
         }

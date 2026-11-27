@@ -3,10 +3,11 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MCLevelEdit.Model.Domain;
 using MCLevelEdit.Model.Domain.Extensions;
+using MCLevelEdit.Model.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Effect = MCLevelEdit.Model.Domain.Effect;
+using Effect = MCLevelEdit.Model.Domain.MC1.Effect;
 
 namespace MCLevelEdit.ViewModels;
 
@@ -21,6 +22,8 @@ public class EntityViewModel : ObservableObject
     private ushort _switchId;
     private ushort _parent;
     private ushort _child;
+    private ushort _par3;
+    private int _rawModel = -1;
 
     public IAvaloniaList<KeyValuePair<int, string>> ModelTypes { get; init; } = new AvaloniaList<KeyValuePair<int, string>>();
 
@@ -34,6 +37,7 @@ public class EntityViewModel : ObservableObject
             _type = value;
             PopulateModelTypes();
             OnPropertyChanged(nameof(Type));
+            OnFieldHelpChanged();
         }
     }
 
@@ -46,14 +50,14 @@ public class EntityViewModel : ObservableObject
     {
         get 
         {
-            var modelTypesList = GetModelTypes(_type);
-
-            if (_modelIdx >= 0)
-                return modelTypesList[_modelIdx].Key;
-            return -1;
+            if (_modelIdx >= 0 && _modelIdx < ModelTypes.Count)
+                return ModelTypes[_modelIdx].Key;
+            return _rawModel;
         }
         set
         {
+            _rawModel = value;
+
             if (!ModelTypes.Any())
                 PopulateModelTypes();
 
@@ -62,8 +66,16 @@ public class EntityViewModel : ObservableObject
                 if(ModelTypes[i].Key == value)
                 {
                     ModelIdx = i;
-                    break;
+                    return;
                 }
+            }
+
+            // Keep model IDs the editor has no name for yet (e.g. Magic Carpet 2 creatures)
+            // instead of silently switching to the first model in the list.
+            if (ModelTypes.Any())
+            {
+                ModelTypes.Add(new KeyValuePair<int, string>(value, $"Unknown{value}"));
+                ModelIdx = ModelTypes.Count - 1;
             }
         }
     }
@@ -71,7 +83,34 @@ public class EntityViewModel : ObservableObject
     public int ModelIdx
     {
         get { return _modelIdx; }
-        set { SetProperty(ref _modelIdx, value); }
+        set
+        {
+            if (SetProperty(ref _modelIdx, value))
+                OnFieldHelpChanged();
+        }
+    }
+
+    private static GameVersion Game => MapRepository.Map?.GameVersion ?? GameVersion.MagicCarpet1;
+
+    private string Help(EntityField field) => EntityFieldHelp.Get(Game, (TypeId)Type, Model, field);
+
+    public string XTip => Help(EntityField.X);
+    public string YTip => Help(EntityField.Y);
+    public string DisIdTip => Help(EntityField.DisId);
+    public string SwitchSizeTip => Help(EntityField.SwitchSize);
+    public string SwitchIdTip => Help(EntityField.SwitchId);
+    public string ParentTip => Help(EntityField.Parent);
+    public string ChildTip => Help(EntityField.Child);
+    public string Par3Tip => Help(EntityField.Par3);
+
+    /// <summary>Par3 is only in Magic Carpet 2 levels.</summary>
+    public bool HasPar3 => Game == GameVersion.MagicCarpet2;
+
+    private void OnFieldHelpChanged()
+    {
+        foreach (var name in new[] { nameof(XTip), nameof(YTip), nameof(DisIdTip), nameof(SwitchSizeTip), nameof(SwitchIdTip),
+            nameof(ParentTip), nameof(ChildTip), nameof(Par3Tip), nameof(HasPar3) })
+            OnPropertyChanged(name);
     }
 
     public string ModelName
@@ -124,6 +163,13 @@ public class EntityViewModel : ObservableObject
         set { SetProperty(ref _child, value); }
     }
 
+    /// <summary>Magic Carpet 2 only.</summary>
+    public ushort Par3
+    {
+        get { return _par3; }
+        set { SetProperty(ref _par3, value); }
+    }
+
     public Color Colour
     {
         get 
@@ -139,7 +185,10 @@ public class EntityViewModel : ObservableObject
                 case TypeId.Spawn:
                     return Color.FromRgb(255, 255, 0);
                 case TypeId.Spell:
+                case TypeId.Vase:
                     return Color.FromRgb(128, 0, 128);
+                case TypeId.Special:
+                    return Color.FromRgb(0, 255, 255);
                 case TypeId.Switch:
                     return Color.FromRgb(255, 255, 255);
                 case TypeId.Weather:
@@ -173,14 +222,15 @@ public class EntityViewModel : ObservableObject
         {
             Id = this.Id,
             Type = this.Type,
-            ModelIdx = this.ModelIdx,
+            Model = this.Model,
             X = this.X,
             Y = this.Y,
             DisId = this.DisId,
             SwitchSize = this.SwitchSize,
             SwitchId = this.SwitchId,
             Parent = this.Parent,
-            Child = this.Child
+            Child = this.Child,
+            Par3 = this.Par3
         };
     }
 
@@ -212,7 +262,7 @@ public class EntityViewModel : ObservableObject
     {
         if (type > 0)
         {
-            var types = ((TypeId)type).GetEntityFromTypeId().ModelTypes
+            var types = (((TypeId)type).GetEntityFromTypeId()?.ModelTypes ?? Array.Empty<ModelType>())
                 .Select(x => new KeyValuePair<int, string>(key: x.Id, value: x.Name))
                 .ToArray();
 

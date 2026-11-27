@@ -1,8 +1,9 @@
-﻿using MCLevelEdit.Model.Enums;
+﻿using MCLevelEdit.Model.Domain.MC1; // MC1 effect IDs for paths, walls, canyons etc. are the same in MC2
+using MCLevelEdit.Model.Enums;
 
-namespace MCLevelEdit.Model.Domain.Validation
+namespace MCLevelEdit.Model.Domain.Validation.MC1
 {
-    public static class EntityRules
+    public static class Mc1EntityRules
     {
         public static ValidationResult HasSwitch(Entity entity, IList<Entity> entities)
         {
