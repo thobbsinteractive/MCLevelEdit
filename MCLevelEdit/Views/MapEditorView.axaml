@@ -41,8 +41,8 @@
            Grid.Column="4"
            Grid.Row="0"
            Content="{Binding #pazMap.ZoomX, StringFormat='Zoom: {0:0.00}'}"/>
-    <!-- the isometric view in place of the map from above, and while it is shown its turn: a slider that stops only at
-         the four fixed angles -->
+    <!-- the viewport shown or hidden; the isometric view in place of the map from above, and while it is shown (on the
+         canvas or in the viewport) its turn: a slider that stops only at the four fixed angles -->
     <StackPanel Grid.Column="5"
                 Grid.Row="0"
                 Orientation="Horizontal"
@@ -50,6 +50,11 @@
                 VerticalAlignment="Center"
                 Spacing="4"
                 Margin="4,0">
+      <CheckBox Name="chkShowViewport"
+                VerticalAlignment="Center"
+                Content="Viewport"
+                ToolTip.Tip="Show the viewport: the view the map does not show (the isometric view, or the map from above)"
+                IsChecked="{Binding ShowViewport}"/>
       <CheckBox Name="chkShowIsometric"
                 VerticalAlignment="Center"
                 Content="Isometric View"
@@ -65,12 +70,12 @@
               VerticalAlignment="Center"
               Margin="0,-8"
               ToolTip.Tip="Turn the isometric view (0°, 90°, 180°, 270°)"
-              IsVisible="{Binding ShowIsometric}"
+              IsVisible="{Binding CanTurnIsometric}"
               Value="{Binding IsometricQuarterTurns}"/>
       <TextBlock Width="32"
                  VerticalAlignment="Center"
                  Text="{Binding IsometricAngle, StringFormat='{}{0}°'}"
-                 IsVisible="{Binding ShowIsometric}"/>
+                 IsVisible="{Binding CanTurnIsometric}"/>
     </StackPanel>
     <Button Name="btnPanLeft"
         Margin="1"
@@ -160,5 +165,26 @@
                Source="{Binding CanvasImage}"/>
       </Canvas>
     </paz:ZoomBorder>
+    <!-- the viewport over the map's bottom right corner: the view the canvas does not show; clicked, the two swap -->
+    <Border Name="bdrViewport"
+            Grid.Column="0"
+            Grid.ColumnSpan="12"
+            Grid.Row="1"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Margin="8"
+            Width="256"
+            Height="256"
+            Background="LightBlue"
+            BorderBrush="DimGray"
+            BorderThickness="2"
+            Cursor="Hand"
+            ToolTip.Tip="Click to swap the viewport and the map"
+            IsVisible="{Binding ShowViewport}">
+      <Image Name="imgViewport"
+             Stretch="Uniform"
+             RenderOptions.BitmapInterpolationMode="MediumQuality"
+             Source="{Binding ViewportImage}"/>
+    </Border>
   </Grid>
 </UserControl>

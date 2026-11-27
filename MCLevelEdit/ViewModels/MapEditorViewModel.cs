@@ -58,6 +58,14 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private int _isometricVersion;
     private readonly object _lockIsometric = new object();
 
+    // the newest isometric drawing's view, and whether its image is of the terrain as it is now (it is not drawn while
+    // neither the canvas nor the viewport shows it)
+    private TerrainView? _isometricView;
+    private bool _isometricCurrent;
+
+    // the viewport in the corner of the map: shows the view the canvas does not (the isometric view, or the map from above)
+    private bool _showViewport = true;
+
     // the entities drawn over the map (their shapes on the canvas shown), or hidden
     private bool _showEntities = true;
 
@@ -72,9 +80,31 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             this.RaiseAndSetIfChanged(ref _preview, value);
             this.RaisePropertyChanged(nameof(CanvasImage));
+            this.RaisePropertyChanged(nameof(ViewportImage));
         }
         get { return _preview; }
     }
+
+    /// <summary>What the viewport shows: whichever view the map's canvas does not.</summary>
+    public WriteableBitmap? ViewportImage => _showIsometric ? _preview : _isometricPreview;
+
+    /// <summary>The viewport in the corner of the map shown (true) or hidden.</summary>
+    public bool ShowViewport
+    {
+        set
+        {
+            if (_showViewport == value)
+                return;
+            this.RaiseAndSetIfChanged(ref _showViewport, value);
+            this.RaisePropertyChanged(nameof(CanTurnIsometric));
+            if (value && !_isometricCurrent)
+                RefreshIsometricAsync();
+        }
+        get { return _showViewport; }
+    }
+
+    /// <summary>Whether the isometric view is shown anywhere (the canvas or the viewport), so it can be turned.</summary>
+    public bool CanTurnIsometric => _showIsometric || _showViewport;
 
     /// <summary>What the map's canvas shows under the entities: the map from above, or the isometric view.</summary>
     public WriteableBitmap? CanvasImage => _showIsometric && _terrainView is not null ? _isometricPreview : _preview;
@@ -145,6 +175,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         {
             this.RaiseAndSetIfChanged(ref _isometricPreview, value);
             this.RaisePropertyChanged(nameof(CanvasImage));
+            this.RaisePropertyChanged(nameof(ViewportImage));
         }
         get { return _isometricPreview; }
     }
@@ -160,14 +191,28 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             if (_showIsometric == value)
                 return;
             this.RaiseAndSetIfChanged(ref _showIsometric, value);
+            this.RaisePropertyChanged(nameof(CanTurnIsometric));
             if (!value)
             {
                 // back to the map from above: the entities and the cursor on its grid again
                 _terrainView = null;
                 this.RaisePropertyChanged(nameof(CanvasImage));
+                this.RaisePropertyChanged(nameof(ViewportImage));
                 PlaceEntitiesAgain();
             }
-            RefreshIsometricAsync();
+            else if (_isometricCurrent && _isometricView is not null && _isometricPreview is not null)
+            {
+                // already drawn for the viewport: on the canvas at once, the entities placed over it
+                _terrainView = _isometricView;
+                this.RaisePropertyChanged(nameof(CanvasImage));
+                this.RaisePropertyChanged(nameof(ViewportImage));
+                PlaceEntitiesAgain();
+            }
+            else
+            {
+                this.RaisePropertyChanged(nameof(ViewportImage));
+                RefreshIsometricAsync();
+            }
         }
         get { return _showIsometric; }
     }
@@ -1037,14 +1082,17 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     }
 
     /// <summary>
-    /// Draws the isometric view again (the terrain, its layer or its turn changed), unless it is hidden, over the whole
-    /// canvas of the map. Its own lock: turning it does not wait for the map from above. Only the newest drawing is
+    /// Draws the isometric view again (the terrain, its layer or its turn changed), unless neither the canvas nor the
+    /// viewport shows it, the size of the whole canvas of the map. Its own lock: turning it does not wait for the map from above. Only the newest drawing is
     /// shown, if an older one finishes after it.
     /// </summary>
     protected void RefreshIsometricAsync()
     {
-        if (!_showIsometric)
+        if (!_showIsometric && !_showViewport)
+        {
+            _isometricCurrent = false;
             return;
+        }
 
         lock (_lockIsometric)
         {
@@ -1061,11 +1109,14 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
                 var (bitmap, view) = await _terrainService.DrawIsometricViewAsync(map, _selectedLayer, IsometricSize, IsometricSize, yaw);
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (version != _isometricVersion || !_showIsometric)
+                    if (version != _isometricVersion)
                         return;
-                    _terrainView = view;
+                    _isometricView = view;
+                    _isometricCurrent = true;
+                    if (_showIsometric)
+                        _terrainView = view;
                     IsometricPreview = bitmap;
-                    if (_cvEntity is null)
+                    if (!_showIsometric || _cvEntity is null)
                         return;
                     RefreshEntities();
                     OnEntitySelected(_selectedEntityViewModel);

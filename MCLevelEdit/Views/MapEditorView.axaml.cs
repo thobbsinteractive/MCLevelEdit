@@ -32,6 +32,18 @@ namespace MCLevelEdit.Views
                 pazMap.LayoutUpdated += OnPazMap_LayoutUpdated;
             }
 
+            // the viewport clicked: it and the map swap views
+            if (bdrViewport != null)
+            {
+                bdrViewport.PointerPressed += (sender, e) =>
+                {
+                    if (VmMapEditor is null || !e.GetCurrentPoint(bdrViewport).Properties.IsLeftButtonPressed)
+                        return;
+                    VmMapEditor.ShowIsometric = !VmMapEditor.ShowIsometric;
+                    e.Handled = true;
+                };
+            }
+
             if (btnPanLeft != null)
             {
                 btnPanLeft.Click += (sender, args) =>
