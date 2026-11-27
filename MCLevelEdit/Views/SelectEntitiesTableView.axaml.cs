@@ -17,7 +17,10 @@ namespace MCLevelEdit.Views
 
         private void CboEntityType_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            int index = ((KeyValuePair<int, string>)this?.cboEntityType?.SelectedItem).Key;
+            // nothing chosen (the list being reset): nothing to filter by yet
+            if (this.cboEntityType?.SelectedItem is not KeyValuePair<int, string> selected)
+                return;
+            int index = selected.Key;
             VmEntitiesTable?.OnCboEntityTypeSelectionChanged(index);
         }
     }

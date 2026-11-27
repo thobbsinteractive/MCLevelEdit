@@ -35,6 +35,8 @@ class Program
         catch (Exception e)
         {
             Log.Fatal(e, $"Unhandled Exception: {e.Message}");
+            // the last chance: the level saved to the recovery file, offered to open the next time the editor starts
+            MCLevelEdit.Utils.CrashGuard.SaveRecovery($"Fatal error: {e.Message}");
         }
         finally
         {

@@ -35,6 +35,7 @@ public class MainViewModel : ViewModelBase
 
     protected readonly ISettingsPort _settingsPort;
     protected readonly IGameService _gameService;
+    protected readonly IRecoveryService _recoveryService;
 
     public int FailCount
     {
@@ -90,10 +91,11 @@ public class MainViewModel : ViewModelBase
     public Interaction<ValidationResultsTableViewModel, ValidationResultsTableViewModel?> ShowValidationResultsDialog { get; }
     public Interaction<AboutWindowViewModel, AboutWindowViewModel?> ShowAboutDialog { get; }
 
-    public MainViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IMapService mapService, ITerrainService terrainService, IGameService gameService) : base(eventAggregator, mapService, terrainService)
+    public MainViewModel(EventAggregator<object> eventAggregator, ISettingsPort settingsPort, IMapService mapService, ITerrainService terrainService, IGameService gameService, IRecoveryService recoveryService) : base(eventAggregator, mapService, terrainService)
     {
         _settingsPort = settingsPort;
         _gameService = gameService;
+        _recoveryService = recoveryService;
 
         // Registered first so the type dropdowns switch game before other views refresh their entities
         _eventAggregator.RegisterEvent("RefreshEntities", (sender, args) => EntityTypeLists.Refresh());
@@ -201,6 +203,7 @@ public class MainViewModel : ViewModelBase
         {
             if (await PromptSaveAndOrContinue())
             {
+                CrashGuard.ClosedNormally = true;
                 if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
                 {
                     desktopApp.Shutdown();
@@ -317,7 +320,8 @@ public class MainViewModel : ViewModelBase
         }
         if (key  == Key.F5) 
         {
-            RunLevel();
+            // not waited on: an error is reported here, not lost
+            RunLevel().ContinueWith(t => CrashGuard.OnError(t.Exception!.GetBaseException()), TaskContinuationOptions.OnlyOnFaulted);
         }
 
         _eventAggregator.RaiseEvent("KeyPressed", this, new PubSubEventArgs<object>(key));
@@ -479,8 +483,10 @@ public class MainViewModel : ViewModelBase
             string filePath = files[0].Path.LocalPath;
             if (!await _mapService.LoadMapFromFileAsync(filePath))
             {
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to load the map file {filePath}!", ButtonEnum.Ok, Icon.Error);
+                // the level that was open is still open, and still saves to its own file (not over the one that failed)
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Unable to load the map file {filePath}! The level you had open is still open.", ButtonEnum.Ok, Icon.Error);
                 await box.ShowAsync();
+                return;
             }
 
             _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
@@ -491,6 +497,75 @@ public class MainViewModel : ViewModelBase
             _settingsPort.CurrentLevelFilePath = filePath;
         }
         RefreshData();
+    }
+
+    /// <summary>
+    /// At start: a recovery file left from before (the editor did not close normally) offered to the person. Opened, it
+    /// is a level not yet saved (Save asks where, suggesting the file it came from); not opened, it is set aside, not
+    /// deleted.
+    /// </summary>
+    public async Task CheckForRecoveryAsync()
+    {
+        var info = _recoveryService.FindRecovery();
+        if (info is null)
+        {
+            _recoveryService.RecoveryHandled();
+            return;
+        }
+
+        bool opened = false;
+        bool discarded = false;
+        try
+        {
+            string level = !string.IsNullOrWhiteSpace(info.OriginalFilePath) ? $" '{Path.GetFileName(info.OriginalFilePath)}'" : string.Empty;
+            var box = MessageBoxManager.GetMessageBoxStandard("Recover Level",
+                $"The editor did not close properly last time. A copy of the level{level} was saved at {info.SavedAt:g}.\n\n" +
+                "Do you want to open it?\n\n(No sets it aside as Recovery_Discarded.DAT in " +
+                $"{Path.GetDirectoryName(info.FilePath)}.)",
+                ButtonEnum.YesNo, Icon.Question);
+            var result = await box.ShowAsPopupAsync(TopLevel.GetTopLevel(MainWindow.I));
+
+            if (result != ButtonResult.Yes)
+            {
+                _recoveryService.DiscardRecovery();
+                discarded = true;
+                return;
+            }
+
+            if (!await _mapService.LoadMapFromFileAsync(info.FilePath))
+            {
+                var error = MessageBoxManager.GetMessageBoxStandard("Error",
+                    $"Unable to open the recovery file! It has been set aside as Recovery_Discarded.DAT in {Path.GetDirectoryName(info.FilePath)}.",
+                    ButtonEnum.Ok, Icon.Error);
+                await error.ShowAsync();
+                return;
+            }
+            opened = true;
+
+            var map = _mapService.GetMap();
+            if (info.HiddenWorlds && !map.IsHiddenWorlds)
+            {
+                map.SetHiddenWorlds(true);
+                await _mapService.RecalculateTerrain(map.Terrain.GenerationParameters);
+            }
+            // not saved over the file it came from without asking
+            map.FilePath = info.OriginalFilePath ?? string.Empty;
+            _settingsPort.CurrentLevelFilePath = string.Empty;
+
+            _eventAggregator.RaiseEvent("RefreshEntities", this, new PubSubEventArgs<object>("RefreshEntities"));
+            _eventAggregator.RaiseEvent("RefreshWorld", this, new PubSubEventArgs<object>("RefreshWorld"));
+            _eventAggregator.RaiseEvent("RefreshTerrain", this, new PubSubEventArgs<object>("RefreshTerrain"));
+            MainWindow.I.Title = GetTitle($"Recovered {Path.GetFileName(info.OriginalFilePath ?? "NewLevel.DAT")}");
+            RefreshData();
+        }
+        finally
+        {
+            // not opened (it failed, or an error came part way): set aside before the editor starts saving its own
+            // recovery copies over it
+            if (!opened && !discarded)
+                _recoveryService.DiscardRecovery();
+            _recoveryService.RecoveryHandled();
+        }
     }
 
     private string GetTitle(string filePath)

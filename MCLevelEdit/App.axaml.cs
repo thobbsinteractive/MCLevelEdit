@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using MCLevelEdit.Utils;
 using MCLevelEdit.ViewModels;
 using MCLevelEdit.Views;
 using Splat;
@@ -17,6 +18,9 @@ public partial class App : Avalonia.Application
     public override void OnFrameworkInitializationCompleted()
     {
         Bootstrapper.Register(Locator.CurrentMutable, Locator.Current);
+
+        // errors do not close the editor and lose the level: they are reported, and it is saved to the recovery file
+        CrashGuard.Install(ApplicationLifetime as IClassicDesktopStyleApplicationLifetime);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

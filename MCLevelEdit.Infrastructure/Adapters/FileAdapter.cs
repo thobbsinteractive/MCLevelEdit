@@ -30,7 +30,7 @@ public class FileAdapter : IFilePort
     {
         if (map is MCLevelEdit.Model.Domain.MC2.Mc2Map mc2Map)
         {
-            File.WriteAllBytes(fileName, Mc2LevelFormat.Write(mc2Map));
+            WriteFileSafely(fileName, Mc2LevelFormat.Write(mc2Map));
             return true;
         }
 
@@ -225,9 +225,35 @@ public class FileAdapter : IFilePort
             clevelPos += 1;
         }
 
-        File.WriteAllBytes(fileName, levfile);
+        WriteFileSafely(fileName, levfile);
 
         return true;
+    }
+
+    /// <summary>
+    /// Writes a file whole to a temporary file beside it first, then puts it in place of the old one: a write that fails
+    /// part way (a full disk, the editor closing) leaves the old file as it was, not half written.
+    /// </summary>
+    private static void WriteFileSafely(string fileName, byte[] bytes)
+    {
+        string tempFile = fileName + ".saving";
+        try
+        {
+            File.WriteAllBytes(tempFile, bytes);
+            File.Move(tempFile, fileName, overwrite: true);
+        }
+        finally
+        {
+            try
+            {
+                if (File.Exists(tempFile))
+                    File.Delete(tempFile);
+            }
+            catch
+            {
+                // left behind; the next save writes over it
+            }
+        }
     }
 
     public Task<Map> LoadMapAsync(string fileName)

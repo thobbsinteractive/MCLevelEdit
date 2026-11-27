@@ -26,6 +26,8 @@ public class MapService : IMapService, IEnableLogger
 
     public async Task<bool> LoadMapFromFileAsync(string filePath)
     {
+        // the level open now, put back if the new one cannot be loaded (else the work on it would be lost)
+        var previousMap = MapRepository.Map;
         try
         {
             MapRepository.Map = await _filePort.LoadMapAsync(filePath);
@@ -35,6 +37,7 @@ public class MapService : IMapService, IEnableLogger
         catch (Exception ex)
         {
             this.Log().Error(ex, $"Error loading level {filePath}:\n{ex.Message}");
+            MapRepository.Map = previousMap;
             return false;
         }
         return true;
