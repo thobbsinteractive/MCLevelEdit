@@ -1,0 +1,143 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCLevelEdit.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="800"
+             x:Class="MCLevelEdit.Views.EditObjectivesView"
+             x:DataType="vm:EditObjectivesViewModel">
+  <!-- a Magic Carpet 2 level's 8 objective slots; each change is made to the level at once. The map shows each objective
+       as a numbered marker while this is open -->
+  <Grid RowDefinitions="Auto,*" Margin="5">
+    <Label Grid.Row="0"
+           FontWeight="Bold"
+           Content="Objectives"/>
+    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+      <ItemsControl ItemsSource="{Binding Slots}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:ObjectiveSlotViewModel">
+            <Border Margin="0,0,4,6"
+                    Padding="6"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    CornerRadius="5">
+              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                <!-- the slot's number, and moving or emptying it -->
+                <DockPanel Grid.Row="0" Grid.ColumnSpan="2" LastChildFill="False">
+                  <TextBlock DockPanel.Dock="Left"
+                             VerticalAlignment="Center"
+                             FontWeight="Bold"
+                             Text="{Binding Header}"/>
+                  <Button DockPanel.Dock="Right"
+                          Margin="2,0,0,0"
+                          Padding="6,1"
+                          Content="Clear"
+                          ToolTip.Tip="Empty this slot"
+                          IsEnabled="{Binding IsUsed}"
+                          Command="{Binding ClearCommand}"/>
+                  <Button DockPanel.Dock="Right"
+                          Margin="2,0,0,0"
+                          Padding="6,1"
+                          Content="▼"
+                          ToolTip.Tip="Swap with the next slot (the game plays each objective's spoken briefing by its slot)"
+                          IsEnabled="{Binding CanMoveDown}"
+                          Command="{Binding MoveDownCommand}"/>
+                  <Button DockPanel.Dock="Right"
+                          Margin="2,0,0,0"
+                          Padding="6,1"
+                          Content="▲"
+                          ToolTip.Tip="Swap with the slot before (the game plays each objective's spoken briefing by its slot)"
+                          IsEnabled="{Binding CanMoveUp}"
+                          Command="{Binding MoveUpCommand}"/>
+                </DockPanel>
+
+                <!-- the type; what each one does is its tooltip, in the list and once chosen -->
+                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Type:</Label>
+                <ComboBox Grid.Row="1"
+                          Grid.Column="1"
+                          Margin="0,2"
+                          HorizontalAlignment="Stretch"
+                          PlaceholderText="(unknown type)"
+                          ToolTip.Tip="{Binding Help}"
+                          ItemsSource="{Binding Source={x:Static vm:ObjectiveSlotViewModel.TypeOptions}}"
+                          SelectedIndex="{Binding TypeIdx}">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ObjectiveTypeOption">
+                      <TextBlock Text="{Binding Name}" ToolTip.Tip="{Binding Help}"/>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <!-- an entity: its id, picked on the map, what it is, gone to -->
+                <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" IsVisible="{Binding ShowEntity}">Entity:</Label>
+                <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="70,*,Auto" IsVisible="{Binding ShowEntity}" Margin="0,2">
+                  <TextBox Grid.Column="0"
+                           ToolTip.Tip="The entity's id (as the tree shows it)"
+                           Text="{Binding EntityId, UpdateSourceTrigger=LostFocus}"/>
+                  <Button Grid.Column="2"
+                          Margin="4,0,0,0"
+                          ToolTip.Tip="Click, then click an entity on the map"
+                          Content="{Binding PickEntityText}"
+                          Command="{Binding PickEntityCommand}"/>
+                </Grid>
+                <StackPanel Grid.Row="3" Grid.Column="1" Spacing="2" Margin="0,0,0,2" IsVisible="{Binding ShowEntity}">
+                  <TextBlock TextWrapping="Wrap" Text="{Binding EntityText}"/>
+                  <Button Padding="6,1"
+                          HorizontalAlignment="Left"
+                          Content="Go to"
+                          ToolTip.Tip="Select this entity on the map and in the tree"
+                          IsEnabled="{Binding CanGoToEntity}"
+                          Command="{Binding GoToEntityCommand}"/>
+                </StackPanel>
+
+                <!-- a place on the map: its own group, X and Y stacked, then picked on the map -->
+                <Border Grid.Row="4"
+                        Grid.ColumnSpan="2"
+                        Margin="0,4,0,2"
+                        Padding="6,2,6,6"
+                        BorderBrush="LightGray"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        IsVisible="{Binding ShowPosition}">
+                  <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,2" FontWeight="SemiBold" Text="Place"/>
+                    <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">X:</Label>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="0,2" Width="70" HorizontalAlignment="Left"
+                             ToolTip.Tip="0 to 255"
+                             Text="{Binding X, UpdateSourceTrigger=LostFocus}"/>
+                    <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Y:</Label>
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="0,2" Width="70" HorizontalAlignment="Left"
+                             ToolTip.Tip="0 to 255"
+                             Text="{Binding Y, UpdateSourceTrigger=LostFocus}"/>
+                    <Button Grid.Row="3" Grid.Column="1" Margin="0,2,0,0"
+                            ToolTip.Tip="Click, then click the place on the map"
+                            Content="{Binding PickPositionText}"
+                            Command="{Binding PickPositionCommand}"/>
+                  </Grid>
+                </Border>
+
+                <!-- a wizard, or a number -->
+                <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" IsVisible="{Binding ShowWizard}">Wizard:</Label>
+                <ComboBox Grid.Row="5"
+                          Grid.Column="1"
+                          Margin="0,2"
+                          HorizontalAlignment="Stretch"
+                          IsVisible="{Binding ShowWizard}"
+                          ItemsSource="{Binding WizardNames}"
+                          SelectedIndex="{Binding WizardIdx}"/>
+                <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" IsVisible="{Binding ShowNumber}" Content="{Binding NumberLabel}"/>
+                <TextBox Grid.Row="5"
+                         Grid.Column="1"
+                         Margin="0,2"
+                         Width="70"
+                         HorizontalAlignment="Left"
+                         IsVisible="{Binding ShowNumber}"
+                         Text="{Binding NumberValue, UpdateSourceTrigger=LostFocus}"/>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

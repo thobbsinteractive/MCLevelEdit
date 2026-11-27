@@ -43,6 +43,14 @@
                               Grid.Column="0"
                               DataContext="{Binding EditEntitiesViewModel}"/>
     </Panel>
+    <Panel Name="pEditObjectives"
+           IsEnabled="{Binding ShowEditObjectives, FallbackValue=false}"
+           IsVisible="{Binding ShowEditObjectives, FallbackValue=false}">
+      <views:EditObjectivesView Name="vmEditObjectives"
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                DataContext="{Binding EditObjectivesViewModel}"/>
+    </Panel>
     <Panel Name="pEditTerrain"
            IsEnabled="{Binding ShowEditTerrain, FallbackValue=false}"
            IsVisible="{Binding ShowEditTerrain, FallbackValue=false}">

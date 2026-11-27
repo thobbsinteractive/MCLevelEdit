@@ -20,6 +20,16 @@ namespace MCLevelEdit.ViewModels
         private EditSwitchViewModel _editSwitchViewModel;
         private bool _showEditEntities;
         private EditEntitiesViewModel? _editEntitiesViewModel;
+        private bool _showEditObjectives;
+
+        /// <summary>A Magic Carpet 2 level's objectives (the Objectives node under the World): one for the editor's life.</summary>
+        public EditObjectivesViewModel EditObjectivesViewModel { get; }
+
+        public bool ShowEditObjectives
+        {
+            get => _showEditObjectives;
+            set => this.RaiseAndSetIfChanged(ref _showEditObjectives, value);
+        }
 
         /// <summary>The properties of more than one entity selected together.</summary>
         public EditEntitiesViewModel? EditEntitiesViewModel
@@ -97,6 +107,7 @@ namespace MCLevelEdit.ViewModels
         public NodePropertiesViewModel(EventAggregator<object> eventAggregator, IMapService mapService, ITerrainService terrainService) : base(eventAggregator, mapService, terrainService)
         {
             EditWorldViewModel = new EditWorldViewModel(eventAggregator, mapService);
+            EditObjectivesViewModel = new EditObjectivesViewModel(eventAggregator, mapService);
             _eventAggregator.RegisterEvent("NodeSelected", NodeSelectedHandler);
             _eventAggregator.RegisterEvent("EntitiesSelected", EntitiesSelectedHandler);
             _eventAggregator.RegisterEvent("UpdateEntity", (sender, args) =>
@@ -125,6 +136,7 @@ namespace MCLevelEdit.ViewModels
             ShowEditWizard = false;
             ShowEditWizards = false;
             ShowEditSwitch = false;
+            ShowEditObjectives = false;
             EditEntitiesViewModel = new EditEntitiesViewModel(_eventAggregator, _mapService, _terrainService, entities);
             ShowEditEntities = true;
         }
@@ -138,6 +150,17 @@ namespace MCLevelEdit.ViewModels
             ShowEditSwitch = false;
             ShowEditEntities = false;
             var wizards = _mapService.GetActiveWizards();
+
+            // the objectives shown, or put away (no picking on the map, no markers) for whatever else is selected
+            var selected = arg.Item as Node;
+            if (selected is not null && selected.GetType() == typeof(Node) && selected.Name == MapTreeViewModel.ObjectivesNodeName)
+            {
+                EditObjectivesViewModel.Show();
+                ShowEditObjectives = EditObjectivesViewModel.Map is not null;
+                return;
+            }
+            ShowEditObjectives = false;
+            EditObjectivesViewModel.Hide();
 
             if (arg.Item is not null)
             {

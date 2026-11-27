@@ -19,6 +19,9 @@ public class MapTreeViewModel : ReactiveObject
 {
     private float SELECTION_RADIUS = 4;
 
+    /// <summary>The name of the node (under the World, Magic Carpet 2 levels only) that opens the level's objectives.</summary>
+    public const string ObjectivesNodeName = "Objectives";
+
     protected readonly IMapService _mapService;
     protected readonly ITerrainService _terrainService;
     protected readonly EventAggregator<object> _eventAggregator;
@@ -60,7 +63,8 @@ public class MapTreeViewModel : ReactiveObject
             { "Switch", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/switch-32.png"))) },
             { "Weather", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/wind-32.png"))) },
             { "Vase", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/magic-32.png"))) },
-            { "Special", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/switch-32.png"))) }
+            { "Special", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/switch-32.png"))) },
+            { "Objectives", new Bitmap(AssetLoader.Open(new Uri("avares://MCLevelEdit/Assets/objectives-32.png"))) }
         };
 
         SelectedNodes.CollectionChanged += SelectedNodes_CollectionChanged;
@@ -201,6 +205,10 @@ public class MapTreeViewModel : ReactiveObject
 
         worldNode.SubNodes.Clear();
 
+        // a Magic Carpet 2 level's objectives: first under the World, above its entities
+        if (map is Model.Domain.MC2.Mc2Map)
+            worldNode.SubNodes.Add(new Node(_icons["Objectives"], ObjectivesNodeName, "Objectives", "The level's objectives: what the player has to do to finish it"));
+
         var squareEntities = map?.VisibleEntities.Where(e => (_entityFilter > 0 ? (int)e.EntityType.TypeId == _entityFilter : true))?.OrderBy(e => e.Id)?.ToEntityViewModels();
         if (squareEntities?.Any() ?? false)
         {
@@ -284,7 +292,7 @@ public class MapTreeViewModel : ReactiveObject
         var world = GetWorldNode();
         if (world != null)
         {
-            var entityNodes = world.SubNodes.Select(n => (EntityNode)n).ToList();
+            var entityNodes = world.SubNodes.OfType<EntityNode>().ToList();
             return entityNodes?.Where(n => n.X == x && n.Y == y).FirstOrDefault();
         }
         return null;
@@ -295,7 +303,7 @@ public class MapTreeViewModel : ReactiveObject
         var world = GetWorldNode();
         if (world != null)
         {
-            return world.SubNodes.Select(n => (EntityNode)n).Where(n => n.Name == id.ToString()).FirstOrDefault();
+            return world.SubNodes.OfType<EntityNode>().Where(n => n.Name == id.ToString()).FirstOrDefault();
         }
         return null;
     }

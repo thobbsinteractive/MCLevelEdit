@@ -70,6 +70,14 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     private bool _pathToolSelected;
     private bool _isInEntitySelectionMode;
 
+    // picking an objective's entity or place on the map (the objectives panel asked for it): a click goes to it
+    // (OnCursorObjectivePicked) and does nothing else
+    private bool _isPickingObjective;
+
+    // the level's objectives shown on the map while the objectives panel is open: (slot, tile), and their markers
+    private IList<(int Slot, Point Tile)> _objectiveMarkers = new List<(int, Point)>();
+    private readonly List<Control> _objectiveMarkerShapes = new List<Control>();
+
     // the isometric view in place of the map: shown, how many quarter turns it is turned, its image, the newest drawing
     // asked for
     private bool _showIsometric = false;
@@ -519,9 +527,61 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
 
             _eventAggregator.RaiseEvent("OnCursorClicked", this, new PubSubEventArgs<object>(cursorEvent));
         }
+        else if (_isPickingObjective)
+        {
+            // one pick: the click goes to the objectives panel, then the map is back to normal
+            _isPickingObjective = false;
+            _isInEntitySelectionMode = false;
+            _eventAggregator.RaiseEvent("OnCursorObjectivePicked", this, new PubSubEventArgs<object>(cursorEvent));
+        }
         else
         {
             _eventAggregator.RaiseEvent("OnCursorSelectionClicked", this, new PubSubEventArgs<object>(cursorEvent));
+        }
+    }
+
+    /// <summary>The objectives shown on the map ((slot, tile) each; none: taken off), each a numbered marker.</summary>
+    private void ShowObjectiveMarkers(IList<(int Slot, Point Tile)>? markers)
+    {
+        _objectiveMarkers = markers ?? new List<(int, Point)>();
+        DrawObjectiveMarkers();
+    }
+
+    private void DrawObjectiveMarkers()
+    {
+        if (_cvEntity is null)
+            return;
+        foreach (var shape in _objectiveMarkerShapes)
+            _cvEntity.Children.Remove(shape);
+        _objectiveMarkerShapes.Clear();
+
+        foreach (var (slot, tile) in _objectiveMarkers)
+        {
+            var centre = TileToCanvas(tile.X, tile.Y);
+            var marker = new Border
+            {
+                Width = 20,
+                Height = 20,
+                CornerRadius = new CornerRadius(10),
+                Background = new SolidColorBrush(Color.FromRgb(200, 30, 30), 0.85),
+                BorderBrush = Brushes.White,
+                BorderThickness = new Thickness(2),
+                ZIndex = 250,
+                IsHitTestVisible = false,
+                Child = new TextBlock
+                {
+                    Text = slot.ToString(),
+                    Foreground = Brushes.White,
+                    FontWeight = FontWeight.Bold,
+                    FontSize = 11,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+                }
+            };
+            Canvas.SetLeft(marker, centre.X - 10);
+            Canvas.SetTop(marker, centre.Y - 10);
+            _objectiveMarkerShapes.Add(marker);
+            _cvEntity.Children.Add(marker);
         }
     }
 
@@ -542,6 +602,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             DrawMultiSelection();
         else
             OnEntitySelected(_selectedEntityViewModel);
+        DrawObjectiveMarkers();
     }
 
     /// <summary>More than one entity selected (EntitiesSelected, their ids): each marked on the map, none on its own.</summary>
@@ -550,6 +611,8 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
         if (args.Item is not IList<int> ids)
             return;
         _isInEntitySelectionMode = false;
+        _isPickingObjective = false;
+        ShowObjectiveMarkers(null);
 
         var entities = ids
             .Select(id => _mapService.GetEntity((ushort)id)?.ToEntityViewModel())
@@ -714,7 +777,7 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     {
         get
         {
-            return string.Format("Cursor X: {0:000} Y: {0:000}", CursorPosition.X, CursorPosition.Y);
+            return string.Format("Cursor X: {0:000} Y: {1:000}", CursorPosition.X, CursorPosition.Y);
         }
     }
 
@@ -751,7 +814,18 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
             _pathToolSelected = false;
             _pathOrigin = null;
             _isInEntitySelectionMode = (bool?)args?.Item ?? false;
+            _isPickingObjective = false;
         });
+        // the objectives panel picking an entity or a place: the next click on the map goes to it
+        _eventAggregator.RegisterEvent("OnObjectivePickModeChanged", (sender, args) =>
+        {
+            _pathToolSelected = false;
+            _pathOrigin = null;
+            _isPickingObjective = (bool?)args?.Item ?? false;
+            _isInEntitySelectionMode = _isPickingObjective;
+        });
+        _eventAggregator.RegisterEvent("ShowObjectiveMarkers", (sender, args) =>
+            ShowObjectiveMarkers(args?.Item as IList<(int Slot, Point Tile)>));
     }
 
     private void AddEntityHandler(object sender, PubSubEventArgs<object> args)
@@ -948,8 +1022,12 @@ public class MapEditorViewModel : ViewModelBase, IEnableLogger
     {
         bool deselect = true;
         _isInEntitySelectionMode = false;
+        _isPickingObjective = false;
         // one node selected (or none): no longer more than one entity
         ClearMultiSelection();
+        // the objectives shown only while their node is selected
+        if ((arg.Item as Node)?.Name != MapTreeViewModel.ObjectivesNodeName)
+            ShowObjectiveMarkers(null);
 
         if (arg.Item is not null)
         {

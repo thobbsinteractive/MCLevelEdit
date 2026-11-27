@@ -11,7 +11,8 @@ public class Mc2Map : Map
 
     /// <summary>Magic Carpet 2's own rules; the Magic Carpet ones are not used here.</summary>
     protected override IEnumerable<ValidationResult> ValidateGameRules() =>
-        Validation.MC2.Mc2MapRules.HasPlayerExit(VisibleEntities.ToList());
+        Validation.MC2.Mc2MapRules.HasPlayerExit(VisibleEntities.ToList())
+            .Concat(Validation.MC2.Mc2MapRules.CheckObjectives(this));
 
     public ushort LevelId { get; set; }
     public byte LevelType { get; set; }
