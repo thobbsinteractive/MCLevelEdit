@@ -6,7 +6,7 @@ Without Moburma's research and his original repo https://github.com/Moburma/MCLe
 
 Magic Carpet 2 level support is based on the level structures in remc2 (https://github.com/thobbsinteractive/magic-carpet-2-hd), and many MC2 entity and spell names come from turican0's MagicBalls editor (https://github.com/turican0/MagicBalls).
 ### Join us on discord: [https://discord.gg/W68ZWrngER](https://discord.gg/W68ZWrngER)
-<img width="2859" height="1636" alt="MC2" src="https://github.com/user-attachments/assets/fc7fc38d-f68d-400e-8e73-281b469a02c9" />
+<img width="1430" height="818" alt="image" src="https://github.com/user-attachments/assets/80fc3b5e-f328-4928-a3aa-be35a99259aa" />
 
 Map Key:<br/>
 Red - Creature (enemies but also villagers)<br/>
